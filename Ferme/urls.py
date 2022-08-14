@@ -21,4 +21,5 @@ from src.views import Index
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('index/', views.Index, name="index"),
+    path('login/', views.Index, name="login"),
 ]
