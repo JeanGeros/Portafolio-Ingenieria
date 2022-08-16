@@ -6,3 +6,6 @@ def Index(request):
 
 def Login(request):
     return render(request, 'login.html')
+
+def SalesModule(request):
+    return render(request, 'Cruds/salesModule.html')
