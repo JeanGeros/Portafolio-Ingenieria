@@ -13,28 +13,28 @@
 
 </head>
 <body>
-<div class="d-flex m-auto" style="justify-content: center; padding-block: 15% " >
-    <form   id="center">
-        <img class="mb-4" src="/logo.jpeg" alt="" width="72" height="57">
-        <h1 class="h3 mb-3 fw-normal text-center">Iniciar Sesion</h1>
-        <div class="form-floating py-2">
-            <input type="email" class="form-control" id="floatingInput" placeholder="nombre@ejemplo.com">
-            <label for="floatingInput">Correo Electronico</label>
-            <div data-lastpass-icon-root="true" style="position: relative !important; height: 0px !important; width: 0px !important; float: left !important;"></div></div>
-        <div class="form-floating">
-            <input type="password" class="form-control" id="floatingPassword" placeholder="Password">
-            <label for="floatingPassword">Contraseña</label>
-            <div data-lastpass-icon-root="true" style="position: relative !important; height: 0px !important; width: 0px !important; float: left !important;"></div></div>
+    <div class="form-signin m-auto" style="justify-content: center; padding-block: 15%; text-align:center ; max-width " >
+        <form   id="center">
+            <img class="mb-4" src="{% static 'img/logo.jpeg'%} " width="100" height="100">
+            <h1 class="h3 mb-3 fw-normal text-center">Iniciar Sesion</h1>
+            <div class="form-floating">
+                <input type="email" class="form-control" id="floatingInput" placeholder="nombre@ejemplo.com">
+                <label for="floatingInput">Correo Electronico</label>
+                <div data-lastpass-icon-root="true" style="position: relative !important; height: 0px !important; width: 0px !important; float: left !important;"></div></div>
+            <div class="form-floating">
+                <input type="password" class="form-control" id="floatingPassword" placeholder="Password">
+                <label for="floatingPassword">Contraseña</label>
+                <div data-lastpass-icon-root="true" style="position: relative !important; height: 0px !important; width: 0px !important; float: left !important;"></div></div>
 
-        <div class="checkbox mb-3">
-            <label>
-                <input type="checkbox" value="remember-me"> Recordar
-            </label>
-        </div>
-        <button class="w-100 btn btn-lg btn-primary" type="submit">Iniciar Sesion</button>
-        <p class="mt-5 mb-3 text-muted">© Equipo Dinamita 2020-2022</p>
-    </form>
-</div>
+            <div class="checkbox mb-3">
+                <label>
+                    <input type="checkbox" value="remember-me"> Recordar
+                </label>
+            </div>
+            <button class="w-100 btn btn-lg btn-primary" type="submit">Iniciar Sesion</button>
+            <p class="mt-5 mb-3 text-muted">© Equipo Dinamita 2020-2022</p>
+        </form>
+    </div>
 
 </body>
 </html>
