@@ -1,0 +1,28 @@
+{% extends 'layout.html' %}
+{% load widget_tweaks %}
+{% load static %}
+
+{% block content %}
+    <!-- <link rel="stylesheet" href="{% static 'css/index.css' %}"> -->
+    
+    <div class="text-center">
+        <form method="post" action="" class="p-3">
+            {% csrf_token %}
+            <div class="container">
+                <h1 class="text-center pb-2">Cliente</h1>
+                <div class="form-group pb-3">
+                    <label for="run" class="txt_negrita">Run:</label>
+                    {% render_field form1.runcuerpo class="form-control"%}
+                    <label for="comuna" class="txt_negrita">Comuna:</label>
+                    {% render_field form2.comunaid class="form-control"%}
+                    
+                </div>
+                
+                <button type="submit" id="boton_aceptar" class="btn btn-primary">Aceptar</button>
+                <a href="" type="submit" class="btn btn-primary">Cancelar</a> 
+            </div>
+        </form>
+    </div>
+    
+
+{% endblock %}

@@ -16,3 +16,8 @@ footer {
     width: 100%;
     height: 40px;
 }
+
+.logo-navbar {
+    max-width: 8%;
+    max-height: 2%;
+}

@@ -19,47 +19,49 @@
         <nav class="navbar navbar-expand-lg">
             <div class="container-fluid">
                 
-                <div class="p-1">
+                <!-- <div class="p-1">
+                    
                     <a class="nav-link logo" aria-current="page" href="/index"><i class="fas fa-store fa-2x p-2"></i></a>
-                </div>
+                </div> -->
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <img class="logo-navbar" src="{% static  'images/Ferme-nav.png' %}" alt="">
                         <li class="nav-item">
-                            <a class="nav-link active fw-bolder text-white" aria-current="page" href="#">Productos</a>
+                            <a class="nav-link active fw-bolder text-black" aria-current="page" href="#">Productos</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link fw-bolder text-white" href="#">Boleta</a>
+                            <a class="nav-link fw-bolder text-black" href="#">Boleta</a>
                         </li>
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle fw-bolder text-white" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <a class="nav-link dropdown-toggle fw-bolder text-black" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             Facturación
                             </a>
                             <ul class="dropdown-menu">
-                                <li><a class="dropdown-item fw-bolder text-white" href="#">Action</a></li>
-                                <li><a class="dropdown-item fw-bolder text-white" href="#">Another action</a></li>
-                                <li><hr class="dropdown-divider fw-bolder text-white"></li>
-                                <li><a class="dropdown-item fw-bolder text-white" href="#">Something else here</a></li>
+                                <li><a class="dropdown-item fw-bolder text-black" href="#">Action</a></li>
+                                <li><a class="dropdown-item fw-bolder text-black" href="#">Another action</a></li>
+                                <li><hr class="dropdown-divider fw-bolder text-black"></li>
+                                <li><a class="dropdown-item fw-bolder text-black" href="#">Something else here</a></li>
                             </ul>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link fw-bolder text-white">Ordenes de compras</a>
+                            <a class="nav-link fw-bolder text-black">Ordenes de compras</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link fw-bolder text-white">Clientes</a>
+                            <a class="nav-link fw-bolder text-black">Clientes</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link fw-bolder text-white">Proveedores</a>
+                            <a class="nav-link fw-bolder text-black">Proveedores</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link fw-bolder text-white">Mis ordenes</a>
+                            <a class="nav-link fw-bolder text-black">Mis ordenes</a>
                         </li>
                     </ul>
                     <button type="button" class="btn ingresar fw-bolder m-1">Ingresar</button>
                     <button type="button" class="btn registrarme fw-bolder m-1">Registrarme</button>
-                    <i class="fa-solid fa-cart-arrow-down text-white fa-2x p-2"></i>
+                    <i class="fa-solid fa-cart-arrow-down text-black fa-2x p-2"></i>
                 </div>
             </div>
         </nav>
@@ -68,7 +70,7 @@
                 <!--codigo que viene de templates-->
             {% endblock %}
         </div>
-        <footer class="footer text-center text-white p-1 fw-bolder">
+        <footer class="footer text-center text-black p-1 fw-bolder">
             Copyright &copy; 2012-2013
         </footer>
     </body>
