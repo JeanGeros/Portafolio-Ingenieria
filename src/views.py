@@ -1,5 +1,5 @@
 from django.shortcuts import render
-
+from .forms import addproductsForm
 
 def Index(request):
     return render(request, 'index.html')
@@ -7,5 +7,8 @@ def Index(request):
 def Login(request):
     return render(request, 'login.html')
 
-def SalesModule(request):
-    return render(request, 'Cruds/salesModule.html')
+def addProducts(request):
+    data = {
+        'form': addproductsForm()
+    }
+    return render(request, 'SalesModule/addProducts.html', data)

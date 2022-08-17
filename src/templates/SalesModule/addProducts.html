@@ -1,0 +1,29 @@
+{% extends 'layout.html' %}
+{% load static %}
+
+{% block content %}
+
+<div class="card">
+  <div class="card-body">
+    <div class="row">
+      <div class="col-12 col-md-6 offset-md-3">
+        <h1>formulario de Contacto</h1>
+        <form action="" method="post" class="formulario_contacto">
+
+          {{form}}
+
+          <input type="submit" value="Cancelar" class="btn btn-secondary">
+          <input type="submit" value="Guardar" class="btn btn-primary">
+        </form>
+
+
+      </div>
+    </div>
+
+
+  </div>
+</div>
+
+
+
+{% endblock %}
