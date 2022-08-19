@@ -1,29 +1,90 @@
 {% extends 'layout.html' %}
+{% load widget_tweaks %}
 {% load static %}
-
 {% block content %}
+    <!-- <link rel="stylesheet" href="{% static 'css/index.css' %}"> -->
+    
+    <div class="text-center">
+        <form method="post" action="" class="p-3">
+            {% csrf_token %}
+            <div class="container w-50">
+                <h1 class="text-center pb-2">Productos</h1>
+                <div class="input-group mb-3">
+                  <label for="precio" class="txt_negrita">Nombre:</label>
+                    {% render_field form.nombre class="form-control"%}
+                </div>
+              
+                
+                <div class="input-group mb-3">
+                  <label for="precio" class="txt_negrita">Precio:</label>
+                    {% render_field form.precio class="form-control"%}
+                </div>
 
-<div class="card">
-  <div class="card-body">
-    <div class="row">
-      <div class="col-12 col-md-6 offset-md-3">
-        <h1>formulario de Contacto</h1>
-        <form action="" method="post" class="formulario_contacto">
+                <div class="input-group mb-3">
+                  <label for="fechavencimiento" class="txt_negrita px-2">Fecha Vencimiento:</label>
+                  {% render_field form.fechavencimiento class="form-control"%}
+                </div>
 
-          {{form}}
+                <div class="input-group mb-3">
+                  <label for="stockcritico" class="txt_negrita px-2">Stock Critico:</label>
+                  {% render_field form.stockcritico class="form-control"%}
+                </div>
 
-          <input type="submit" value="Cancelar" class="btn btn-secondary">
-          <input type="submit" value="Guardar" class="btn btn-primary">
+                <div class="input-group mb-3">
+                  <label for="codigo" class="txt_negrita px-2">Codigo:</label>
+                  {% render_field form.codigo class="form-control"%}
+                </div>
+                
+
+                <div class="input-group mb-3">
+                  <input type="file" class="form-control" id="inputGroupFile02">
+                  <label class="input-group-text" for="inputGroupFile02">Subir</label>
+                </div>
+
+
+                <div class="input-group mb-3">
+                  <label for="stock" class="txt_negrita px-2">Stock:</label>
+                  {% render_field form.stock class="form-control"%}
+                </div>
+
+                <div class="input-group mb-3">
+                  <label class="input-group-text" for="inputGroupSelect01">Opciones</label>
+                  <select class="form-select" id="inputGroupSelect01">
+                    <option selected>Seleccionar Proveedor...</option>
+                    % render_field form.proveedorid class="form-control"%}
+                    <option value="1">Uno</option>
+                    <option value="2">Dos</option>
+                    <option value="3">Tres</option>
+                  </select>
+                </div>
+
+                <div class="input-group mb-3">
+                  <label class="input-group-text" for="inputGroupSelect01">Opciones</label>
+                  <select class="form-select" id="inputGroupSelect01">
+                    <option selected>Seleccionar Tipo de Producto...</option>
+                    % render_field form.proveedorid class="form-control"%}
+                    <option value="1">Uno</option>
+                    <option value="2">Dos</option>
+                    <option value="3">Tres</option>
+                  </select>
+                </div>
+
+                <div class="input-group mb-3">
+                  <label class="input-group-text" for="inputGroupSelect01">Opciones</label>
+                  <select class="form-select" id="inputGroupSelect01">
+                    <option selected>Seleccionar Familia de Producto...</option>
+                    % render_field form.proveedorid class="form-control"%}
+                    <option value="1">Uno</option>
+                    <option value="2">Dos</option>
+                    <option value="3">Tres</option>
+                  </select>
+                </div>
+
+                <button type="submit" id="boton_aceptar" class="btn btn-primary">Aceptar</button>
+                <a href="" type="submit" class="btn btn-primary">Cancelar</a> 
+            </div>
         </form>
-
-
-      </div>
     </div>
-
-
-  </div>
-</div>
-
-
+  
 
 {% endblock %}
