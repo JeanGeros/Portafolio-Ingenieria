@@ -17,12 +17,13 @@ from django.contrib import admin
 from django.urls import path
 from django.conf import settings
 from src import views, static
-from src.views import Index, Login, addProducts
-
+from src.views import Index, Login, Registro_clientes ,addProducts
+ 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('index/', views.Index, name="index"),
+     path('registro_cliente/', views.Registro_clientes, name="registro_clientes"),
     path('login/', views.Login, name="login"),
     path('agregar-producto/', views.addProducts, name="agregar-producto"),
 ]

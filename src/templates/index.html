@@ -2,9 +2,11 @@
 {% load static %}
 
 {% block content %}
-
-    <h1>Hola
-    </h1>
-
+    <link rel="stylesheet" href="{% static 'css/index.css' %}">
+        
+    <div class="text-center">
+        <h1>Encuentra los mejores productos de ferreteria</h1>
+        <img class="logo-principal" src="{% static  'images/Ferme-logo.png' %}" alt="">
+    </div>
 
 {% endblock %}
