@@ -89,6 +89,7 @@ class Boleta(models.Model):
         db_table = 'boleta'
 
 
+
 class Cliente(models.Model):
     clienteid = models.BigIntegerField(primary_key=True)
     direccionid = models.ForeignKey('Direccion', models.DO_NOTHING, db_column='direccionid')
@@ -281,6 +282,7 @@ class Producto(models.Model):
     proveedorid = models.ForeignKey('Proveedor', models.DO_NOTHING, db_column='proveedorid')
     tipoproductoid = models.ForeignKey('Tipoproducto', models.DO_NOTHING, db_column='tipoproductoid')
     familiaproid = models.ForeignKey(Familiaproducto, models.DO_NOTHING, db_column='familiaproid')
+
 
     class Meta:
         managed = False

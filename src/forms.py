@@ -1,5 +1,5 @@
 from django import forms
-from .models import Producto
+from .models import Producto, Persona, Direccion, Usuario
 
 class FormClienteNormal1(forms.ModelForm):
     
@@ -11,7 +11,7 @@ class FormClienteNormal2(forms.ModelForm):
     
     class Meta:
         model = Direccion
-        fields = ("calle","numero","comunaid","tipoviviendaid","tipobarrioid","nombresector")
+        fields = ("calle","numero","comunaid","tipoviviendaid","tipobarrioid",)
 
 class FormClienteNormal3(forms.ModelForm):
     
