@@ -13,7 +13,18 @@ def addProducts(request):
     data = {
         'form': addproductsForm()
     }
-    return render(request, 'SalesModule/addProducts.html', data)
+
+    if request.method == 'POST':
+        formulario = addproductsForm(data=request.POST, files=request.FILES)
+        if formulario.is_valid():
+            formulario.saves()
+            data["mensaje"] = "Guardado Correctamente"
+        else:
+            data["form"] = formulario
+    return render(request, 'Modulo_productos/addProducts.html', data)
+
+def listar_productos(request):
+    return render(request, 'Modulo_productos/listarProductos.html')
 
 def Registro_clientes(request):
 

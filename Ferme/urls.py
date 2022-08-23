@@ -26,4 +26,5 @@ urlpatterns = [
      path('registro_cliente/', views.Registro_clientes, name="registro_clientes"),
     path('login/', views.Login, name="login"),
     path('agregar-producto/', views.addProducts, name="agregar-producto"),
+    path('listar-producto/', views.listar_productos, name="listar-producto"),
 ]

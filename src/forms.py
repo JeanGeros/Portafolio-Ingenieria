@@ -5,13 +5,13 @@ class FormClienteNormal1(forms.ModelForm):
     
     class Meta:
         model = Persona
-        fields = ("runcuerpo","dv","apellidopaterno","apellidomaterno","nombres","telefono")
+        fields = ("runcuerpo", "dv", "apellidopaterno", "apellidomaterno", "nombres", "telefono")
 
 class FormClienteNormal2(forms.ModelForm):
     
     class Meta:
         model = Direccion
-        fields = ("calle","numero","comunaid","tipoviviendaid","tipobarrioid",)
+        fields = ("calle", "numero", "comunaid", "tipoviviendaid", "tipobarrioid",)
 
 class FormClienteNormal3(forms.ModelForm):
     
