@@ -88,13 +88,10 @@ class Boleta(models.Model):
     fechaboleta = models.DateField()
     totalboleta = models.BigIntegerField()
     ventaid = models.ForeignKey('Venta', models.DO_NOTHING, db_column='ventaid', blank=True, null=True)
-<<<<<<< HEAD
-=======
     estadoid = models.ForeignKey('Estado', models.DO_NOTHING, db_column='estadoid')
 
     def __str__(self):
         return self.nroboleta
->>>>>>> master
 
     class Meta:
         managed = False
@@ -127,9 +124,6 @@ class Comuna(models.Model):
         db_table = 'comuna'
 
 
-<<<<<<< HEAD
-class Detallepedido(models.Model):
-=======
 class Despacho(models.Model):
     despachoid = models.BigIntegerField(primary_key=True)
     fechasolicitud = models.DateField()
@@ -142,7 +136,6 @@ class Despacho(models.Model):
 
 
 class Detalleorden(models.Model):
->>>>>>> master
     detalleid = models.BigIntegerField(primary_key=True)
     cantidad = models.BigIntegerField()
     productoid = models.ForeignKey('Producto', models.DO_NOTHING, db_column='productoid')
@@ -159,11 +152,8 @@ class Direccion(models.Model):
     numero = models.CharField(max_length=10)
     tipoviviendaid = models.ForeignKey('Tipovivienda', models.DO_NOTHING, db_column='tipoviviendaid')
     tipobarrioid = models.ForeignKey('Tipobarrio', models.DO_NOTHING, db_column='tipobarrioid')
-<<<<<<< HEAD
-=======
     nombresector = models.CharField(max_length=100)
     comunaid = models.ForeignKey(Comuna, models.DO_NOTHING, db_column='comunaid', verbose_name="texto")
->>>>>>> master
 
     class Meta:
         managed = False
@@ -248,6 +238,9 @@ class Estado(models.Model):
     estadoid = models.BigIntegerField(primary_key=True)
     descripcion = models.CharField(max_length=10)
 
+    def __str__(self):
+            return self.descripcion
+
     class Meta:
         managed = False
         db_table = 'estado'
@@ -270,10 +263,7 @@ class Factura(models.Model):
     iva = models.BigIntegerField()
     totalfactura = models.BigIntegerField()
     ventaid = models.ForeignKey('Venta', models.DO_NOTHING, db_column='ventaid', blank=True, null=True)
-<<<<<<< HEAD
-=======
     estadoid = models.ForeignKey(Estado, models.DO_NOTHING, db_column='estadoid')
->>>>>>> master
 
     class Meta:
         managed = False
@@ -298,10 +288,7 @@ class Guiadespacho(models.Model):
     fechaguia = models.DateField()
     ventaid = models.ForeignKey('Venta', models.DO_NOTHING, db_column='ventaid')
     clienteid = models.ForeignKey(Cliente, models.DO_NOTHING, db_column='clienteid')
-<<<<<<< HEAD
-=======
     estadoid = models.ForeignKey(Estado, models.DO_NOTHING, db_column='estadoid')
->>>>>>> master
 
     class Meta:
         managed = False
@@ -314,13 +301,10 @@ class Notacredito(models.Model):
     fechanota = models.DateField()
     total = models.BigIntegerField()
     facturaid = models.ForeignKey(Factura, models.DO_NOTHING, db_column='facturaid')
-<<<<<<< HEAD
-=======
     estadoid = models.ForeignKey(Estado, models.DO_NOTHING, db_column='estadoid')
 
     def __str__(self):
         return self.numero
->>>>>>> master
 
     class Meta:
         managed = False
@@ -375,15 +359,16 @@ class Producto(models.Model):
         managed = False
         db_table = 'producto'
 
-
 class Proveedor(models.Model):
     proveedorid = models.BigIntegerField(primary_key=True)
     razonsocial = models.CharField(max_length=50)
-    rut = models.CharField(max_length=11)
+    rutcuerpo = models.BigIntegerField()
+    dv = models.CharField(max_length=1)
     fono = models.BigIntegerField(blank=True, null=True)
     rubroid = models.ForeignKey('Tiporubro', models.DO_NOTHING, db_column='rubroid')
-    estadoid = models.ForeignKey(Estado, models.DO_NOTHING, db_column='estadoid')
     direccionid = models.ForeignKey(Direccion, models.DO_NOTHING, db_column='direccionid')
+    estadoid = models.ForeignKey(Estado, models.DO_NOTHING, db_column='estadoid')
+
 
     class Meta:
         managed = False
@@ -512,11 +497,7 @@ class Venta(models.Model):
     totalventa = models.BigIntegerField()
     clienteid = models.ForeignKey(Cliente, models.DO_NOTHING, db_column='clienteid')
     productoid = models.ForeignKey(Producto, models.DO_NOTHING, db_column='productoid')
-<<<<<<< HEAD
-    tipodocid = models.ForeignKey(Tipodocumento, models.DO_NOTHING, db_column='tipodocid')
-=======
     tipoid = models.ForeignKey(Tipodocumento, models.DO_NOTHING, db_column='tipoid')
->>>>>>> master
 
     class Meta:
         managed = False

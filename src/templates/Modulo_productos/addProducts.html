@@ -3,75 +3,58 @@
 {% load static %}
 {% block content %}
     <!-- <link rel="stylesheet" href="{% static 'css/index.css' %}"> -->
+
+    <link rel="stylesheet" href="{% static 'css/registro_clientes.css' %}">
+
+   <div class="container text-end caja rounded">
+        
+    <h1 class="text-center p-2">Registro de Productos</h1>
     
-    <div class="text-center">
-        <form method="post" action="" class="p-3">
-            {% csrf_token %}
-            <div class="container w-50">
-                <h1 class="text-center pb-2">Productos</h1>
-                <div class="input-group mb-3">
-                  <label for="precio" class="txt_negrita">Nombre:</label>
-                    {% render_field form.nombre class="form-control"%}
+    <form method="post" action="" class="">
+        {% csrf_token %}        
+
+            <div class="form-group row pb-3">
+                <div class="col-md-2 mt-1 textos p-0">
+                    <label class="txt_negrita label">Nombre:</label><br>
+                    <label class="txt_negrita label">Precio:</label><br>
+                    <label class="txt_negrita label">Stock:</label><br>
+                    <label class="txt_negrita label">Stock Critico:</label><br>
+                    <label class="txt_negrita label">Fecha de Vencimiento:</label><br>
                 </div>
-                <div class="input-group mb-3">
-                  <label for="precio" class="txt_negrita">Precio:</label>
-                    {% render_field form.precio class="form-control"%}
-                </div>
-                <div class="input-group mb-3">
-                  <label for="fechavencimiento" class="txt_negrita px-2">Fecha Vencimiento:</label>
-                  {% render_field form.fechavencimiento class="form-control"%}
-                </div>
-                <div class="input-group mb-3">
-                  <label for="stockcritico" class="txt_negrita px-2">Stock Critico:</label>
-                  {% render_field form.stockcritico class="form-control"%}
-                </div>
-                  <div class="input-group mb-3">
-                  <input type="file" class="form-control" id="inputGroupFile02">
-                  <label class="input-group-text" for="inputGroupFile02">Subir</label>
-                </div>
-                <div class="input-group mb-3">
-                  <label for="stock" class="txt_negrita px-2">Stock:</label>
-                  {% render_field form.stock class="form-control"%}
-                </div>
-                
-                <div class="input-group mb-3">
-                  <label class="input-group-text" for="inputGroupSelect01">Opciones</label>
-                  <select class="form-select" id="inputGroupSelect01">
-                    <option selected>Seleccionar Proveedor...</option>
-                    % render_field form.proveedorid class="form-control"%}
-                    <option value="1">Uno</option>
-                    <option value="2">Dos</option>
-                    <option value="3">Tres</option>
-                  </select>
+                <div class="col-md-2">
+                    {% render_field form.nombre class="form-control input border border-secondary" name="nombre" %}
+                    {% render_field form.precio class="form-control input border border-secondary" name="precio" %}
+                    {% render_field form.stock class="form-control input border border-secondary" name="stock" %}
+                    {% render_field form.stockcritico class="form-control input border border-secondary" name="stock_critico" %}
+                    {% render_field form.fechavencimiento class="form-control input border border-secondary" name="fecha_vencimiento" %}
                 </div>
 
-                <div class="input-group mb-3">
-                  <label class="input-group-text" for="inputGroupSelect01">Opciones</label>
-                  <select class="form-select" id="inputGroupSelect01">
-                    <option selected>Seleccionar Tipo de Producto...</option>
-                    % render_field form.proveedorid class="form-control"%}
-                    <option value="1">Uno</option>
-                    <option value="2">Dos</option>
-                    <option value="3">Tres</option>
-                  </select>
-                </div>
+                <div class="col-md-2 mt-1 p-0">
+                    <label for="comuna" class="txt_negrita label">Imagen del Producto:</label><br>
+                    <label for="comuna" class="txt_negrita label">Proveedor :</label><br>
+                    <label for="comuna" class="txt_negrita label">Tipo de Producto :</label><br>
+                    <label for="comuna" class="txt_negrita label">familiaproid:</label><br>
+                    <label for="comuna" class="txt_negrita label">Estado Producto:</label><br>
 
-                <div class="input-group mb-3">
-                  <label class="input-group-text" for="inputGroupSelect01">Opciones</label>
-                  <select class="form-select" id="inputGroupSelect01">
-                    <option selected>Seleccionar Familia de Producto...</option>
-                    % render_field form.proveedorid class="form-control"%}
-                    <option value="1">Uno</option>
-                    <option value="2">Dos</option>
-                    <option value="3">Tres</option>
-                  </select>
                 </div>
-
-                <button type="submit" id="boton_aceptar" class="btn btn-primary">Aceptar</button>
-                <a href="" type="submit" class="btn btn-primary">Cancelar</a> 
+                <div class="col-md-2">
+                    {% render_field form.imagen class="form-control input border border-secondary" name="calle" %}
+                    {% render_field form.proveedorid class="form-control input border border-secondary" name="numero" %}
+                    {% render_field form.tipoproductoid class="form-control input border border-secondary" name="comuna_id" %}
+                    {% render_field form.familiaproid class="form-control input border border-secondary" name="tipo_vivienda_id" %}
+                    {% render_field form.estadoid class="form-control input border border-secondary" name="tipo_barrio_id" %}
+                </div>
             </div>
-        </form>
-    </div>
-  
 
+            <div>
+              <div class="col-md-2">
+                <button type="submit" id="boton_aceptar" class="btn">Aceptar</button>
+                <a href="" type="submit" class="btn">Cancelar</a> 
+            </div>
+            </div>
+            
+            
+        
+    </form>
+</div>
 {% endblock %}

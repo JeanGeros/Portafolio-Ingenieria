@@ -2,10 +2,7 @@ from django.shortcuts import render
 from src.forms import (
     FormClienteNormal1, FormClienteNormal2, FormClienteNormal3, addproductsForm
 )
-<<<<<<< HEAD
-=======
 from .models import Persona, Direccion, Usuario
->>>>>>> master
 
 def Index(request):
     return render(request, 'index.html')
@@ -31,7 +28,6 @@ def listar_productos(request):
     return render(request, 'Modulo_productos/listarProductos.html')
 
 def Registro_clientes(request):
-
     form1 = FormClienteNormal1()
     form2 = FormClienteNormal2()
     form3 = FormClienteNormal3()
