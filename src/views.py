@@ -1,7 +1,6 @@
 from django.shortcuts import render, redirect
 
 from django.contrib import messages
-from django.contrib.auth.hashers import check_password
 from src.forms import (
     FormClienteNormal1, FormClienteNormal2, FormClienteNormal3, addproductsForm
 )
@@ -67,14 +66,13 @@ def listar_productos(request):
 
 
 def Registro_clientes(request):
+    
     form1 = FormClienteNormal1()
     form2 = FormClienteNormal2()
     form3 = FormClienteNormal3()
-    form4 = FormClienteNormal4()
 
     if request.method == 'POST':
         
-
         run_cuerpo = request.POST.get('runcuerpo')
         dv = request.POST.get('dv')
         nombres = request.POST.get('nombres')
@@ -138,7 +136,6 @@ def Registro_clientes(request):
         'form1': form1,
         'form2': form2,
         'form3': form3,
-        'form4': form4
     }
 
     return render(request, 'usuarios/registro_clientes.html', context)
