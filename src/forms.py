@@ -19,8 +19,8 @@ class FormClienteNormal3(forms.ModelForm):
         model = Usuario
         fields = ("email","password")
 
-
 class addproductsForm(forms.ModelForm):
     class Meta:
         model = Producto
         fields = '__all__'
+
