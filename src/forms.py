@@ -18,3 +18,4 @@ class FormClienteNormal3(forms.ModelForm):
     class Meta:
         model = Usuario
         fields = ("email","password")
+

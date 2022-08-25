@@ -8,7 +8,20 @@
     <div class="container text-end caja rounded">
         
         <h1 class="text-center p-2">Registro de clientes</h1>
-        
+        {% if messages %}
+            <ul class="messages list-group mb-3">
+                {% for message in messages %}
+                    <script>
+                        Swal.fire({
+                        icon: 'success',
+                        text: "{{message}}",
+                        showConfirmButton: false,
+                        timer: 2000
+                    })
+                    </script>
+                {% endfor %}
+            </ul>
+        {% endif %}
         <form method="post" action="" class="">
             {% csrf_token %}        
 
@@ -58,8 +71,8 @@
                         <label for="precio" class="txt_negrita label">Confirme contraseña:</label><br>
                     </div>
                     <div class="col-md-2">
-                        <input class="form-control input border border-secondary" type="text" name="contraseña"/>
-                        <input class="form-control input border border-secondary" type="text" name="confirme_contraseña"/>
+                        {% render_field form3.password type="password" class="form-control input border border-secondary" name="password" %}
+                        {% render_field form3.password type="password" class="form-control input border border-secondary" name="password" %}
                         <button type="submit" id="boton_aceptar" class="btn">Aceptar</button>
                         <a href="" type="submit" class="btn">Cancelar</a> 
                     </div>
