@@ -38,8 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'src',
-    'widget_tweaks',
-    'django_extensions'
+    'widget_tweaks'
 ]
 
 MIDDLEWARE = [
