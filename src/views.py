@@ -1,19 +1,72 @@
 from django.shortcuts import render, redirect
+
 from django.contrib import messages
 from django.contrib.auth.hashers import check_password
 from src.forms import (
-    FormClienteNormal1, FormClienteNormal2, FormClienteNormal3, FormClienteNormal4
+    FormClienteNormal1, FormClienteNormal2, FormClienteNormal3, addproductsForm
 )
 from .models import (
-    Persona, Direccion, Usuario, Cliente, Estado, Comuna, Tipobarrio, Tipovivienda, Rolusuario
+    Persona, Direccion, Usuario, Cliente, Estado, Comuna, Tipobarrio, Tipovivienda, Rolusuario, 
+    Proveedor, Tipoproducto, Producto, Familiaproducto
 )
 
 def Index(request):
-
     return render(request, 'index.html')
 
-def Registro_clientes(request):
+def Login(request):
+    return render(request, 'login.html')
 
+def addProducts(request):
+    form = addproductsForm()
+
+    if request.method == 'POST':
+        nombre = request.POST.get('nombre')
+        precio = request.POST.get('precio')
+        stock = request.POST.get('stock')
+        stockcritico = request.POST.get('stockcritico')
+        fechavencimiento = request.POST.get('fechavencimiento')
+        imagen = request.POST.get('imagen')
+        proveedorid = request.POST.get('proveedorid')
+        tipoproductoid = request.POST.get('tipoproductoid')
+        familiaproid = request.POST.get('familiaproid')
+        estadoid = request.POST.get('estadoid')
+
+        proveedor = Proveedor.objects.get(proveedorid=proveedorid)
+        tipo_producto = Tipoproducto.objects.get(tipoproductoid=tipoproductoid)
+        familia_producto = Familiaproducto.objects.get(familiaproid=familiaproid)
+        Estado_producto = Estado.objects.get(estadoid=estadoid)
+        product = Producto.objects.create(
+           nombre = nombre.strip(),
+           precio = precio.strip(),
+           stock = stock.strip(),
+           stockcritico = stockcritico.strip(),
+           fechavencimiento = fechavencimiento,
+           codigo = 1234,
+           imagen = imagen,
+           proveedorid = proveedor,
+           tipoproductoid = tipo_producto,
+           familiaproid = familia_producto,
+           estadoid = Estado_producto
+        )
+        product.save()
+        
+        if product is not None:
+            product.save()
+            messages.warning(request, 'Producto creado correctamente')
+            return redirect('listar-producto')
+        else:
+            messages.warning(request, 'No se pudo crear el Producto')
+    context = {
+    'form': form,
+    }
+    return render(request, 'Modulo_productos/addProducts.html', context)
+
+def listar_productos(request):
+    productos = Producto.objects.all()
+    return render(request, 'Modulo_productos/listarProductos.html', {'productos':productos})
+
+
+def Registro_clientes(request):
     form1 = FormClienteNormal1()
     form2 = FormClienteNormal2()
     form3 = FormClienteNormal3()

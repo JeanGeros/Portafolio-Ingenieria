@@ -1,0 +1,44 @@
+{% extends 'layout.html' %}
+{% load widget_tweaks %}
+{% load static %}
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/modulo_productos.css' %}">
+
+<div class="container text-end caja rounded">
+ <h1 class="text-center p-2">Lista de Productos</h1>
+    <table class="table table-bordered " style="background-color: white">
+        <thead class="table-dark" style="text-align:center">
+        <tr>
+            <th>Nombre</th>
+            <th>Precio</th>
+            <th>Stock</th>
+            <th>Stock Critico</th>
+            <th>Fecha de Vencimiento</th>
+            <th>Imagen del producto</th>
+        </tr>
+        </thead>
+        <tbody style="text-align:center">
+        
+        {% for producto in productos %}
+        <tr>
+            <td>{{ producto.nombre }}</td>
+            <td>{{ producto.precio }}</td>
+            <td>{{ producto.stock }}</td>
+            <td>{{ producto.stockcritico }}</td>
+            <td>{{ producto.fechavencimiento }}</td>
+            <td>{{ producto.imagen }}</td>
+            
+        </tr>
+        {% endfor %}
+    
+        </tbody>
+    </table>
+    <div class="col-md-4">
+        <a href="/agregar-producto" type="" id="boton_aceptar" class="btn">Crear</a>
+        <button type="" id="boton_aceptar" class="btn">Modificar</button>
+        <button type="" id="boton_aceptar" class="btn">Eliminar</button>
+        <button type="" id="boton_aceptar" class="btn">Ver Detalle</button>
+    </div>
+</div>
+
+{% endblock %}
