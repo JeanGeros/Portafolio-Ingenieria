@@ -2,17 +2,20 @@
 {% load widget_tweaks %}
 {% load static %}
 {% block content %}
-    <!-- <link rel="stylesheet" href="{% static 'css/index.css' %}"> -->
 
-    <link rel="stylesheet" href="{% static 'css/registro_clientes.css' %}">
+    <link rel="stylesheet" href="{% static 'css/modulo_productos.css' %}">
 
    <div class="container text-end caja rounded">
-        
     <h1 class="text-center p-2">Registro de Productos</h1>
-    
-    <form method="post" action="" class="">
+    {% if messages %}
+                <ul class="messages list-group mb-3">
+                {% for message in messages %}
+                    <li{% if message.tags %} class="{{ message.tags }} list-group-item list-group-item-primary"{% endif %}>{{ message }}</li>
+                {% endfor %}
+                </ul>
+            {% endif %}
+    <form method="post" action="">
         {% csrf_token %}        
-
             <div class="form-group row pb-3">
                 <div class="col-md-2 mt-1 textos p-0">
                     <label class="txt_negrita label">Nombre:</label><br>
@@ -30,31 +33,29 @@
                 </div>
 
                 <div class="col-md-2 mt-1 p-0">
-                    <label for="comuna" class="txt_negrita label">Imagen del Producto:</label><br>
-                    <label for="comuna" class="txt_negrita label">Proveedor :</label><br>
-                    <label for="comuna" class="txt_negrita label">Tipo de Producto :</label><br>
-                    <label for="comuna" class="txt_negrita label">familiaproid:</label><br>
-                    <label for="comuna" class="txt_negrita label">Estado Producto:</label><br>
+                    <label class="txt_negrita label">Imagen del Producto:</label><br>
+                    <label class="txt_negrita label">Proveedor :</label><br>
+                    <label class="txt_negrita label">Tipo de Producto :</label><br>
+                    <label class="txt_negrita label">familiaproid:</label><br>
+                    <label class="txt_negrita label">Estado Producto:</label><br>
 
                 </div>
-                <div class="col-md-2">
-                    {% render_field form.imagen class="form-control input border border-secondary" name="calle" %}
-                    {% render_field form.proveedorid class="form-control input border border-secondary" name="numero" %}
-                    {% render_field form.tipoproductoid class="form-control input border border-secondary" name="comuna_id" %}
-                    {% render_field form.familiaproid class="form-control input border border-secondary" name="tipo_vivienda_id" %}
-                    {% render_field form.estadoid class="form-control input border border-secondary" name="tipo_barrio_id" %}
+                    <div class="col-md-2">
+                        {% render_field form.imagen class="form-control input border border-secondary" name="imagen" %}
+                        {% render_field form.proveedorid class="form-control input border border-secondary" name="proveedorid" %}
+                        {% render_field form.tipoproductoid class="form-control input border border-secondary" name="tipoproductoid" %}
+                        {% render_field form.familiaproid class="form-control input border border-secondary" name="familiaproid" %}
+                        {% render_field form.estadoid class="form-control input border border-secondary" name="estadoid" %}
+                    </div>
                 </div>
-            </div>
+
 
             <div>
-              <div class="col-md-2">
-                <button type="submit" id="boton_aceptar" class="btn">Aceptar</button>
-                <a href="" type="submit" class="btn">Cancelar</a> 
+                <div class="col-md-2">
+                    <button type="submit" id="boton_aceptar" class="btn">Aceptar</button>
+                    <a href="/listar-producto" type="submit" class="btn">Cancelar</a> 
+                </div>
             </div>
-            </div>
-            
-            
-        
     </form>
 </div>
 {% endblock %}

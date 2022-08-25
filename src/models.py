@@ -1,3 +1,4 @@
+from distutils.command.upload import upload
 from django.db import models
 
 
@@ -345,7 +346,7 @@ class Producto(models.Model):
     stockcritico = models.BigIntegerField()
     fechavencimiento = models.DateField()
     codigo = models.CharField(max_length=17)
-    imagen = models.CharField(max_length=256, blank=True, null=True)
+    imagen = models.ImageField(upload_to="static/img")
     proveedorid = models.ForeignKey('Proveedor', models.DO_NOTHING, db_column='proveedorid')
     tipoproductoid = models.ForeignKey('Tipoproducto', models.DO_NOTHING, db_column='tipoproductoid')
     familiaproid = models.ForeignKey(Familiaproducto, models.DO_NOTHING, db_column='familiaproid')
@@ -369,6 +370,8 @@ class Proveedor(models.Model):
     direccionid = models.ForeignKey(Direccion, models.DO_NOTHING, db_column='direccionid')
     estadoid = models.ForeignKey(Estado, models.DO_NOTHING, db_column='estadoid')
 
+    def __str__(self):
+        return self.razonsocial
 
     class Meta:
         managed = False
