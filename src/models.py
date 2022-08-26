@@ -1,3 +1,4 @@
+from distutils.command.upload import upload
 from django.db import models
 
 
@@ -96,6 +97,7 @@ class Boleta(models.Model):
     class Meta:
         managed = False
         db_table = 'boleta'
+
 
 
 class Cliente(models.Model):
@@ -237,6 +239,9 @@ class Estado(models.Model):
     estadoid = models.BigIntegerField(primary_key=True)
     descripcion = models.CharField(max_length=10)
 
+    def __str__(self):
+            return self.descripcion
+
     class Meta:
         managed = False
         db_table = 'estado'
@@ -341,7 +346,7 @@ class Producto(models.Model):
     stockcritico = models.BigIntegerField()
     fechavencimiento = models.DateField()
     codigo = models.CharField(max_length=17)
-    imagen = models.CharField(max_length=256, blank=True, null=True)
+    imagen = models.ImageField(upload_to="static/img")
     proveedorid = models.ForeignKey('Proveedor', models.DO_NOTHING, db_column='proveedorid')
     tipoproductoid = models.ForeignKey('Tipoproducto', models.DO_NOTHING, db_column='tipoproductoid')
     familiaproid = models.ForeignKey(Familiaproducto, models.DO_NOTHING, db_column='familiaproid')
@@ -350,19 +355,23 @@ class Producto(models.Model):
     def __str__(self):
         return self.nombre
 
+
     class Meta:
         managed = False
         db_table = 'producto'
 
-
 class Proveedor(models.Model):
     proveedorid = models.BigIntegerField(primary_key=True)
     razonsocial = models.CharField(max_length=50)
-    rut = models.CharField(max_length=11)
+    rutcuerpo = models.BigIntegerField()
+    dv = models.CharField(max_length=1)
     fono = models.BigIntegerField(blank=True, null=True)
     rubroid = models.ForeignKey('Tiporubro', models.DO_NOTHING, db_column='rubroid')
-    estadoid = models.ForeignKey(Estado, models.DO_NOTHING, db_column='estadoid')
     direccionid = models.ForeignKey(Direccion, models.DO_NOTHING, db_column='direccionid')
+    estadoid = models.ForeignKey(Estado, models.DO_NOTHING, db_column='estadoid')
+
+    def __str__(self):
+        return self.razonsocial
 
     class Meta:
         managed = False
@@ -470,6 +479,7 @@ class Usuario(models.Model):
     usuarioid = models.BigIntegerField(primary_key=True)
     email = models.CharField(max_length=50)
     password = models.CharField(max_length=25)
+    conexion = models.CharField(max_length=1)
     rolid = models.ForeignKey(Rolusuario, models.DO_NOTHING, db_column='rolid')
     personaid = models.ForeignKey(Persona, models.DO_NOTHING, db_column='personaid', blank=True, null=True)
     empresaid = models.ForeignKey(Empresa, models.DO_NOTHING, db_column='empresaid', blank=True, null=True)
