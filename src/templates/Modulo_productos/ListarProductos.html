@@ -2,6 +2,8 @@
 {% load widget_tweaks %}
 {% load static %}
 {% block content %}
+{% load humanize %}
+
 <link rel="stylesheet" href="{% static 'css/modulo_productos.css' %}">
 
 <div class="container text-end caja rounded">
@@ -21,13 +23,12 @@
         
         {% for producto in productos %}
         <tr>
-            <td>{{ producto.nombre }}</td>
-            <td>{{ producto.precio }}</td>
+            <td>{{ producto.nombre | capfirst}}</td>
+            <td>${{ producto.precio | intcomma}}</td>
             <td>{{ producto.stock }}</td>
             <td>{{ producto.stockcritico }}</td>
             <td>{{ producto.fechavencimiento }}</td>
-            <td>{{ producto.imagen }}</td>
-            
+            <td> <img src="/static/img/{{producto.imagen}}" alt="imagen producto" style="width:100px;height:100px;"> </td>
         </tr>
         {% endfor %}
     
@@ -40,5 +41,7 @@
         <button type="" id="boton_aceptar" class="btn">Ver Detalle</button>
     </div>
 </div>
-
+<script>
+    console.log(image)
+</script>
 {% endblock %}
