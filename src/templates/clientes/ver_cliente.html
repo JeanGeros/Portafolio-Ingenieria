@@ -1,0 +1,50 @@
+{% extends 'layout.html' %}
+{% load widget_tweaks %}
+{% load static %}
+
+{% block content %}
+
+    <link rel="stylesheet" href="{% static 'css/registro_clientes.css' %}">
+    <div class="container p-5">
+        <h1 class="text-center" >Detalles del Cliente</h1>
+
+        <table class="table table-striped table-hover">
+            <thead>
+                <tr>
+                    <th>Run</th>
+                    <th>Nombres</th>
+                    <th>Telefono</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="border border-secondary">{{cliente.personaid.runcuerpo}} - {{cliente.personaid.dv}}</td>
+                    <td class="border border-secondary">{{cliente.personaid.nombres}} {{cliente.personaid.apellidopaterno}} {{cliente.personaid.apellidomaterno}}</td>
+                    <td class="border border-secondary">{{cliente.personaid.telefono}}</td>
+                </tr>
+            </tbody>
+        </table>
+        <table class="table table-striped table-hover">
+            <thead>
+                <tr>
+                    <th>Direccion</th>
+                    <th>Tipo de vivienda</th>
+                    <th>Tipo de barrio</th>
+                    <th>Estado del cliente</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="border border-secondary">{{cliente.direccionid.calle}} {{cliente.direccionid.numero}} {{cliente.direccionid.nombresector}}, {{cliente.direccionid.comunaid.nombre}}, {{cliente.direccionid.comunaid.regionid.nombre}}</td>
+                    <td class="border border-secondary">{{cliente.direccionid.tipoviviendaid.descripcion}}</td>
+                    <td class="border border-secondary">{{cliente.direccionid.tipobarrioid.descripcion}}</td>
+                    <td class="border border-secondary">{{cliente.estadoid.descripcion}}</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <a href="{% url 'listar_clientes' %}" type="submit" class="btn">Volver</a>
+
+    </div>
+    
+{% endblock %}
