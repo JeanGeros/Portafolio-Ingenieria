@@ -19,16 +19,12 @@
         <nav class="navbar navbar-expand-lg">
             <div class="container-fluid">
                 
-                <!-- <div class="p-1">
-                    
-                    <a class="nav-link logo" aria-current="page" href="/index"><i class="fas fa-store fa-2x p-2"></i></a>
-                </div> -->
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                        <img class="logo-navbar" src="{% static  'images/Ferme-nav.png' %}" alt="">
+                        <img class="logo-navbar" src="{% static 'images/Ferme-nav.png' %}" alt="">
 
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle fw-bolder text-black" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Productos</a>
@@ -58,7 +54,7 @@
                             <a class="nav-link fw-bolder text-black">Ordenes de compras</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link fw-bolder text-black">Clientes</a>
+                            <a href="/clientes" class="nav-link fw-bolder text-black">Administracion de clientes</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link fw-bolder text-black">Proveedores</a>
@@ -67,13 +63,30 @@
                             <a class="nav-link fw-bolder text-black">Mis ordenes</a>
                         </li>
                     </ul>
-                    <button type="button" class="btn ingresar fw-bolder m-1">Ingresar</button>
-                    <button type="button" class="btn registrarme fw-bolder m-1">Registrarme</button>
+                    {% if conexion == 1 %}
+                        <li class="nav-item dropdown icono_usuario rounded">
+                            <a class="nav-link dropdown-toggle fw-bolder icono_persona" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fa-solid fa-user fa-2x" ></i>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item fw-bolder text-black" href="#">Action</a></li>
+                                <li><a class="dropdown-item fw-bolder text-black" href="#">Another action</a></li>
+                                <li><hr class="dropdown-divider fw-bolder text-black"></li>
+                                <form method="POST" action="">
+                                    {% csrf_token %}
+                                    <li><button type="submit" id="" name="cerrar_sesion" value="CerrarSesion" class="dropdown-item fw-bolder text-black">Cerrar sesion</button></li>
+                                </form>
+                            </ul>
+                        </li>
+                    {% else %}
+                        <a href="{% url 'ingreso' %}" type="button" class="btn ingresar fw-bolder m-1">Ingresar</a>
+                    {% endif %}
+                        <a href="{% url 'registro_clientes' %}" type="button" class="btn registrarme fw-bolder m-1">Registrarme</a>
                     <i class="fa-solid fa-cart-arrow-down text-black fa-2x p-2"></i>
                 </div>
             </div>
         </nav>
-        <div id="content">
+        <div id="content" class="pt-5">
             {% block content %}
                 <!--codigo que viene de templates-->
             {% endblock %}

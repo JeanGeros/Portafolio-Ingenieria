@@ -1,0 +1,48 @@
+{% extends 'layout.html' %}
+{% load static %}
+
+{% block content %}
+
+    <link rel="stylesheet" href="{% static 'css/ingreso_usuarios.css' %}">
+    <div class="form-signin w-100 m-auto p-5 text-center border  rounded">
+        {% if messages %}
+            <ul class="messages list-group mb-3">
+                {% for message in messages %}
+                    <script>
+                        Swal.fire({
+                            icon: 'warning',
+                            text: "{{message}}",
+                            showConfirmButton: false,
+                            timer: 3000
+                        })
+                    </script>
+                {% endfor %}
+            </ul>
+        {% endif %}
+        <form id="center" method="post" action="" class="">
+          {% csrf_token %} 
+            <img class="mb-4" src="{% static 'images/Ferme-logo.png' %}" width="150" height="150">
+            <h1 class="h3 mb-3 fw-normal text-center">Iniciar Sesion</h1>
+
+            <div class="form-floating inputStyle">
+              <input type="email" name="correo" class="form-control" id="exampleInputEmail1" placeholder="nombre@ejemplo.com">
+              <label for="" class="form-label font-style">Correo electrónico</label>
+            </div>
+            <div class="mb-3 form-floating inputStyle">
+              <input type="password" name="contraseña" class="form-control" id="exampleInputPassword1" placeholder="Contraseña">
+              <label for="exampleInputPassword1" class="form-label font-style">Contraseña</label>
+            </div>
+            <div class="checkbox mb-3">
+                <label class="font-style">
+                    <input type="checkbox" value="remember-me" > Recordar
+                </label>
+            </div>
+           
+            <button type="submit" class="btn btn-primary py-2 m-2" style="font-size: 1.3rem;">Iniciar Sesion</button>
+
+
+          </form>
+    </div>
+
+{% endblock %}
+
