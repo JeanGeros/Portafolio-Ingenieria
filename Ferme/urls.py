@@ -16,15 +16,18 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from django.conf import settings
-from src import views, static
-from src.views import Index, Login, Registro_clientes ,addProducts
- 
+from src import views, static 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('index/', views.Index, name="index"),
-     path('registro_cliente/', views.Registro_clientes, name="registro_clientes"),
-    path('login/', views.Login, name="login"),
+    path('ingreso_usuarios/', views.Ingreso, name="ingreso"),
+
+    path('registro_cliente/', views.Registro_clientes, name="registro_clientes"),
+    path('clientes/', views.Listar_clientes, name="listar_clientes"),
+    path('clientes/ver_cliente', views.Ver_cliente, name="ver_cliente"),
+    path('clientes/editar_cliente', views.Editar_cliente, name="editar_cliente"),
+    
     path('agregar-producto/', views.addProducts, name="agregar-producto"),
     path('listar-producto/', views.listar_productos, name="listar-producto"),
 ]

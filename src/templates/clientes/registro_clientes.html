@@ -1,0 +1,101 @@
+{% extends 'layout.html' %}
+{% load widget_tweaks %}
+{% load static %}
+
+{% block content %}
+    <link rel="stylesheet" href="{% static 'css/registro_clientes.css' %}">
+    
+    <div class="container text-end caja rounded mt-5">
+        
+        <h1 class="text-center p-2">Registro de clientes</h1>
+        {% if messages %}
+            <ul class="messages list-group mb-3">
+                {% for message in messages %}
+                    <script>
+                        Swal.fire({
+                            icon: 'success',
+                            text: "{{message}}",
+                            showConfirmButton: false,
+                            timer: 2000
+                        })
+                    </script>
+                {% endfor %}
+            </ul>
+        {% endif %}
+        <form method="post" action="" class="">
+            {% csrf_token %}        
+
+                <div class="form-group row pb-3">
+                    <div class="col-md-2 mt-1 textos p-0">
+                        <label for="run" class="txt_negrita label">Run:</label><br>
+                        <label for="run" class="txt_negrita label">Nombres:</label><br>
+                        <label for="run" class="txt_negrita label">Apellido paterno:</label><br>
+                        <label for="run" class="txt_negrita label">Apellido materno:</label><br>
+                        <label for="run" class="txt_negrita label">Telefono:</label><br>
+                        <label for="comuna" class="txt_negrita label">Correo:</label><br>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="run">
+                            {% render_field form1.runcuerpo class="form-control border border-secondary input-run" name="run_cuerpo"%}
+                            <label for="run" class="txt_negrita guion">-</label>
+                            {% render_field form1.dv class="form-control input-dv border border-secondary" name="dv"%}
+                        </div>
+                        
+                        {% render_field form1.nombres class="form-control input border border-secondary" name="nombres" %}
+                        {% render_field form1.apellidopaterno class="form-control input border border-secondary" name="apellido_paterno" %}
+                        {% render_field form1.apellidomaterno class="form-control input border border-secondary" name="apellido_materno" %}
+                        {% render_field form1.telefono class="form-control input border border-secondary" name="telefono" %}
+                        {% render_field form3.email class="form-control input border border-secondary" name="email" %}
+                    </div>
+
+                    <div class="col-md-2 mt-1 p-0">
+                        <label for="comuna" class="txt_negrita label">Calle:</label><br>
+                        <label for="comuna" class="txt_negrita label">Numero:</label><br>
+                        <label for="comuna" class="txt_negrita label">Comuna:</label><br>
+                        <label for="comuna" class="txt_negrita label">Tipo de vivienda:</label><br>
+                        <label for="comuna" class="txt_negrita label">Tipo de barrio:</label><br>
+                        <label for="comuna" class="txt_negrita label">Nombre de sector:</label><br>
+
+                    </div>
+                    <div class="col-md-2">
+                        {% render_field form2.calle class="form-control input border border-secondary" name="calle" %}
+                        {% render_field form2.numero class="form-control input border border-secondary" name="numero" %}
+                        {% render_field form2.comunaid class="form-control input border border-secondary" name="comuna_id" %}
+                        {% render_field form2.tipoviviendaid class="form-control input border border-secondary" name="tipo_vivienda_id" %}
+                        {% render_field form2.tipobarrioid class="form-control input border border-secondary" name="tipo_barrio_id" %}
+                        {% render_field form2.nombresector class="form-control input border border-secondary" name="nombre_sector" %}
+                    </div>
+                    <div class="col-md-2 mt-1 p-0">
+                        <label for="precio" class="txt_negrita label">Contraseña:</label><br>
+                        <label for="precio" class="txt_negrita label">Confirme contraseña:</label><br>
+                    </div>
+                    <div class="col-md-2">
+                        <input class="form-control input border border-secondary" type="password" id="password" name="password" onkeyup="myFunction()"/>
+                        <input class="form-control input border border-secondary" type="password" id="confirme_contraseña" name="confirme_contraseña" onkeyup="myFunction()"/>
+                        <button type="submit" id="boton_aceptar" class="btn btn_aceptar">Aceptar</button>
+                        <a href="{% url 'index' %}" type="submit" class="btn">Cancelar</a> 
+                    </div>
+                </div>
+        </form>
+    </div>
+    
+    <!-- <script src="{% static 'js/registro_clientes.js' %}"></script> -->
+    <script>
+
+        let button = document.getElementById('boton_aceptar')
+        button.disabled = true
+
+        function myFunction() {
+
+            var password = document.getElementById('password').value;
+            var confirme_contraseña = document.getElementById('confirme_contraseña').value;
+            if (password !== "" && confirme_contraseña !== "" && password === confirme_contraseña){
+                button.disabled = false
+            }
+            else{
+                button.disabled = true
+            }
+        }
+        
+    </script>
+{% endblock %}
