@@ -1,5 +1,8 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponseRedirect
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.models import User
 
 from django.contrib import messages
 from src.forms import (
@@ -13,24 +16,8 @@ from .models import (
 
 def Index(request):
 
-    old_post_ingreso = request.session.get('_old_post_ingreso') 
-    old_post_conexion = request.session.get('_old_post_conexion') 
-
-    if request.method == 'POST':
-
-        cerrar_sesion = request.POST.get('cerrar_sesion')
-
-        if cerrar_sesion == "CerrarSesion":
-            usuario = Usuario.objects.get(email=old_post_ingreso['correo'])
-            usuario.conexion = 0
-            usuario.save()
-            old_post_conexion = {'conexion':usuario.conexion}
-            return redirect('index')
-
-
     context = {
-        'correo': old_post_ingreso['correo'],
-        'conexion': old_post_conexion['conexion']
+
     }
 
     return render(request, 'index.html', context)
@@ -38,34 +25,34 @@ def Index(request):
 def Ingreso(request):
 
     if request.method == 'POST':
-        correo = request.POST.get('correo')
-        contraseña = request.POST.get('contraseña')
-        usuario_correo = Usuario.objects.filter(email=correo).exists()
+
+        username = request.POST.get('usuario')
+        password = request.POST.get('contraseña')
+
+        usuario_correo = Usuario.objects.filter(nombreusuario=username).exists()
 
         if usuario_correo == True:
 
-            usuario = Usuario.objects.filter(email=correo).values('password','rolid')
-            print(usuario)
+            user = authenticate(request, username = username, password = password)
 
-            if contraseña == usuario[0]['password']:
-                usuario = Usuario.objects.get(email=correo)
-                usuario.conexion = 1
-                usuario.save()
-                request.session['_old_post_ingreso'] = request.POST
-                request.session['_old_post_conexion'] = {'conexion':usuario.conexion}
-                return redirect('index')
+            if user is not None:
+                login(request, user)
+                return render(request, 'index.html')
             else:
                 messages.warning(request, 'Email y/o contraseña inválidos.')
         else:
             messages.warning(request, 'Email y/o contraseña inválidos.')
 
+    context = {
 
-    return render(request, 'ingreso/ingreso_usuarios.html')
+    }
+
+    return render(request, 'ingreso/ingreso_usuarios.html', context)
 
 def addProducts(request):
 
-    old_post_ingreso = request.session.get('_old_post_ingreso') 
-    old_post_conexion = request.session.get('_old_post_conexion') 
+    old_post_ingreso = request.session.get('old_post_ingreso') 
+    old_post_conexion = request.session.get('old_post_conexion') 
 
     form = addproductsForm()
 
@@ -113,8 +100,9 @@ def addProducts(request):
             usuario = Usuario.objects.get(email=old_post_ingreso['correo'])
             usuario.conexion = 0
             usuario.save()
-            old_post_conexion = {'conexion':usuario.conexion}
-            return redirect('index')
+            request.session['old_post_ingreso'] = request.POST
+            request.session['old_post_conexion'] = {'conexion':usuario.conexion}
+            return render(request, 'index.html', context)
 
     context = {
         'form': form,
@@ -126,26 +114,10 @@ def addProducts(request):
 
 def listar_productos(request):
 
-    old_post_ingreso = request.session.get('_old_post_ingreso') 
-    old_post_conexion = request.session.get('_old_post_conexion') 
-
     productos = Producto.objects.all()
-
-    if request.method == 'POST':
-
-        cerrar_sesion = request.POST.get('cerrar_sesion')
-
-        if cerrar_sesion == "CerrarSesion":
-            usuario = Usuario.objects.get(email=old_post_ingreso['correo'])
-            usuario.conexion = 0
-            usuario.save()
-            old_post_conexion = {'conexion':usuario.conexion}
-            return redirect('index')
     
     context = {
-        'productos':productos,
-        'correo': old_post_ingreso['correo'],
-        'conexion': old_post_conexion['conexion']
+        'productos': productos
     }
 
     return render(request, 'Modulo_productos/listarProductos.html', context)
@@ -153,9 +125,6 @@ def listar_productos(request):
 ##********************Clientes*******************************************************************
 
 def Registro_clientes(request):
-
-    old_post_ingreso = request.session.get('_old_post_ingreso') 
-    old_post_conexion = request.session.get('_old_post_conexion') 
     
     form1 = FormClienteNormal1()
     form2 = FormClienteNormal2()
@@ -169,6 +138,7 @@ def Registro_clientes(request):
         apellido_paterno = request.POST.get('apellidopaterno')
         apellido_materno = request.POST.get('apellidomaterno')
         telefono = request.POST.get('telefono')
+        nombre_usuario = request.POST.get('nombreusuario')
         email = request.POST.get('email')
         calle = request.POST.get('calle')
         numero = request.POST.get('numero')
@@ -177,7 +147,22 @@ def Registro_clientes(request):
         tipo_barrio_id = request.POST.get('tipobarrioid')
         nombre_sector = request.POST.get('nombresector')
         contraseña = request.POST.get('password')
+        confirme_contraseña = request.POST.get('confirme_contraseña')
 
+        user = User.objects.create_user(
+            username = nombre_usuario,
+            first_name = nombres,
+            last_name = apellido_paterno,
+            email = email,
+            is_superuser = False,
+            is_active = True
+        )
+        user.set_password(contraseña)
+        user.set_password(confirme_contraseña)
+
+        if user is not None:
+            user.save()
+        
         # Estado activo = 1 e inactivo = 2 
         Persona.objects.create(
             runcuerpo = run_cuerpo,
@@ -209,7 +194,7 @@ def Registro_clientes(request):
             password = contraseña,
             personaid = Persona.objects.get(runcuerpo=run_cuerpo, dv=dv),
             rolid = Rolusuario.objects.get(descripcion="Cliente"),
-            conexion = 1
+            nombreusuario = nombre_usuario
         )
 
         if Cliente is not None:
@@ -217,30 +202,16 @@ def Registro_clientes(request):
             return redirect('registro_clientes')
         else:
             messages.warning(request, 'No se pudo crear el Cliente')
-        
-        cerrar_sesion = request.POST.get('cerrar_sesion')
-
-        if cerrar_sesion == "CerrarSesion":
-            usuario = Usuario.objects.get(email=old_post_ingreso['correo'])
-            usuario.conexion = 0
-            usuario.save()
-            old_post_conexion = {'conexion':usuario.conexion}
-            return redirect('index')
 
     context = {
         'form1': form1,
         'form2': form2,
-        'form3': form3,
-        'correo': old_post_ingreso['correo'],
-        'conexion': old_post_conexion['conexion']
+        'form3': form3
     }
 
     return render(request, 'clientes/registro_clientes.html', context)
 
 def Listar_clientes(request):
-
-    old_post_ingreso = request.session.get('_old_post_ingreso') 
-    old_post_conexion = request.session.get('_old_post_conexion') 
 
     clientes = Cliente.objects.all()
 
@@ -248,7 +219,6 @@ def Listar_clientes(request):
 
         if request.POST.get('CambiarEstado') is not None:
             id_cliente = request.POST.get('CambiarEstado')
-            print(id_cliente)
             Cambiar_estado_cliente(id_cliente)
             cliente = Cliente.objects.get(clienteid = id_cliente)
             messages.warning(request, f'El cliente {cliente.personaid.runcuerpo} - {cliente.personaid.dv} ha quedado {cliente.estadoid.descripcion} correctamente')
@@ -262,19 +232,8 @@ def Listar_clientes(request):
             request.session['_old_post'] = request.POST
             return HttpResponseRedirect('editar_cliente')
 
-        cerrar_sesion = request.POST.get('cerrar_sesion')
-
-        if cerrar_sesion == "CerrarSesion":
-            usuario = Usuario.objects.get(email=old_post_ingreso['correo'])
-            usuario.conexion = 0
-            usuario.save()
-            old_post_conexion = {'conexion':usuario.conexion}
-            return redirect('index')
-
     context = {
         'clientes':clientes,
-        'correo': old_post_ingreso['correo'],
-        'conexion': old_post_conexion['conexion']
     }
 
     return render(request, 'clientes/listar_clientes.html', context)
@@ -292,35 +251,19 @@ def Cambiar_estado_cliente(id_cliente):
 
 def Ver_cliente(request):
 
-    old_post_ingreso = request.session.get('_old_post_ingreso') 
-    old_post_conexion = request.session.get('_old_post_conexion') 
+    old_post_ingreso = request.session.get('old_post_ingreso') 
+    old_post_conexion = request.session.get('old_post_conexion') 
 
     old_post = request.session.get('_old_post')
     cliente = Cliente.objects.get(clienteid=old_post['VerCliente'])
 
-    if request.method == 'POST':
-
-        cerrar_sesion = request.POST.get('cerrar_sesion')
-
-        if cerrar_sesion == "CerrarSesion":
-            usuario = Usuario.objects.get(email=old_post_ingreso['correo'])
-            usuario.conexion = 0
-            usuario.save()
-            old_post_conexion = {'conexion':usuario.conexion}
-            return redirect('index')
-
     context = {
-        'cliente':cliente,
-        'correo': old_post_ingreso['correo'],
-        'conexion': old_post_conexion['conexion']
+        'cliente':cliente
     }
 
     return render(request, 'clientes/ver_cliente.html', context)
 
 def Editar_cliente(request):
-
-    old_post_ingreso = request.session.get('_old_post_ingreso') 
-    old_post_conexion = request.session.get('_old_post_conexion') 
 
     old_post = request.session.get('_old_post')
 
@@ -334,15 +277,6 @@ def Editar_cliente(request):
     form3 = FormClienteNormal3(request.POST or None, instance=cliente_usuario)
 
     if request.method == 'POST':
-
-        cerrar_sesion = request.POST.get('cerrar_sesion')
-
-        if cerrar_sesion == "CerrarSesion":
-            usuario = Usuario.objects.get(email=old_post_ingreso['correo'])
-            usuario.conexion = 0
-            usuario.save()
-            old_post_conexion = {'conexion':usuario.conexion}
-            return redirect('index')
 
         run_cuerpo = request.POST.get('runcuerpo')
         dv = request.POST.get('dv')
@@ -393,8 +327,6 @@ def Editar_cliente(request):
         'form1': form1,
         'form2': form2,
         'form3': form3,
-        'correo': old_post_ingreso['correo'],
-        'conexion': old_post_conexion['conexion']
     }
 
     return render(request, 'clientes/editar_cliente.html', context)

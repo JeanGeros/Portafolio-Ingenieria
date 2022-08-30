@@ -63,7 +63,8 @@
                             <a class="nav-link fw-bolder text-black">Mis ordenes</a>
                         </li>
                     </ul>
-                    {% if conexion == 1 %}
+
+                    {% if user.is_authenticated %}
                         <li class="nav-item dropdown icono_usuario rounded">
                             <a class="nav-link dropdown-toggle fw-bolder icono_persona" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             <i class="fa-solid fa-user fa-2x" ></i>
@@ -72,10 +73,7 @@
                                 <li><a class="dropdown-item fw-bolder text-black" href="#">Action</a></li>
                                 <li><a class="dropdown-item fw-bolder text-black" href="#">Another action</a></li>
                                 <li><hr class="dropdown-divider fw-bolder text-black"></li>
-                                <form method="POST" action="">
-                                    {% csrf_token %}
-                                    <li><button type="submit" id="" name="cerrar_sesion" value="CerrarSesion" class="dropdown-item fw-bolder text-black">Cerrar sesion</button></li>
-                                </form>
+                                <li><a href="{% url 'logout'%}?next={{request.path}}" class="dropdown-item fw-bolder text-black">Cerrar Sesion</a></li>
                             </ul>
                         </li>
                     {% else %}
