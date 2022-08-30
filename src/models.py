@@ -479,11 +479,10 @@ class Usuario(models.Model):
     usuarioid = models.BigIntegerField(primary_key=True)
     email = models.CharField(max_length=50)
     password = models.CharField(max_length=25)
-    conexion = models.CharField(max_length=1)
+    nombreusuario = models.CharField(max_length=50)
     rolid = models.ForeignKey(Rolusuario, models.DO_NOTHING, db_column='rolid')
     personaid = models.ForeignKey(Persona, models.DO_NOTHING, db_column='personaid', blank=True, null=True)
     empresaid = models.ForeignKey(Empresa, models.DO_NOTHING, db_column='empresaid', blank=True, null=True)
-    conexion = models.CharField(max_length=1)
 
     def __str__(self):
         return self.email

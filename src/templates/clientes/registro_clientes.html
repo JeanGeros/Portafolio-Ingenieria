@@ -66,10 +66,12 @@
                         {% render_field form2.nombresector class="form-control input border border-secondary" name="nombre_sector" %}
                     </div>
                     <div class="col-md-2 mt-1 p-0">
+                        <label for="precio" class="txt_negrita label">Nombre de usuario:</label><br>
                         <label for="precio" class="txt_negrita label">Contraseña:</label><br>
                         <label for="precio" class="txt_negrita label">Confirme contraseña:</label><br>
                     </div>
                     <div class="col-md-2">
+                        <input class="form-control input border border-secondary" type="text" id="nombre_usuario" name="nombreusuario"/>
                         <input class="form-control input border border-secondary" type="password" id="password" name="password" onkeyup="myFunction()"/>
                         <input class="form-control input border border-secondary" type="password" id="confirme_contraseña" name="confirme_contraseña" onkeyup="myFunction()"/>
                         <button type="submit" id="boton_aceptar" class="btn btn_aceptar">Aceptar</button>
