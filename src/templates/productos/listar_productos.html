@@ -1,0 +1,81 @@
+{% extends 'layout.html' %}
+{% load widget_tweaks %}
+{% load static %}
+{% block content %}
+{% load l10n %}
+{% localize on %}
+{% load humanize %}
+
+    <link rel="stylesheet" href="{% static 'css/modulo_productos.css' %}">
+    <div class="container text-end caja rounded mt-5">
+    <h1 class="text-center">Administracion de Productos</h1>
+    <div class="container mb-4">
+        {% if messages %}
+            <ul class="messages list-group mb-3">
+                {% for message in messages %}
+                    <script>
+                        Swal.fire({
+                            icon: 'success',
+                            text: "{{message}}",
+                            showConfirmButton: false,
+                            timer: 2000
+                        })
+                    </script>
+                {% endfor %}
+            </ul>
+        {% endif %}
+        </div>  
+        <table class="table table-striped table-hover " style="background-color: white">
+            <thead  class="table-dark" style="text-align:center">
+                <tr>
+                    <th>Nombre</th>
+                    <th>Precio</th>
+                    <th>Stock</th>
+                    <th>Stock Critico</th>
+                    <th>Fecha de Vencimiento</th>
+                    <th>Imagen del producto</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody style="text-align:center">
+                {% for producto in productos %}
+                    <tr>
+                        <td>{{ producto.nombre | capfirst}}</td>
+                        <td>${{ producto.precio|localize |intcomma}}</td>
+                        <td>{{ producto.stock }}</td>
+                        <td>{{ producto.stockcritico }}</td>
+                        <td>{{ producto.fechavencimiento|date:"SHORT_DATE_FORMAT" }}</td>
+                        <td> <img src="/static/images/{{producto.imagen}}" alt="imagen producto" style="width:100px;height:100px;"> </td>
+
+
+                        <td>
+                            <form method="POST" action="">
+                                {% csrf_token %}
+                                <div class="btn-group">
+                                    <button  id="" name="VerProducto" value="{{producto.productoid}}" class="btn btn_aceptar border border-secondary">Ver</button>
+                                    <button  id="" name="EditarProducto" value="{{producto.productoid}}" class="btn btn_aceptar border border-secondary">Editar</button>
+                                    <!-- <a href="#" title="Editar" type="button" class="btn btn-primary">Editar </a> -->
+                                    {% if producto.estadoid.descripcion == 'Activo' %}
+                                        <button type="submit" id="" name="CambiarEstado" value="{{producto.productoid}}" class="btn btn_aceptar border border-secondary">Desactivar Producto</button>
+                                    {% else %}
+                                        <button type="submit" id="" name="CambiarEstado" value="{{producto.productoid}}" class="btn btn_aceptar border border-secondary">Activar Producto</button>
+                                    {% endif %}
+                                </div>
+                            </form>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+            <div align="left" class="btn_crear mb-5">
+                <a href="{% url 'agregar_productos' %}" type="button" class="btn btn-primary">Crear</a>
+            </div>
+
+    </div>
+    <script>
+        console.log(image)
+    </script>
+    {% endlocalize %}
+    {% endblock %}
+

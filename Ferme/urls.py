@@ -28,6 +28,9 @@ urlpatterns = [
     path('clientes/ver_cliente', views.Ver_cliente, name="ver_cliente"),
     path('clientes/editar_cliente', views.Editar_cliente, name="editar_cliente"),
     
-    path('agregar-producto/', views.addProducts, name="agregar-producto"),
-    path('listar-producto/', views.listar_productos, name="listar-producto"),
+    path('productos/', views.Listar_productos, name="listar_productos"),
+    path('productos/agregar_producto/', views.Agregar_productos, name="agregar_productos"),
+    path('productos/ver_producto', views.Ver_producto, name="ver_productos"),
+    path('productos/editar_producto', views.Editar_producto, name="editar_productos"),
+
 ]
