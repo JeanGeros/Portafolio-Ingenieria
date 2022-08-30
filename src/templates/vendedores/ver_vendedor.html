@@ -1,0 +1,50 @@
+{% extends 'layout.html' %}
+{% load widget_tweaks %}
+{% load static %}
+
+{% block content %}
+
+    <link rel="stylesheet" href="{% static 'css/registro_clientes.css' %}">
+    <div class="container text-end caja rounded mt-5">
+        <h1 class="text-center p-3" >Detalles del Vendedor</h1>
+
+        <table class="table table-striped table-hover" style="background-color: white; margin-bottom: 35px;">
+            <thead class="table-dark" style="text-align:center">
+                <tr>
+                    <th>Run</th>
+                    <th>Nombre</th>
+                    <th>Telefono</th>
+                </tr>
+            </thead>
+            <tbody style="text-align:center">
+                <tr>
+                    <td class="border border-secondary">{{vendedor.personaid.runcuerpo}} - {{vendedor.personaid.dv}}</td>
+                    <td class="border border-secondary">{{vendedor.personaid.nombres}} {{vendedor.personaid.apellidopaterno}} {{cliente.personaid.apellidomaterno}}</td>
+                    <td class="border border-secondary">{{vendedor.personaid.telefono}}</td>
+                </tr>
+            </tbody>
+        </table>
+        <table class="table table-striped table-hover" style="background-color: white">
+            <thead class="table-dark" style="text-align:center">
+                <tr>
+                    <th>Fecha de ingreso</th>
+                    <th>Fecha de desvinculacion</th>
+                    <th>Cargo</th>
+                    <th>Estado del vendedor</th>
+                </tr>
+            </thead>
+            <tbody style="text-align:center">
+                <tr>
+                    <td class="border border-secondary">{{vendedor.fechaingreso}}</td>
+                    <td class="border border-secondary">{{vendedor.fechadesvinculacion}}</td>
+                    <td class="border border-secondary">{{vendedor.cargoid.descripcion}}</td>
+                    <td class="border border-secondary">{{vendedor.estadoid.descripcion}}</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <a href="{% url 'listar_vendedores' %}" type="submit" class="btn">Volver</a>
+
+    </div>
+    
+{% endblock %}

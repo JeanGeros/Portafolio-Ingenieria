@@ -11,7 +11,7 @@ from src.forms import (
 
 from .models import (
     Persona, Direccion, Usuario, Cliente, Estado, Comuna, Tipobarrio, Tipovivienda, Rolusuario, 
-    Proveedor, Tipoproducto, Producto, Familiaproducto
+    Proveedor, Tipoproducto, Producto, Familiaproducto, Empleado, Cargo
 )
 
 def Index(request):
@@ -377,9 +377,6 @@ def Cambiar_estado_cliente(id_cliente):
 
 def Ver_cliente(request):
 
-    old_post_ingreso = request.session.get('old_post_ingreso') 
-    old_post_conexion = request.session.get('old_post_conexion') 
-
     old_post = request.session.get('_old_post')
     cliente = Cliente.objects.get(clienteid=old_post['VerCliente'])
 
@@ -459,3 +456,46 @@ def Editar_cliente(request):
     return render(request, 'clientes/editar_cliente.html', context)
 
 ##******************************************************************************************
+
+
+def Listar_vendedor(request):
+
+    vendedores = Cargo.objects.get(descripcion="Vendedor")
+    vendedores = Empleado.objects.filter(cargoid=vendedores)
+
+    if request.method == 'POST':
+
+        if request.POST.get('VerVendedor') is not None:
+            request.session['_old_post'] = request.POST
+            return HttpResponseRedirect('ver_vendedor')
+
+    context = {
+        'vendedores':vendedores
+    }
+    return render(request, 'vendedores/listar_vendedores.html', context)
+
+def Agregar_vendedor(request):
+
+    context = {
+
+    }
+    return render(request, 'vendedores/agregar_vendedor.html', context)
+
+def Ver_vendedor(request):
+
+    old_post = request.session.get('_old_post')
+    print(old_post['VerVendedor'])
+    vendedor = Empleado.objects.get(empleadoid=old_post['VerVendedor'])
+
+    context = {
+        'vendedor':vendedor
+    }
+
+    return render(request, 'vendedores/ver_vendedor.html', context)
+
+def Editar_vendedor(request):
+
+    context = {
+
+    }
+    return render(request, 'vendedores/editar_vendedor.html', context)

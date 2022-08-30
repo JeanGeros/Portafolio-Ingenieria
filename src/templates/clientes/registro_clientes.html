@@ -5,9 +5,9 @@
 {% block content %}
     <link rel="stylesheet" href="{% static 'css/registro_clientes.css' %}">
     
-    <div class="container text-end caja rounded mt-5">
+    <div class="container text-end caja rounded mt-5 mb-5">
         
-        <h1 class="text-center p-2">Registro de clientes</h1>
+        <h1 class="text-center">Registro de clientes</h1>
         {% if messages %}
             <ul class="messages list-group mb-3">
                 {% for message in messages %}
@@ -74,8 +74,11 @@
                         <input class="form-control input border border-secondary" type="text" id="nombre_usuario" name="nombreusuario"/>
                         <input class="form-control input border border-secondary" type="password" id="password" name="password" onkeyup="myFunction()"/>
                         <input class="form-control input border border-secondary" type="password" id="confirme_contraseña" name="confirme_contraseña" onkeyup="myFunction()"/>
-                        <button type="submit" id="boton_aceptar" class="btn btn_aceptar">Aceptar</button>
-                        <a href="{% url 'index' %}" type="submit" class="btn">Cancelar</a> 
+                        <div class="" style="display: flex;">
+                            <button type="submit" id="boton_aceptar" class="btn btn_aceptar" style="margin-right: 10px;">Aceptar</button>
+                            <a href="{% url 'index' %}" type="submit" class="btn">Cancelar</a>
+                        </div>
+                         
                     </div>
                 </div>
         </form>

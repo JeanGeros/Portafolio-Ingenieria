@@ -98,7 +98,13 @@ class Boleta(models.Model):
         managed = False
         db_table = 'boleta'
 
+class Cargo(models.Model):
+    cargoid = models.BigIntegerField(primary_key=True)
+    descripcion = models.CharField(max_length=30)
 
+    class Meta:
+        managed = False
+        db_table = 'cargo'
 
 class Cliente(models.Model):
     clienteid = models.BigIntegerField(primary_key=True)
@@ -207,11 +213,10 @@ class DjangoSession(models.Model):
 
 class Empleado(models.Model):
     empleadoid = models.BigIntegerField(primary_key=True)
-    cargo = models.CharField(max_length=25)
-    funcion = models.CharField(max_length=25, blank=True, null=True)
     fechaingreso = models.DateField()
     fechadesvinculacion = models.DateField(blank=True, null=True)
     personaid = models.ForeignKey('Persona', models.DO_NOTHING, db_column='personaid')
+    cargoid = models.ForeignKey(Cargo, models.DO_NOTHING, db_column='cargoid')
     estadoid = models.ForeignKey('Estado', models.DO_NOTHING, db_column='estadoid')
 
     class Meta:

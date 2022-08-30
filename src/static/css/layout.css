@@ -1,5 +1,6 @@
 .navbar, .footer {
     background-color: #909090;
+    z-index: 3;
 }
 
 .ingresar, .registrarme{
@@ -29,8 +30,8 @@ footer {
 }
 
 .logo-navbar {
-    max-width: 8%;
-    max-height: 2%;
+    max-width: 10%;
+    max-height: 4%;
 }
 
 .icono_persona {
