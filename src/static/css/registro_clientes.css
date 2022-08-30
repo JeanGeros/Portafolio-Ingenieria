@@ -13,9 +13,12 @@
 }
 
 .caja {
-    padding: 5%;
-    margin-top: 4%!important;
-    margin-bottom: 10px;
+    padding-top: 2%;
+    padding-bottom: 3%;
+    padding-left: 4%;
+    padding-right: 4%;
+    margin-top: 5%!important;
+    margin-bottom: 6%!important;
     background-color: #D9D9D9;
 }
 

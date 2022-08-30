@@ -26,18 +26,9 @@
                     <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                         <img class="logo-navbar" src="{% static 'images/Ferme-nav.png' %}" alt="">
 
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle fw-bolder text-black" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Productos</a>
-                            <ul class="dropdown-menu">
-                                <li><a class="dropdown-item fw-bolder text-black" href="/agregar-producto">Agregar Productos</a></li>
-                                <li><a class="dropdown-item fw-bolder text-black" href="/listar-producto">Listar Productosn</a></li>
-                            </ul>
-                        </li>
-
                         <li class="nav-item">
-                            <a class="nav-link fw-bolder text-black" href="#">Boleta</a>
+                            <a class="nav-link fw-bolder text-black" href="/productos">Administración <br> de productos</a>
                         </li>
-
 
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle fw-bolder text-black" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -51,10 +42,10 @@
                             </ul>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link fw-bolder text-black">Ordenes de compras</a>
+                            <a href="/vendedores" class="nav-link fw-bolder text-black">Administración <br> de vendedores</a>
                         </li>
                         <li class="nav-item">
-                            <a href="/clientes" class="nav-link fw-bolder text-black">Administracion de clientes</a>
+                            <a href="/clientes" class="nav-link fw-bolder text-black">Administración <br> de clientes</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link fw-bolder text-black">Proveedores</a>

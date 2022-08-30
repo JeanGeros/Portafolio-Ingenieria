@@ -5,7 +5,7 @@
 {% block content %}
     <link rel="stylesheet" href="{% static 'css/registro_clientes.css' %}">
     <div class="container text-end caja rounded mt-5">
-        <h1 class="text-center pt-4">Administracion de Clientes</h1>
+        <h1 class="text-center pt-4">Administracion de Vendedores</h1>
         <div class="container mb-4">
             {% if messages %}
                 <ul class="messages list-group mb-3">
@@ -24,7 +24,7 @@
         </div>
 
         <table class="table table-striped table-hover" style="background-color: white">
-            <h3 class="titulo-cliente text-center p-2 mb-0">Clientes</h3>
+            <h3 class="titulo-cliente text-center p-2 mb-0">Vendedores</h3>
             <thead class="table-dark" style="text-align:center">
                 <tr>
                     <th>Run</th>
@@ -36,23 +36,23 @@
             </thead>
             <tbody style="text-align:center">
           
-                {% for cliente in clientes %}
+                {% for vendedor in vendedores %}
                     <tr>
-                        <td>{{ cliente.personaid.runcuerpo }} - {{ cliente.personaid.dv }}</td>
-                        <td>{{ cliente.personaid.nombres }}</td>
-                        <td>{{ cliente.personaid.apellidopaterno }}</td>
-                        <td>{{ cliente.personaid.apellidopaterno }}</td>
+                        <td>{{ vendedor.personaid.runcuerpo }} - {{ vendedor.personaid.dv }}</td>
+                        <td>{{ vendedor.personaid.nombres }}</td>
+                        <td>{{ vendedor.personaid.apellidopaterno }}</td>
+                        <td>{{ vendedor.personaid.apellidopaterno }}</td>
                         <td>
                             <form method="POST" action="">
                                 {% csrf_token %}
                                 <div class="btn-group">
-                                    <button  id="" name="VerCliente" value="{{cliente.clienteid}}" class="btn btn_aceptar border border-secondary">Ver</button>
-                                    <button  id="" name="EditarCliente" value="{{cliente.clienteid}}" class="btn btn_aceptar border border-secondary">Editar</button>
+                                    <button  id="" name="VerVendedor" value="{{vendedor.empleadoid}}" class="btn btn_aceptar border border-secondary">Ver</button>
+                                    <button  id="" name="EditarVendedor" value="{{vendedor.empleadoid}}" class="btn btn_aceptar border border-secondary">Editar</button>
                                     <!-- <a href="#" title="Editar" type="button" class="btn btn-primary">Editar </a> -->
-                                    {% if cliente.estadoid.descripcion == 'Activo' %}
-                                        <button type="submit" id="" name="CambiarEstado" value="{{cliente.clienteid}}" class="btn btn_aceptar border border-secondary">Desactivar Cliente</button>
+                                    {% if vendedor.estadoid.descripcion == 'Activo' %}
+                                        <button type="submit" id="" name="CambiarEstado" value="{{vendedor.empleadoid}}" class="btn btn_aceptar border border-secondary">Desactivar Vendedor</button>
                                     {% else %}
-                                        <button type="submit" id="" name="CambiarEstado" value="{{cliente.clienteid}}" class="btn btn_aceptar border border-secondary">Activar Cliente</button>
+                                        <button type="submit" id="" name="CambiarEstado" value="{{vendedor.empleadoid}}" class="btn btn_aceptar border border-secondary">Activar Vendedor</button>
                                     {% endif %}
                                 </div>
                             </form>
@@ -63,7 +63,7 @@
         </table>
   
         <div align="left" class="btn_crear mb-5">
-          <a href="{% url 'registro_clientes' %}" type="button" class="btn btn-primary">Crear</a>
+          <a href="{% url 'agregar_vendedor' %}" type="button" class="btn btn-primary">Crear</a>
         </div>
   
     </div>
