@@ -1,0 +1,67 @@
+{% extends 'layout.html' %}
+{% load widget_tweaks %}
+{% load static %}
+
+{% block content %}
+    <link rel="stylesheet" href="{% static 'css/modulo_productos.css' %}">
+
+    <div class="container text-end caja rounded">
+        
+        <h1 class="text-center pb-2">Editar Producto</h1>
+        {% if messages %}
+            <ul class="messages list-group mb-3">
+                {% for message in messages %}
+                    <script>
+                        Swal.fire({
+                            icon: 'success',
+                            text: "{{message}}",
+                            showConfirmButton: false,
+                            timer: 2000
+                        })
+                    </script>
+                {% endfor %}
+            </ul>
+        {% endif %}
+        <form method="post" action="" class="">
+            {% csrf_token %}        
+
+                <div class="form-group row pb-3">
+                    <div class="col-md-3 mt-1 textos p-0">
+                        <label for="run"  class="txt_negrita label">Nombre:</label><br>
+                        <label for="run" class="txt_negrita label">Precio:</label><br>
+                        <label for="run" class="txt_negrita label">Stock:</label><br>
+                        <label for="run" class="txt_negrita label">Stock Critico:</label><br>
+                        <label for="run" class="txt_negrita label">Fecha de Vencimiento:</label><br>
+                    </div>
+                    <div class="col-md-3">
+                        {% render_field form.nombre class="form-control input border border-secondary" name="nombre" %}
+                        {% render_field form.precio class="form-control input border border-secondary" name="precio" %}
+                        {% render_field form.stock class="form-control input border border-secondary" name="stock" %}
+                        {% render_field form.stockcritico class="form-control input border border-secondary" name="stock_critico" %}
+                        {% render_field form.fechavencimiento class="form-control input border border-secondary" name="fecha_vencimiento" %}
+                    </div>
+
+                    <div class="col-md-3 mt-1 p-0">
+                        <br>
+                        <label class="txt_negrita label">Imagen del Producto:</label><br>
+                        <label class="txt_negrita label">Proveedor :</label><br>
+                        <label class="txt_negrita label">Tipo de Producto :</label><br>
+                        <label class="txt_negrita label">familiaproid:</label><br>
+                        <label class="txt_negrita label">Estado Producto:</label><br>
+
+                    </div>
+                    <div class="col-md-3">
+                        {% render_field form.imagen class="form-control input border border-secondary" name="imagen" %}
+                        {% render_field form.proveedorid class="form-control input border border-secondary" name="proveedorid" %}
+                        {% render_field form.tipoproductoid class="form-control input border border-secondary" name="tipoproductoid" %}
+                        {% render_field form.familiaproid class="form-control input border border-secondary" name="familiaproid" %}
+                        {% render_field form.estadoid class="form-control input border border-secondary" name="estadoid" %}
+                        <button type="submit" id="boton_aceptar" class="btn btn_aceptar">Aceptar</button>
+                        <a href="{% url 'listar_productos' %}" type="submit" class="btn">Cancelar</a>
+                    </div>
+                    
+                </div>
+        </form>
+    </div>
+
+{% endblock %}

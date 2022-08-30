@@ -49,7 +49,7 @@ def Ingreso(request):
 
     return render(request, 'ingreso/ingreso_usuarios.html', context)
 
-def addProducts(request):
+def Agregar_productos(request):
 
     old_post_ingreso = request.session.get('old_post_ingreso') 
     old_post_conexion = request.session.get('old_post_conexion') 
@@ -72,6 +72,7 @@ def addProducts(request):
         tipo_producto = Tipoproducto.objects.get(tipoproductoid=tipoproductoid)
         familia_producto = Familiaproducto.objects.get(familiaproid=familiaproid)
         Estado_producto = Estado.objects.get(estadoid=estadoid)
+
         product = Producto.objects.create(
            nombre = nombre.strip(),
            precio = precio.strip(),
@@ -85,12 +86,10 @@ def addProducts(request):
            familiaproid = familia_producto,
            estadoid = Estado_producto
         )
-        product.save()
         
         if product is not None:
-            product.save()
             messages.warning(request, 'Producto creado correctamente')
-            return redirect('listar-producto')
+            return redirect('listar_productos')
         else:
             messages.warning(request, 'No se pudo crear el Producto')
 
@@ -110,17 +109,144 @@ def addProducts(request):
         'conexion': old_post_conexion['conexion']
     }
 
-    return render(request, 'Modulo_productos/addProducts.html', context)
+    return render(request, 'productos/agregar_productos.html', context)
 
-def listar_productos(request):
+def Listar_productos(request):
 
     productos = Producto.objects.all()
+
+    if request.method == 'POST':
+        if request.POST.get('CambiarEstado') is not None:
+            id_producto = request.POST.get('CambiarEstado')
+            print(id_producto)
+            Cambiar_estado_producto(id_producto)
+            producto = Producto.objects.get(productoid = id_producto)
+            messages.warning(request, f'El producto {producto.nombre} ha quedado {producto.estadoid.descripcion} correctamente')
+            return redirect('listar_productos')
+
+        cerrar_sesion = request.POST.get('cerrar_sesion')
+
+        if cerrar_sesion == "CerrarSesion":
+            usuario = Usuario.objects.get(email=old_post_ingreso['correo'])
+            usuario.conexion = 0
+            usuario.save()
+            old_post_conexion = {'conexion':usuario.conexion}
+            return redirect('index')
+        
+        if request.POST.get('VerProducto') is not None:
+            request.session['_old_post'] = request.POST
+            return HttpResponseRedirect('ver_producto')
+
+        if request.POST.get('EditarProducto') is not None:
+            request.session['_old_post'] = request.POST
+            return HttpResponseRedirect('editar_producto')
     
     context = {
         'productos': productos
     }
 
-    return render(request, 'Modulo_productos/listarProductos.html', context)
+    return render(request, 'productos/listar_productos.html', context)
+
+def Cambiar_estado_producto(id_producto):
+
+    producto = Producto.objects.get(productoid = id_producto)
+
+    if producto.estadoid.descripcion == 'Activo':
+        producto.estadoid = Estado.objects.get(descripcion = "Inactivo")
+        producto.save()
+    else: 
+        producto.estadoid = Estado.objects.get(descripcion = "Activo")
+        producto.save()
+
+def Ver_producto(request):
+
+    old_post_ingreso = request.session.get('_old_post_ingreso') 
+    old_post_conexion = request.session.get('_old_post_conexion') 
+
+    old_post = request.session.get('_old_post')
+    producto = Producto.objects.get(productoid=old_post['VerProducto'])
+
+    if request.method == 'POST':
+
+        cerrar_sesion = request.POST.get('cerrar_sesion')
+
+        if cerrar_sesion == "CerrarSesion":
+            usuario = Usuario.objects.get(email=old_post_ingreso['correo'])
+            usuario.conexion = 0
+            usuario.save()
+            old_post_conexion = {'conexion':usuario.conexion}
+            return redirect('index')
+
+    context = {
+        'producto':producto,
+        'correo': old_post_ingreso['correo'],
+        'conexion': old_post_conexion['conexion']
+    }
+
+    return render(request, 'productos/ver_producto.html', context)
+
+
+def Editar_producto(request):
+
+    old_post_ingreso = request.session.get('_old_post_ingreso') 
+    old_post_conexion = request.session.get('_old_post_conexion') 
+
+    old_post = request.session.get('_old_post')
+
+    producto = Producto.objects.get(productoid=old_post['EditarProducto'])
+
+    form = addproductsForm(request.POST or None, instance=producto)
+
+    if request.method == 'POST':
+
+        cerrar_sesion = request.POST.get('cerrar_sesion')
+
+        if cerrar_sesion == "CerrarSesion":
+            usuario = Usuario.objects.get(email=old_post_ingreso['correo'])
+            usuario.conexion = 0
+            usuario.save()
+            old_post_conexion = {'conexion':usuario.conexion}
+            return redirect('index')
+
+        nombre = request.POST.get('nombre')
+        precio = request.POST.get('precio')
+        stock = request.POST.get('stock')
+        stockcritico = request.POST.get('stockcritico')
+        fechavencimiento = request.POST.get('fechavencimiento')
+        imagen = request.POST.get('imagen')
+        proveedorid = request.POST.get('proveedorid')
+        tipoproductoid = request.POST.get('tipoproductoid')
+        familiaproid = request.POST.get('familiaproid')
+        estadoid = request.POST.get('estadoid')
+
+        proveedor = Proveedor.objects.get(proveedorid=proveedorid)
+        tipo_producto = Tipoproducto.objects.get(tipoproductoid=tipoproductoid)
+        familia_producto = Familiaproducto.objects.get(familiaproid=familiaproid)
+        Estado_producto = Estado.objects.get(estadoid=estadoid)
+
+        producto, created = Producto.objects.get_or_create(productoid=old_post['EditarProducto'])
+        producto.nombre = nombre 
+        producto.precio = precio
+        producto.stock = stock
+        producto.stockcritico = stockcritico
+        producto.fechavencimiento = fechavencimiento
+        producto.imagen = imagen
+        producto.proveedorid = proveedor
+        producto.tipoproductoid = tipo_producto
+        producto.familiaproid = familia_producto
+        producto.estadoid = Estado_producto
+        producto.save()
+
+        messages.warning(request, 'Producto actualizado correctamente')
+        return redirect('listar_productos')
+
+    context = {
+        'form': form,
+        'correo': old_post_ingreso['correo'],
+        'conexion': old_post_conexion['conexion']
+    }
+
+    return render(request, 'productos/editar_productos.html', context)
 
 ##********************Clientes*******************************************************************
 
@@ -291,6 +417,7 @@ def Editar_cliente(request):
         tipo_vivienda_id = request.POST.get('tipoviviendaid')
         tipo_barrio_id = request.POST.get('tipobarrioid')
         nombre_sector = request.POST.get('nombresector')
+
 
         cliente_persona.runcuerpo = run_cuerpo
         cliente_persona.save()
