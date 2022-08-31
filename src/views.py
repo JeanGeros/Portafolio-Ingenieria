@@ -3,7 +3,7 @@ from django.http import HttpResponseRedirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-
+import datetime 
 from django.contrib import messages
 from src.forms import (
     FormClienteNormal1, FormClienteNormal2, FormClienteNormal3, addproductsForm
@@ -62,6 +62,8 @@ def Agregar_productos(request):
         stock = request.POST.get('stock')
         stockcritico = request.POST.get('stockcritico')
         fechavencimiento = request.POST.get('fechavencimiento')
+        fecha = fechavencimiento.split("/")
+        fechavencimiento = f"{fecha[2]}-{fecha[1]}-{fecha[0]}"
         imagen = request.POST.get('imagen')
         proveedorid = request.POST.get('proveedorid')
         tipoproductoid = request.POST.get('tipoproductoid')
@@ -93,20 +95,8 @@ def Agregar_productos(request):
         else:
             messages.warning(request, 'No se pudo crear el Producto')
 
-        cerrar_sesion = request.POST.get('cerrar_sesion')
-
-        if cerrar_sesion == "CerrarSesion":
-            usuario = Usuario.objects.get(email=old_post_ingreso['correo'])
-            usuario.conexion = 0
-            usuario.save()
-            request.session['old_post_ingreso'] = request.POST
-            request.session['old_post_conexion'] = {'conexion':usuario.conexion}
-            return render(request, 'index.html', context)
-
     context = {
         'form': form,
-        'correo': old_post_ingreso['correo'],
-        'conexion': old_post_conexion['conexion']
     }
 
     return render(request, 'productos/agregar_productos.html', context)
@@ -199,15 +189,6 @@ def Editar_producto(request):
 
     if request.method == 'POST':
 
-        cerrar_sesion = request.POST.get('cerrar_sesion')
-
-        if cerrar_sesion == "CerrarSesion":
-            usuario = Usuario.objects.get(email=old_post_ingreso['correo'])
-            usuario.conexion = 0
-            usuario.save()
-            old_post_conexion = {'conexion':usuario.conexion}
-            return redirect('index')
-
         nombre = request.POST.get('nombre')
         precio = request.POST.get('precio')
         stock = request.POST.get('stock')
@@ -218,32 +199,37 @@ def Editar_producto(request):
         tipoproductoid = request.POST.get('tipoproductoid')
         familiaproid = request.POST.get('familiaproid')
         estadoid = request.POST.get('estadoid')
-
+        fecha = fechavencimiento.split("/")
+        fechavencimiento = f"{fecha[2]}-{fecha[1]}-{fecha[0]}"
         proveedor = Proveedor.objects.get(proveedorid=proveedorid)
         tipo_producto = Tipoproducto.objects.get(tipoproductoid=tipoproductoid)
         familia_producto = Familiaproducto.objects.get(familiaproid=familiaproid)
         Estado_producto = Estado.objects.get(estadoid=estadoid)
 
+    
         producto, created = Producto.objects.get_or_create(productoid=old_post['EditarProducto'])
-        producto.nombre = nombre 
-        producto.precio = precio
-        producto.stock = stock
-        producto.stockcritico = stockcritico
-        producto.fechavencimiento = fechavencimiento
-        producto.imagen = imagen
-        producto.proveedorid = proveedor
-        producto.tipoproductoid = tipo_producto
-        producto.familiaproid = familia_producto
-        producto.estadoid = Estado_producto
-        producto.save()
+        try:
+            producto.nombre = nombre 
+            producto.precio = precio
+            producto.stock = stock
+            producto.stockcritico = stockcritico
+            producto.fechavencimiento = fechavencimiento
+            producto.imagen = imagen
+            producto.proveedorid = proveedor
+            producto.tipoproductoid = tipo_producto
+            producto.familiaproid = familia_producto
+            producto.estadoid = Estado_producto
+            producto.save()
 
-        messages.warning(request, 'Producto actualizado correctamente')
-        return redirect('listar_productos')
+            messages.warning(request, 'Cliente actualizado correctamente')
+            return redirect('listar_productos')
+            
+        except Exception as error:
+            messages.error(request, error)
+
 
     context = {
         'form': form,
-        'correo': old_post_ingreso['correo'],
-        'conexion': old_post_conexion['conexion']
     }
 
     return render(request, 'productos/editar_productos.html', context)

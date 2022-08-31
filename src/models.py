@@ -338,6 +338,9 @@ class Persona(models.Model):
     telefono = models.BigIntegerField(blank=True, null=True)
     estadoid = models.ForeignKey(Estado, models.DO_NOTHING, db_column='estadoid')
 
+    def __str__(self):
+        return self.nombres
+    
     class Meta:
         managed = False
         db_table = 'persona'
