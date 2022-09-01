@@ -1,20 +1,4 @@
 
-
-let button = document.getElementById('boton_aceptar')
-button.disabled = true
-
-function ValidacionContraseñas(e) {
-
-    var password = document.getElementById('password').value;
-    var confirme_contraseña = document.getElementById('confirme_contraseña').value;
-    if (password !== "" && confirme_contraseña !== "" && password === confirme_contraseña){
-        button.disabled = false
-    }
-    else{
-        button.disabled = true
-    }
-}
-
 function SoloNumeros(e) {
     key = e.keyCode || e.which;
     tecla = String.fromCharCode(key).toLowerCase();
@@ -55,7 +39,7 @@ function SoloLetras(e){
 function ValidacionTelefono(e){
     key = e.keyCode || e.which;
     tecla = String.fromCharCode(key)
-    teclas = "1234567890";
+    teclas = "1234567890+";
     especiales = "8-37-39-46";
 
     tecla_especial = false
