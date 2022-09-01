@@ -162,6 +162,9 @@ class Direccion(models.Model):
     nombresector = models.CharField(max_length=100)
     comunaid = models.ForeignKey(Comuna, models.DO_NOTHING, db_column='comunaid', verbose_name="texto")
 
+    def __str__(self):
+        return f"{self.calle} {self.numero}"
+
     class Meta:
         managed = False
         db_table = 'direccion'
@@ -352,7 +355,7 @@ class Producto(models.Model):
     precio = models.BigIntegerField()
     stock = models.BigIntegerField()
     stockcritico = models.BigIntegerField()
-    fechavencimiento = models.DateField()
+    fechavencimiento = models.DateField(blank=True, null=True)
     codigo = models.CharField(max_length=17)
     imagen = models.ImageField(max_length=256, blank=True, null=True, upload_to='static/images/')
     proveedorid = models.ForeignKey('Proveedor', models.DO_NOTHING, db_column='proveedorid')

@@ -1,0 +1,109 @@
+{% extends 'layout.html' %}
+{% load widget_tweaks %}
+{% load static %}
+{% block content %}
+
+    <link href="{% static 'js/jquery-ui-1.12.1/jquery-ui.min.css' %}" rel="stylesheet">
+    <link href="{% static 'js/jquery-ui-1.12.1/jquery-ui.structure.min.css' %}" rel="stylesheet">
+    <link href="{% static 'js/jquery-ui-1.12.1/jquery-ui.theme.min.css' %}" rel="stylesheet">
+    <link href="{% static 'js/jquery-ui-1.12.1/external/jquery/jquery.js' %}" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/modulo_productos.css' %}">
+
+<div class="container text-end caja rounded mt-5">
+    <h1 class="text-center p-2">Registro de Productos</h1>
+    {% if messages %}
+                <ul class="messages list-group mb-3">
+                {% for message in messages %}
+                    <li{% if message.tags %} class="{{ message.tags }} list-group-item list-group-item-primary"{% endif %}>{{ message }}</li>
+                {% endfor %}
+                </ul>
+            {% endif %}
+    <form method="post" action="">
+        {% csrf_token %}        
+            <div class="form-group row pb-3">
+                <div class="col-md-2 mt-1 textos p-0">
+                    <label class="txt_negrita label">Nombre:</label><br>
+                    <label class="txt_negrita label">Precio:</label><br>
+                    <label class="txt_negrita label">Stock:</label><br>
+                    <label class="txt_negrita label">Stock Critico:</label><br>
+                    <label class="txt_negrita label">Fecha de Vencimiento:</label><br>
+                </div>
+                <div class="col-md-2">
+                    {% render_field form.nombre class="form-control input border border-secondary" onkeypress="return numerosCaracteres(event)" %}
+                    {% render_field form.precio class="form-control input border border-secondary" onkeypress="return soloNumeros(event)" %}
+                    {% render_field form.stock class="form-control input border border-secondary" onkeypress="return soloNumeros(event)" %} 
+                    {% render_field form.stockcritico class="form-control input border border-secondary" onkeypress="return soloNumeros(event)" %} 
+                    {% render_field form.fechavencimiento class="form-control dateinput border border-secondary" name="fecha_vencimiento" %}
+                   
+                </div>
+
+                <div class="col-md-2 mt-1 textos p-0">
+                    <label class="txt_negrita label">Imagen del Producto:</label><br>
+                    <label class="txt_negrita label">Proveedor :</label><br>
+                    <label class="txt_negrita label">Tipo de Producto :</label><br>
+                    <label class="txt_negrita label">Familia del Producto:</label><br>
+                    <label class="txt_negrita label">Estado Producto:</label><br>
+
+                </div>
+                    <div class="col-md-2">
+                        {% render_field form.imagen class="form-control input border border-secondary" name="imagen" %}
+                        {% render_field form.proveedorid class="form-control input border border-secondary" name="proveedorid" %}
+                        {% render_field form.tipoproductoid class="form-control input border border-secondary" name="tipoproductoid" %}
+                        {% render_field form.familiaproid class="form-control input border border-secondary" name="familiaproid" %}
+                        {% render_field form.estadoid class="form-control input border border-secondary" name="estadoid" %}
+                    </div>
+                </div>
+
+
+            <div>
+                <div class="col-md-2">
+                    <button type="submit" id="boton_aceptar" class="btn">Aceptar</button>
+                    <a href="/productos" type="submit" class="btn">Cancelar</a> 
+                </div>
+            </div>
+    </form>
+</div>
+<script>
+
+
+
+    function numerosCaracteres(e) {
+        key = e.keyCode || e.which;
+        tecla = String.fromCharCode(key).toLowerCase();
+        letras = "ABCDEFGHIJKLMNOPQRSTUVWXYZáéíóúabcdefghijklmnñopqrstuvwxyz1234567890,";
+        especiales = [8, 37, 39, 46];
+
+        tecla_especial = false
+        for(var i in especiales) {
+            if(key == especiales[i]) {
+                tecla_especial = true;
+                break;
+            }
+        }
+
+        if(letras.indexOf(tecla) == -1 && !tecla_especial)
+            return false;
+    }
+
+    function soloNumeros(e) {
+            key = e.keyCode || e.which;
+            tecla = String.fromCharCode(key).toLowerCase();
+            letras = "1234567890";
+            especiales = [8, 37, 39, 46];
+
+            tecla_especial = false
+            for(var i in especiales) {
+                if(key == especiales[i]) {
+                    tecla_especial = true;
+                    break;
+                }
+            }
+
+            if(letras.indexOf(tecla) == -1 && !tecla_especial)
+                return false;
+        }
+        
+
+</script>
+
+{% endblock %}
