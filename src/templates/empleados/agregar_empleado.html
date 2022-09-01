@@ -7,7 +7,7 @@
     
     <div class="container text-end caja rounded mt-5 mb-5">
         
-        <h1 class="text-center">Registro de vendedor</h1>
+        <h1 class="text-center">Registro de empleado</h1>
         {% if messages %}
             <ul class="messages list-group mb-3">
                 {% for message in messages %}
@@ -61,7 +61,7 @@
                     <input class="form-control input border border-secondary" type="password" id="confirme_contraseña" name="confirme_contraseña" onkeyup="myFunction()"/>
                     <div class="" style="display: flex;">
                         <button type="submit" id="boton_aceptar" class="btn btn_aceptar" style="margin-right: 10px;">Aceptar</button>
-                        <a href="{% url 'listar_vendedores' %}" type="submit" class="btn">Cancelar</a>
+                        <a href="{% url 'listar_empleados' %}" type="submit" class="btn">Cancelar</a>
                     </div>
                 </div>
             </div>

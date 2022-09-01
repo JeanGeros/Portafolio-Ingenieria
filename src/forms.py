@@ -1,13 +1,13 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from .models import Producto, Persona, Direccion, Usuario, Cliente
+from .models import Producto, Persona, Direccion, Usuario, Cliente, Empleado
 
 class FormRegistroUsuario(UserCreationForm):
 
     class Meta:
         model = User
-        fields = ("email","password1","password2")
+        fields = ("email", "username","password1","password2")
 
 class FormClienteNormal1(forms.ModelForm):
     
@@ -43,4 +43,40 @@ class addproductsForm(forms.ModelForm):
     class Meta:
         model = Producto
         fields = '__all__'
+
+class FormVendedorPersona(forms.ModelForm):
+    
+    class Meta:
+        model = Persona
+        fields = ("runcuerpo", "dv", "apellidopaterno", "apellidomaterno", "nombres", "telefono")
+
+class FormVendedorUsuario(forms.ModelForm):
+    
+    class Meta:
+        model = Usuario
+        fields = ("email", "nombreusuario","password")
+
+class FormVendedorEmpleado(forms.ModelForm):
+    
+    class Meta:
+        model = Empleado
+        fields = ("fechaingreso",)
+
+class FormEmpleadoPersona(forms.ModelForm):
+    
+    class Meta:
+        model = Persona
+        fields = ("runcuerpo", "dv", "apellidopaterno", "apellidomaterno", "nombres", "telefono")
+
+class FormEmpleadoUsuario(forms.ModelForm):
+    
+    class Meta:
+        model = Usuario
+        fields = ("email", "nombreusuario","password")
+
+class FormEmpleadoEmpleado(forms.ModelForm):
+    
+    class Meta:
+        model = Empleado
+        fields = ("fechaingreso",)
 

@@ -26,6 +26,7 @@ urlpatterns = [
 
     path('registro_cliente/', views.Registro_clientes, name="registro_clientes"),
     path('clientes/', views.Listar_clientes, name="listar_clientes"),
+    path('clientes/agregar_cliente', views.Agregar_cliente, name="agregar_cliente"),
     path('clientes/ver_cliente', views.Ver_cliente, name="ver_cliente"),
     path('clientes/editar_cliente', views.Editar_cliente, name="editar_cliente"),
     
@@ -34,9 +35,14 @@ urlpatterns = [
     path('productos/ver_producto', views.Ver_producto, name="ver_productos"),
     path('productos/editar_producto', views.Editar_producto, name="editar_productos"),
 
-    path('vendedores/', views.Listar_vendedor, name="listar_vendedores"),
+    path('vendedores/', views.Listar_vendedores, name="listar_vendedores"),
     path('vendedores/agregar_vendedor', views.Agregar_vendedor, name="agregar_vendedor"),
     path('vendedores/ver_vendedor', views.Ver_vendedor, name="ver_vendedor"),
     path('vendedores/editar_vendedor', views.Editar_vendedor, name="editar_vendedor"),
+
+    path('empleados/', views.Listar_empleados, name="listar_empleados"),
+    path('empleados/agregar_empleado', views.Agregar_empleado, name="agregar_empleado"),
+    path('empleados/ver_empleado', views.Ver_empleado, name="ver_empleado"),
+    path('empleados/editar_empleado', views.Editar_empleado, name="editar_empleado"),
 
 ]

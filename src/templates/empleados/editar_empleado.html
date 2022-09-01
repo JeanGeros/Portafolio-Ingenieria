@@ -7,7 +7,7 @@
 
     <div class="container text-end caja rounded">
         
-        <h1 class="text-center pb-2">Editar Vendedor</h1>
+        <h1 class="text-center pb-2">Editar Empleado</h1>
         {% if messages %}
             <ul class="messages list-group mb-3">
                 {% for message in messages %}
@@ -56,7 +56,7 @@
                     {% render_field form3.fechaingreso class="form-control input border border-secondary" %}
                     {% render_field form2.nombreusuario class="form-control input border border-secondary" %}
                     <button type="submit" id="boton_aceptar" class="btn btn_aceptar">Aceptar</button>
-                    <a href="{% url 'listar_vendedores' %}" type="submit" class="btn">Cancelar</a>
+                    <a href="{% url 'listar_empleados' %}" type="submit" class="btn">Cancelar</a>
                 </div>
                 
             </div>
