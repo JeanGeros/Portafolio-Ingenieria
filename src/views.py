@@ -62,8 +62,6 @@ def Agregar_productos(request):
         stock = request.POST.get('stock')
         stockcritico = request.POST.get('stockcritico')
         fechavencimiento = request.POST.get('fechavencimiento')
-        fecha = fechavencimiento.split("/")
-        fechavencimiento = f"{fecha[2]}-{fecha[1]}-{fecha[0]}"
         imagen = request.POST.get('imagen')
         proveedorid = request.POST.get('proveedorid')
         tipoproductoid = request.POST.get('tipoproductoid')
@@ -75,13 +73,22 @@ def Agregar_productos(request):
         familia_producto = Familiaproducto.objects.get(familiaproid=familiaproid)
         Estado_producto = Estado.objects.get(estadoid=estadoid)
 
+        fecha = fechavencimiento.split("/")
+        if len(fechavencimiento) == 10:  
+            fechavencimiento = f"{fecha[2]}-{fecha[1]}-{fecha[0]}"
+            fechacodigo = f"{fecha[2]}{fecha[1]}{fecha[0]}"
+        else:
+            fechacodigo = "00000000"
+
+        codigo = f"{proveedor.proveedorid}{familia_producto.familiaproid}{fechacodigo}{tipo_producto.tipoproductoid}"
+
         product = Producto.objects.create(
            nombre = nombre.strip(),
            precio = precio.strip(),
            stock = stock.strip(),
            stockcritico = stockcritico.strip(),
            fechavencimiento = fechavencimiento,
-           codigo = 1234,
+           codigo = codigo,
            imagen = imagen,
            proveedorid = proveedor,
            tipoproductoid = tipo_producto,
@@ -188,7 +195,6 @@ def Editar_producto(request):
     form = addproductsForm(request.POST or None, instance=producto)
 
     if request.method == 'POST':
-
         nombre = request.POST.get('nombre')
         precio = request.POST.get('precio')
         stock = request.POST.get('stock')
@@ -199,14 +205,21 @@ def Editar_producto(request):
         tipoproductoid = request.POST.get('tipoproductoid')
         familiaproid = request.POST.get('familiaproid')
         estadoid = request.POST.get('estadoid')
-        fecha = fechavencimiento.split("/")
-        fechavencimiento = f"{fecha[2]}-{fecha[1]}-{fecha[0]}"
+     
         proveedor = Proveedor.objects.get(proveedorid=proveedorid)
         tipo_producto = Tipoproducto.objects.get(tipoproductoid=tipoproductoid)
         familia_producto = Familiaproducto.objects.get(familiaproid=familiaproid)
         Estado_producto = Estado.objects.get(estadoid=estadoid)
 
-    
+        fecha = fechavencimiento.split("/")
+        if len(fechavencimiento) == 10:  
+            fechavencimiento = f"{fecha[2]}-{fecha[1]}-{fecha[0]}"
+            fechacodigo = f"{fecha[2]}{fecha[1]}{fecha[0]}"
+        else:
+            fechacodigo = "00000000"
+
+        codigo = f"{proveedor.proveedorid}{familia_producto.familiaproid}{fechacodigo}{tipo_producto.tipoproductoid}"
+
         producto, created = Producto.objects.get_or_create(productoid=old_post['EditarProducto'])
         try:
             producto.nombre = nombre 
@@ -214,14 +227,16 @@ def Editar_producto(request):
             producto.stock = stock
             producto.stockcritico = stockcritico
             producto.fechavencimiento = fechavencimiento
-            producto.imagen = imagen
             producto.proveedorid = proveedor
             producto.tipoproductoid = tipo_producto
             producto.familiaproid = familia_producto
             producto.estadoid = Estado_producto
+            producto.codigo = codigo
+            producto.imagen = imagen
+
             producto.save()
 
-            messages.warning(request, 'Cliente actualizado correctamente')
+            messages.warning(request, 'Producto actualizado correctamente')
             return redirect('listar_productos')
             
         except Exception as error:
