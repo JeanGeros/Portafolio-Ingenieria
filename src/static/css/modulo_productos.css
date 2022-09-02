@@ -29,6 +29,12 @@
     width: 25%;
 }
 
+.dateinput {
+    width: 25%;
+    height: 10%;
+
+}
+
 .input-run {
     width: 100%;
 }

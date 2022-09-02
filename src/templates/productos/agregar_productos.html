@@ -33,7 +33,7 @@
                     {% render_field form.precio class="form-control input border border-secondary" onkeypress="return soloNumeros(event)" %}
                     {% render_field form.stock class="form-control input border border-secondary" onkeypress="return soloNumeros(event)" %} 
                     {% render_field form.stockcritico class="form-control input border border-secondary" onkeypress="return soloNumeros(event)" %} 
-                    {% render_field form.fechavencimiento class="form-control dateinput border border-secondary" name="fecha_vencimiento" %}
+                    {% render_field form.fechavencimiento class="form-control dateinput  border border-secondary" name="fecha_vencimiento" %}
                    
                 </div>
 
@@ -54,11 +54,11 @@
                     </div>
                 </div>
 
-
-            <div>
-                <div class="col-md-2">
-                    <button type="submit" id="boton_aceptar" class="btn">Aceptar</button>
-                    <a href="/productos" type="submit" class="btn">Cancelar</a> 
+                <div class="row">
+                    <div class="" style="display: flex; justify-content: center;">
+                        <button type="submit" id="boton_aceptar" class="btn" style="margin-right: 30px;">Aceptar</button>
+                        <a href="/productos" type="submit" class="btn">Cancelar</a> 
+                    </div>
                 </div>
             </div>
     </form>

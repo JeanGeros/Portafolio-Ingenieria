@@ -11,7 +11,7 @@ from src.forms import (
 
 from .models import (
     Persona, Direccion, Usuario, Cliente, Estado, Comuna, Tipobarrio, Tipovivienda, Rolusuario, 
-    Proveedor, Tipoproducto, Producto, Familiaproducto, Empleado, Cargo
+    Proveedor, Tipoproducto, Producto, Familiaproducto, Empleado, Cargo, Tiporubro
 )
 
 def Index(request):
@@ -506,65 +506,47 @@ def Editar_vendedor(request):
 
 ##********************Proveedores*******************************************************************
 
-# def Agregar_proveedores(request):
+def Agregar_proveedor(request):
 
-#     old_post_ingreso = request.session.get('old_post_ingreso') 
-#     old_post_conexion = request.session.get('old_post_conexion') 
+    old_post_ingreso = request.session.get('old_post_ingreso') 
+    old_post_conexion = request.session.get('old_post_conexion') 
 
-#     form = FormProveedor()
+    form = FormProveedor()
 
-#     if request.method == 'POST':
-#         nombre = request.POST.get('nombre')
-#         precio = request.POST.get('precio')
-#         stock = request.POST.get('stock')
-#         stockcritico = request.POST.get('stockcritico')
-#         fechavencimiento = request.POST.get('fechavencimiento')
-#         imagen = request.POST.get('imagen')
-#         proveedorid = request.POST.get('proveedorid')
-#         tipoproductoid = request.POST.get('tipoproductoid')
-#         familiaproid = request.POST.get('familiaproid')
-#         estadoid = request.POST.get('estadoid')
+    if request.method == 'POST':
+        razonsocial = request.POST.get('razonsocial')
+        rutcuerpo = request.POST.get('rutcuerpo')
+        dv = request.POST.get('dv')
+        fono = request.POST.get('fono')
+        rubroid = request.POST.get('rubroid')
+        direccionid = request.POST.get('direccionid')
+        estadoid = request.POST.get('estadoid')
 
-#         proveedor = Proveedor.objects.get(proveedorid=proveedorid)
-#         tipo_producto = Tipoproducto.objects.get(tipoproductoid=tipoproductoid)
-#         familia_producto = Familiaproducto.objects.get(familiaproid=familiaproid)
-#         Estado_producto = Estado.objects.get(estadoid=estadoid)
+        rubro = Tiporubro.objects.get(rubroid=rubroid)
+        direccion = Direccion.objects.get(direccionid=direccionid)
+        estado = Estado.objects.get(estadoid=estadoid)
 
-#         fecha = fechavencimiento.split("/")
-#         if len(fechavencimiento) == 10:  
-#             fechavencimiento = f"{fecha[2]}-{fecha[1]}-{fecha[0]}"
-#             fechacodigo = f"{fecha[2]}{fecha[1]}{fecha[0]}"
-#         else:
-#             fechavencimiento = None
-#             fechacodigo = "00000000"    
-
-#         codigo = f"{proveedor.proveedorid}{familia_producto.familiaproid}{fechacodigo}{tipo_producto.tipoproductoid}"
-
-#         product = Producto.objects.create(
-#            nombre = nombre.strip(),
-#            precio = precio.strip(),
-#            stock = stock.strip(),
-#            stockcritico = stockcritico.strip(),
-#            fechavencimiento = fechavencimiento,
-#            codigo = codigo,
-#            imagen = imagen,
-#            proveedorid = proveedor,
-#            tipoproductoid = tipo_producto,
-#            familiaproid = familia_producto,
-#            estadoid = Estado_producto
-#         )
+        proveedor = Proveedor.objects.create(
+            razonsocial = razonsocial.strip(),
+            rutcuerpo = rutcuerpo.strip(),
+            dv = dv.strip(),
+            fono = fono.strip(),
+            direccionid = direccion,
+            estadoid = estado,
+            rubroid = rubro,
+        )
         
-#         if product is not None:
-#             messages.warning(request, 'Producto creado correctamente')
-#             return redirect('listar_productos')
-#         else:
-#             messages.warning(request, 'No se pudo crear el Producto')
+        if proveedor is not None:
+            messages.warning(request, 'Proveedor creado correctamente')
+            return redirect('listar_proveedores')
+        else:
+            messages.warning(request, 'No se pudo crear el Producto')
 
-#     context = {
-#         'form': form,
-#     }
+    context = {
+        'form': form,
+    }
 
-#     return render(request, 'productos/agregar_productos.html', context)
+    return render(request, 'proveedores/agregar_proveedor.html', context)
 
 def Cambiar_estado_proveedor(id_proveedor):
     proveedor = Proveedor.objects.get(proveedorid = id_proveedor)
@@ -601,17 +583,6 @@ def Listar_proveedores(request):
 
     return render(request, 'proveedores/listar_proveedores.html', context)
 
-# def Cambiar_estado_proveedores(id_producto):
-
-#     producto = Producto.objects.get(productoid = id_producto)
-
-#     if producto.estadoid.descripcion == 'Activo':
-#         producto.estadoid = Estado.objects.get(descripcion = "Inactivo")
-#         producto.save()
-#     else: 
-#         producto.estadoid = Estado.objects.get(descripcion = "Activo")
-#         producto.save()
-
 def Ver_proveedor(request):
     old_post = request.session.get('_old_post')
     proveedor = Proveedor.objects.get(proveedorid=old_post['VerProveedor'])
@@ -623,61 +594,42 @@ def Ver_proveedor(request):
 
     return render(request, 'proveedores/ver_proveedor.html', context)
 
-# def Editar_proveedores(request):
+def Editar_proveedor(request):
 
     old_post_ingreso = request.session.get('_old_post_ingreso') 
     old_post_conexion = request.session.get('_old_post_conexion') 
 
     old_post = request.session.get('_old_post')
 
-    producto = Producto.objects.get(productoid=old_post['EditarProducto'])
-
-    form = addproductsForm(request.POST or None, instance=producto)
+    proveedor = Proveedor.objects.get(proveedorid=old_post['EditarProveedor'])
+    form = FormProveedor(request.POST or None, instance=proveedor)
 
     if request.method == 'POST':
-        nombre = request.POST.get('nombre')
-        precio = request.POST.get('precio')
-        stock = request.POST.get('stock')
-        stockcritico = request.POST.get('stockcritico')
-        fechavencimiento = request.POST.get('fechavencimiento')
-        imagen = request.POST.get('imagen')
-        proveedorid = request.POST.get('proveedorid')
-        tipoproductoid = request.POST.get('tipoproductoid')
-        familiaproid = request.POST.get('familiaproid')
+        razonsocial = request.POST.get('razonsocial')
+        rutcuerpo = request.POST.get('rutcuerpo')
+        dv = request.POST.get('dv')
+        fono = request.POST.get('fono')
+        rubroid = request.POST.get('rubroid')
+        direccionid = request.POST.get('direccionid')
         estadoid = request.POST.get('estadoid')
-        proveedor = Proveedor.objects.get(proveedorid=proveedorid)
-        tipo_producto = Tipoproducto.objects.get(tipoproductoid=tipoproductoid)
-        familia_producto = Familiaproducto.objects.get(familiaproid=familiaproid)
-        Estado_producto = Estado.objects.get(estadoid=estadoid)
 
-        fecha = fechavencimiento.split("/")
-        if len(fechavencimiento) == 10:  
-            fechavencimiento = f"{fecha[2]}-{fecha[1]}-{fecha[0]}"
-            fechacodigo = f"{fecha[2]}{fecha[1]}{fecha[0]}"
-        else:
-            fechavencimiento = None
-            fechacodigo = "00000000"
+        rubro = Tiporubro.objects.get(rubroid=rubroid)
+        direccion = Direccion.objects.get(direccionid=direccionid)
+        estado = Estado.objects.get(estadoid=estadoid)
 
-        codigo = f"{proveedor.proveedorid}{familia_producto.familiaproid}{fechacodigo}{tipo_producto.tipoproductoid}"
-
-        producto, created = Producto.objects.get_or_create(productoid=old_post['EditarProducto'])
+        proveedor, created = Proveedor.objects.get_or_create(proveedorid=old_post['EditarProveedor'])
         try:
-            producto.nombre = nombre 
-            producto.precio = precio
-            producto.stock = stock
-            producto.stockcritico = stockcritico
-            producto.fechavencimiento = fechavencimiento
-            producto.proveedorid = proveedor
-            producto.tipoproductoid = tipo_producto
-            producto.familiaproid = familia_producto
-            producto.estadoid = Estado_producto
-            producto.codigo = codigo
-            producto.imagen = imagen
-            print(fechavencimiento)
-            producto.save()
+            proveedor.razonsocial = razonsocial 
+            proveedor.rutcuerpo = rutcuerpo
+            proveedor.dv = dv
+            proveedor.fono = fono
+            proveedor.rubroid = rubro
+            proveedor.direccionid = direccion
+            proveedor.estadoid = estado
+            proveedor.save()
 
-            messages.warning(request, 'Producto actualizado correctamente')
-            return redirect('listar_productos')
+            messages.warning(request, 'Proveedor actualizado correctamente')
+            return redirect('listar_proveedores')
             
         except Exception as error:
             print(error)
@@ -688,4 +640,4 @@ def Ver_proveedor(request):
         'form': form,
     }
 
-    return render(request, 'productos/editar_productos.html', context)
+    return render(request, 'proveedores/editar_proveedor.html', context)
