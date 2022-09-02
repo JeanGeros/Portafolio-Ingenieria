@@ -6,12 +6,8 @@ from django.contrib.auth.models import User
 import datetime 
 from django.contrib import messages
 from src.forms import (
-<<<<<<< HEAD
-    FormClienteNormal1, FormClienteNormal2, FormClienteNormal3, addproductsForm, FormProveedor
-=======
     FormClienteNormal1, FormClienteNormal2, FormClienteNormal3, addproductsForm, FormVendedorPersona,
-    FormVendedorUsuario, FormVendedorEmpleado, FormEmpleadoPersona, FormEmpleadoUsuario, FormEmpleadoEmpleado
->>>>>>> master
+    FormVendedorUsuario, FormVendedorEmpleado, FormEmpleadoPersona, FormEmpleadoUsuario, FormEmpleadoEmpleado,  FormProveedor
 )
 
 from .models import (
@@ -57,7 +53,6 @@ def Ingreso(request):
 ##********************Productos*******************************************************************
 
 def Agregar_productos(request):
-
     form = addproductsForm()
 
     if request.method == 'POST':
@@ -82,30 +77,31 @@ def Agregar_productos(request):
             fechavencimiento = f"{fecha[2]}-{fecha[1]}-{fecha[0]}"
             fechacodigo = f"{fecha[2]}{fecha[1]}{fecha[0]}"
         else:
-            fechavencimiento = None
             fechacodigo = "00000000"    
 
         codigo = f"{proveedor.proveedorid}{familia_producto.familiaproid}{fechacodigo}{tipo_producto.tipoproductoid}"
+        try:
+            product = Producto.objects.create(
+            nombre = nombre.strip(),
+            precio = precio.strip(),
+            stock = stock.strip(),
+            stockcritico = stockcritico.strip(),
+            fechavencimiento = fechavencimiento,
+            codigo = codigo,
+            imagen = imagen,
+            proveedorid = proveedor,
+            tipoproductoid = tipo_producto,
+            familiaproid = familia_producto,
+            estadoid = Estado_producto
+            )
 
-        product = Producto.objects.create(
-           nombre = nombre.strip(),
-           precio = precio.strip(),
-           stock = stock.strip(),
-           stockcritico = stockcritico.strip(),
-           fechavencimiento = fechavencimiento,
-           codigo = codigo,
-           imagen = imagen,
-           proveedorid = proveedor,
-           tipoproductoid = tipo_producto,
-           familiaproid = familia_producto,
-           estadoid = Estado_producto
-        )
-        
-        if product is not None:
-            messages.warning(request, 'Producto creado correctamente')
-            return redirect('listar_productos')
-        else:
-            messages.warning(request, 'No se pudo crear el Producto')
+            if product is not None:
+                messages.warning(request, 'Producto creado correctamente')
+                return redirect('listar_productos')
+
+        except Exception as error:
+            print(error)
+            messages.error(request, error)
 
     context = {
         'form': form,
@@ -171,10 +167,6 @@ def Editar_producto(request):
     form = addproductsForm(request.POST or None, instance=producto)
 
     if request.method == 'POST':
-<<<<<<< HEAD
-=======
-
->>>>>>> master
         nombre = request.POST.get('nombre')
         precio = request.POST.get('precio')
         stock = request.POST.get('stock')
@@ -213,7 +205,6 @@ def Editar_producto(request):
             producto.estadoid = Estado_producto
             producto.codigo = codigo
             producto.imagen = imagen
-            print(fechavencimiento)
             producto.save()
 
             messages.warning(request, 'Producto actualizado correctamente')
@@ -831,7 +822,7 @@ def Editar_vendedor(request):
 
     return render(request, 'vendedores/editar_vendedor.html', context)
 
-<<<<<<< HEAD
+
 ##********************Proveedores*******************************************************************
 
 def Agregar_proveedor(request):
@@ -969,9 +960,7 @@ def Editar_proveedor(request):
     }
 
     return render(request, 'proveedores/editar_proveedor.html', context)
-=======
 
-def Cambiar_estado_vendedor(id_vendedor):
 
     vendedor = Empleado.objects.get(empleadoid = id_vendedor)
 
@@ -1201,4 +1190,3 @@ def Cambiar_estado_empleado(id_empleado):
         empleado.save()
 
 #***************************************************************************************************
->>>>>>> master

@@ -11,13 +11,15 @@
 
 <div class="container text-end caja rounded mt-5">
     <h1 class="text-center p-2">Registro de Productos</h1>
-    {% if messages %}
-                <ul class="messages list-group mb-3">
+        {% if messages %}
+            <ul class="messages list-group mb-3">
                 {% for message in messages %}
-                    <li{% if message.tags %} class="{{ message.tags }} list-group-item list-group-item-primary"{% endif %}>{{ message }}</li>
+                <script>
+                    "{{message}}"
+                </script>
                 {% endfor %}
-                </ul>
-            {% endif %}
+            </ul>
+        {% endif %}
     <form method="post" action="">
         {% csrf_token %}        
             <div class="form-group row pb-3">
@@ -29,12 +31,11 @@
                     <label class="txt_negrita label">Fecha de Vencimiento:</label><br>
                 </div>
                 <div class="col-md-2">
-                    {% render_field form.nombre class="form-control input border border-secondary" onkeypress="return numerosCaracteres(event)" %}
-                    {% render_field form.precio class="form-control input border border-secondary" onkeypress="return soloNumeros(event)" %}
-                    {% render_field form.stock class="form-control input border border-secondary" onkeypress="return soloNumeros(event)" %} 
-                    {% render_field form.stockcritico class="form-control input border border-secondary" onkeypress="return soloNumeros(event)" %} 
-                    {% render_field form.fechavencimiento class="form-control dateinput  border border-secondary" name="fecha_vencimiento" %}
-                   
+                    {% render_field form.nombre class="form-control input border border-secondary" minlenght="1" maxlength="50" onkeypress="return numerosCaracteres(event)" %}
+                    {% render_field form.precio class="form-control input border border-secondary" type="text" minlenght="1" maxlength="7" onkeypress="return soloNumeros(event)" %}
+                    {% render_field form.stock class="form-control input border border-secondary" type="text" minlenght="1" maxlength="7" onkeypress="return soloNumeros(event)" %} 
+                    {% render_field form.stockcritico class="form-control input border border-secondary" type="text" minlenght="1" maxlength="7" onkeypress="return soloNumeros(event)" %} 
+                    {% render_field form.fechavencimiento|attr:"readonly:True" class="form-control dateinput  border border-secondary"  name="fecha_vencimiento" %}
                 </div>
 
                 <div class="col-md-2 mt-1 textos p-0">
@@ -43,7 +44,6 @@
                     <label class="txt_negrita label">Tipo de Producto :</label><br>
                     <label class="txt_negrita label">Familia del Producto:</label><br>
                     <label class="txt_negrita label">Estado Producto:</label><br>
-
                 </div>
                     <div class="col-md-2">
                         {% render_field form.imagen class="form-control input border border-secondary" name="imagen" %}
@@ -64,7 +64,6 @@
     </form>
 </div>
 <script>
-
 
 
     function numerosCaracteres(e) {
