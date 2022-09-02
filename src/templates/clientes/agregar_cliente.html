@@ -7,7 +7,7 @@
     
     <div class="container text-end caja rounded mt-5 mb-5">
         
-        <h1 class="text-center">Registro de clientes</h1>
+        <h1 class="text-center">Registro de cliente</h1>
         {% if messages %}
             <ul class="messages list-group mb-3">
                 {% for message in messages %}
@@ -31,7 +31,7 @@
                     </div>
                     <div class="col-md-2">
                         <div class="run">
-                            {% render_field form1.runcuerpo class="form-control border border-secondary input-run" type="text" placeholder="12345678" minlength="7" maxlength="8" onkeypress="return SoloNumeros(event)" %}
+                            {% render_field form1.runcuerpo class="form-control border border-secondary input-run" type="text" placeholder="12345678" minlength="7" maxlength="9" onkeypress="return SoloNumeros(event)" %}
                             <label for="run" class="txt_negrita guion">-</label>
                             {% render_field form1.dv class="form-control input-dv border border-secondary" onkeypress="return ValidacionDv(event)" %}
                         </div>
@@ -39,7 +39,7 @@
                         {% render_field form1.nombres class="form-control input border border-secondary" onkeypress="return SoloLetras(event)" %}
                         {% render_field form1.apellidopaterno class="form-control input border border-secondary" onkeypress="return SoloLetras(event)" %}
                         {% render_field form1.apellidomaterno class="form-control input border border-secondary" onkeypress="return SoloLetras(event)" %}
-                        {% render_field form1.telefono class="form-control input border border-secondary" type="text" placeholder="+56999999999 223456789" onkeypress="return ValidacionTelefono(event)" %}
+                        {% render_field form1.telefono class="form-control input border border-secondary" type="text" placeholder="56999999999 223456789" onkeypress="return ValidacionTelefono(event)" %}
                         {% render_field form3.email type="email" class="form-control input border border-secondary" placeholder="nombre@ejemplo.com" %}
                     </div>
 
@@ -71,7 +71,7 @@
                         <input class="form-control input border border-secondary" type="password" id="confirme_contraseña" name="confirme_contraseña" minlength="6" onkeyup="ValidacionContraseñas()" onkeypress="return SinEspacios(event)"/>
                         <div class="" style="display: flex;">
                             <button type="submit" id="boton_aceptar" class="btn btn_aceptar" style="margin-right: 10px;">Aceptar</button>
-                            <a href="{% url 'index' %}" type="submit" class="btn">Cancelar</a>
+                            <a href="{% url 'listar_clientes' %}" type="submit" class="btn">Cancelar</a>
                         </div>
                          
                     </div>
