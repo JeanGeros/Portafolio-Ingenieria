@@ -53,10 +53,10 @@
 
                 </div>
                 <div class="col-md-3">
-                    {% render_field form3.fechaingreso class="form-control input border border-secondary" %}
+                    {% render_field form3.fechaingreso|attr:"readonly:True" class="form-control input border border-secondary dateinput" placeholder="Click aqui" style="width:110px" %}
                     {% render_field form2.nombreusuario class="form-control input border border-secondary" %}
-                    <button type="submit" id="boton_aceptar" class="btn btn_aceptar">Aceptar</button>
-                    <a href="{% url 'listar_empleados' %}" type="submit" class="btn">Cancelar</a>
+                    <button type="submit" id="boton_aceptar" class="btn btn_aceptar border border-secondary text-black">Aceptar</button>
+                    <a href="{% url 'listar_empleados' %}" type="submit" class="btn btn_aceptar border border-secondary text-black">Cancelar</a>
                 </div>
                 
             </div>
