@@ -249,6 +249,24 @@ def Registro_clientes(request):
                     timer: 3000
                 })
             ''')
+        elif Usuario.objects.get(personaid = Persona.objects.get(runcuerpo=run_cuerpo, dv=dv)) is not None:
+            messages.warning(request, '''
+                Swal.fire({
+                    icon: 'error',
+                    text: "El cliente ya cuenta con un usuario",
+                    showConfirmButton: false,
+                    timer: 3000
+                })
+            ''')
+        elif Usuario.objects.get(nombreusuario = nombre_usuario) is not None:
+            messages.warning(request, '''
+                Swal.fire({
+                    icon: 'error',
+                    text: "El cliente ya cuenta con un usuario",
+                    showConfirmButton: false,
+                    timer: 3000
+                })
+            ''')
         else: 
             user = User.objects.create_user(
                 username = nombre_usuario,
@@ -260,9 +278,6 @@ def Registro_clientes(request):
             )
             user.set_password(contraseña)
             user.set_password(confirme_contraseña)
-
-            if user is not None:
-                user.save()
             
             # Estado activo = 1 e inactivo = 2 
             Persona.objects.create(
@@ -302,7 +317,13 @@ def Registro_clientes(request):
                 nombreusuario = nombre_usuario
             )
 
-            if Persona  is not None and Direccion  is not None and Usuario  is not None and Cliente is not None:
+            if (Persona is not None and 
+                Direccion  is not None and 
+                Usuario  is not None and 
+                Cliente is not None and 
+                user is not None):
+                
+                user.save()
                 messages.warning(request, '''
                     Swal.fire({
                         icon: 'success',
@@ -358,7 +379,7 @@ def Agregar_cliente(request):
         if Persona.objects.get(runcuerpo=run_cuerpo, dv=dv) is not None:
             messages.warning(request, '''
                 Swal.fire({
-                    icon: 'success',
+                    icon: 'error',
                     text: "El run ingresado ya existe",
                     showConfirmButton: false,
                     timer: 3000
@@ -367,7 +388,7 @@ def Agregar_cliente(request):
         elif Cliente.objects.get(personaid = Persona.objects.get(runcuerpo=run_cuerpo, dv=dv)) is not None:
             messages.warning(request, '''
                 Swal.fire({
-                    icon: 'success',
+                    icon: 'error',
                     text: "El cliente con el run ingresado ya existe",
                     showConfirmButton: false,
                     timer: 3000
@@ -376,8 +397,26 @@ def Agregar_cliente(request):
         elif Usuario.objects.create(email = email) is not None:
             messages.warning(request, '''
                 Swal.fire({
-                    icon: 'success',
+                    icon: 'error',
                     text: "El correo ingresado ya existe",
+                    showConfirmButton: false,
+                    timer: 3000
+                })
+            ''')
+        elif Usuario.objects.get(personaid = Persona.objects.get(runcuerpo=run_cuerpo, dv=dv)) is not None:
+            messages.warning(request, '''
+                Swal.fire({
+                    icon: 'error',
+                    text: "El cliente ya cuenta con un usuario",
+                    showConfirmButton: false,
+                    timer: 3000
+                })
+            ''')
+        elif Usuario.objects.get(nombreusuario = nombre_usuario) is not None:
+            messages.warning(request, '''
+                Swal.fire({
+                    icon: 'error',
+                    text: "El cliente ya cuenta con un usuario",
                     showConfirmButton: false,
                     timer: 3000
                 })
@@ -394,9 +433,6 @@ def Agregar_cliente(request):
             )
             user.set_password(contraseña)
             user.set_password(confirme_contraseña)
-
-            if user is not None:
-                user.save()
             
             # Estado activo = 1 e inactivo = 2 
             Persona.objects.create(
@@ -436,7 +472,14 @@ def Agregar_cliente(request):
                 nombreusuario = nombre_usuario
             )
 
-            if Persona is not None and Direccion is not None and Cliente is not None and Usuario is not None:
+            if (Persona is not None and 
+                Direccion is not None and 
+                Cliente is not None and 
+                Usuario is not None and 
+                user is not None):
+                
+                user.save()
+                
                 messages.warning(request, '''
                     Swal.fire({
                         icon: 'success',
@@ -494,13 +537,20 @@ def Listar_clientes(request):
 def Cambiar_estado_cliente(id_cliente):
 
     cliente = Cliente.objects.get(clienteid = id_cliente)
+    persona_id = Empleado.objects.filter(empleadoid = id_cliente).values('personaid')
+    usuario = Usuario.objects.filter(personaid = persona_id[0]['personaid']).values('nombreusuario')
+    user = User.objects.filter(username = usuario)
 
     if cliente.estadoid.descripcion == 'Activo':
         cliente.estadoid = Estado.objects.get(descripcion = "Inactivo")
         cliente.save()
+        user.is_active = False
+        user.save()
     else: 
         cliente.estadoid = Estado.objects.get(descripcion = "Activo")
         cliente.save()
+        user.is_active = True
+        user.save()
 
 def Ver_cliente(request):
 
@@ -642,65 +692,116 @@ def Agregar_vendedor(request):
         contraseña = request.POST.get('password')
         confirme_contraseña = request.POST.get('confirme_contraseña')
 
-        user = User.objects.create_user(
-            username = nombre_usuario,
-            first_name = nombres,
-            last_name = apellido_paterno,
-            email = email,
-            is_superuser = False,
-            is_active = True
-        )
-        user.set_password(contraseña)
-        user.set_password(confirme_contraseña)
+        fecha_ingreso = fecha_ingreso[6:10] + '-' + fecha_ingreso[3:5] + '-' + fecha_ingreso[0:2]
 
-        if user is not None:
-            user.save()
-        
-        # Estado activo = 1 e inactivo = 2 
-        Persona.objects.create(
-            runcuerpo = run_cuerpo,
-            dv = dv,
-            apellidopaterno = apellido_paterno,
-            apellidomaterno = apellido_materno,
-            nombres = nombres,
-            telefono = telefono,
-            estadoid = Estado.objects.get(descripcion="Activo")
-        )
-
-        Usuario.objects.create(
-            email = email,
-            password = contraseña,
-            personaid = Persona.objects.get(runcuerpo=run_cuerpo, dv=dv),
-            rolid = Rolusuario.objects.get(descripcion="Vendedor"),
-            nombreusuario = nombre_usuario
-        )
-
-        Empleado.objects.create(
+        if Persona.objects.get(runcuerpo=run_cuerpo, dv=dv) is not None:
+            messages.warning(request, '''
+                Swal.fire({
+                    icon: 'error',
+                    text: "El run ingresado ya existe",
+                    showConfirmButton: false,
+                    timer: 3000
+                })
+            ''')
+        elif Empleado.objects.get(
             fechaingreso = fecha_ingreso,
-            personaid = Persona.objects.get(runcuerpo=run_cuerpo, dv=dv),
-            cargoid = Cargo.objects.get(descripcion="Vendedor"),
-            estadoid = Estado.objects.get(descripcion="Activo")
-        )
-
-        if Empleado is not None:
+            personaid = Persona.objects.get(runcuerpo=run_cuerpo, dv=dv)) is not None:
             messages.warning(request, '''
-                        Swal.fire({
-                            icon: 'success',
-                            text: "Vendedor creado correctamente",
-                            showConfirmButton: false,
-                            timer: 3000
-                        })
-                    ''')
-            return redirect('listar_vendedores')
+                Swal.fire({
+                    icon: 'error',
+                    text: "El vendedor con el run ingresado ya existe",
+                    showConfirmButton: false,
+                    timer: 3000
+                })
+            ''')
+        elif Usuario.objects.get(email = email) is not None:
+            messages.warning(request, '''
+                Swal.fire({
+                    icon: 'error',
+                    text: "El correo ingresado ya existe",
+                    showConfirmButton: false,
+                    timer: 3000
+                })
+            ''')
+        elif Usuario.objects.get(personaid = Persona.objects.get(runcuerpo=run_cuerpo, dv=dv)) is not None:
+            messages.warning(request, '''
+                Swal.fire({
+                    icon: 'error',
+                    text: "El vendedor ya cuenta con un usuario",
+                    showConfirmButton: false,
+                    timer: 3000
+                })
+            ''')
+        elif Usuario.objects.get(nombreusuario = nombre_usuario) is not None:
+            messages.warning(request, '''
+                Swal.fire({
+                    icon: 'error',
+                    text: "El vendedor ya cuenta con un usuario",
+                    showConfirmButton: false,
+                    timer: 3000
+                })
+            ''')
         else:
-            messages.warning(request, '''
-                        Swal.fire({
-                            icon: 'error',
-                            text: "No es posible crear el vendedor en este momento",
-                            showConfirmButton: false,
-                            timer: 3000
-                        })
-                    ''')
+
+            user = User.objects.create_user(
+                username = nombre_usuario,
+                first_name = nombres,
+                last_name = apellido_paterno,
+                email = email,
+                is_superuser = False,
+                is_active = True
+            )
+            user.set_password(contraseña)
+            user.set_password(confirme_contraseña)
+            
+            # Estado activo = 1 e inactivo = 2 
+            Persona.objects.create(
+                runcuerpo = run_cuerpo,
+                dv = dv,
+                apellidopaterno = apellido_paterno,
+                apellidomaterno = apellido_materno,
+                nombres = nombres,
+                telefono = telefono,
+                estadoid = Estado.objects.get(descripcion="Activo")
+            )
+
+            Usuario.objects.create(
+                email = email,
+                password = contraseña,
+                personaid = Persona.objects.get(runcuerpo=run_cuerpo, dv=dv),
+                rolid = Rolusuario.objects.get(descripcion="Vendedor"),
+                nombreusuario = nombre_usuario
+            )
+
+            Empleado.objects.create(
+                fechaingreso = fecha_ingreso,
+                personaid = Persona.objects.get(runcuerpo=run_cuerpo, dv=dv),
+                cargoid = Cargo.objects.get(descripcion="Vendedor"),
+                estadoid = Estado.objects.get(descripcion="Activo")
+            )
+
+            if Persona is not None and Usuario is not None and Empleado is not None and user is not None:
+
+                user.save()
+
+                messages.warning(request, '''
+                            Swal.fire({
+                                icon: 'success',
+                                text: "Vendedor creado correctamente",
+                                showConfirmButton: false,
+                                timer: 3000
+                            })
+                        ''')
+                return redirect('listar_vendedores')
+            else:
+                messages.warning(request, '''
+                            Swal.fire({
+                                icon: 'error',
+                                text: "No es posible crear el vendedor en este momento",
+                                showConfirmButton: false,
+                                timer: 3000
+                            })
+                        ''')
 
     context = {
         'form1': form1,
@@ -745,6 +846,8 @@ def Editar_vendedor(request):
         nombre_usuario = request.POST.get('nombreusuario')
         fecha_ingreso = request.POST.get('fechaingreso')
         email = request.POST.get('email')
+
+        fecha_ingreso = fecha_ingreso[6:10] + '-' + fecha_ingreso[3:5] + '-' + fecha_ingreso[0:2]
 
         empleado, created = Empleado.objects.get_or_create(empleadoid=old_post['EditarVendedor'])
         empleado.fechaingreso = fecha_ingreso 
@@ -796,17 +899,23 @@ def Editar_vendedor(request):
 
     return render(request, 'vendedores/editar_vendedor.html', context)
 
-
 def Cambiar_estado_vendedor(id_vendedor):
 
     vendedor = Empleado.objects.get(empleadoid = id_vendedor)
+    persona_id = Empleado.objects.filter(empleadoid = id_vendedor).values('personaid')
+    usuario = Usuario.objects.filter(personaid = persona_id[0]['personaid']).values('nombreusuario')
+    user = User.objects.filter(username = usuario)
 
     if vendedor.estadoid.descripcion == 'Activo':
         vendedor.estadoid = Estado.objects.get(descripcion = "Inactivo")
         vendedor.save()
+        user.is_active = False
+        user.save()
     else: 
         vendedor.estadoid = Estado.objects.get(descripcion = "Activo")
         vendedor.save()
+        user.is_active = True
+        user.save()
 
 #***************************************************************************************************
 
@@ -860,65 +969,110 @@ def Agregar_empleado(request):
         contraseña = request.POST.get('password')
         confirme_contraseña = request.POST.get('confirme_contraseña')
 
-        user = User.objects.create_user(
-            username = nombre_usuario,
-            first_name = nombres,
-            last_name = apellido_paterno,
-            email = email,
-            is_superuser = False,
-            is_active = True
-        )
-        user.set_password(contraseña)
-        user.set_password(confirme_contraseña)
+        fecha_ingreso = fecha_ingreso[6:10] + '-' + fecha_ingreso[3:5] + '-' + fecha_ingreso[0:2]
 
-        if user is not None:
-            user.save()
-        
-        # Estado activo = 1 e inactivo = 2 
-        Persona.objects.create(
-            runcuerpo = run_cuerpo,
-            dv = dv,
-            apellidopaterno = apellido_paterno,
-            apellidomaterno = apellido_materno,
-            nombres = nombres,
-            telefono = telefono,
-            estadoid = Estado.objects.get(descripcion="Activo")
-        )
-
-        Usuario.objects.create(
-            email = email,
-            password = contraseña,
-            personaid = Persona.objects.get(runcuerpo=run_cuerpo, dv=dv),
-            rolid = Rolusuario.objects.get(descripcion="Empleado"),
-            nombreusuario = nombre_usuario
-        )
-
-        Empleado.objects.create(
+        if Persona.objects.get(runcuerpo=run_cuerpo, dv=dv) is not None:
+            messages.warning(request, '''
+                Swal.fire({
+                    icon: 'error',
+                    text: "El run ingresado ya existe",
+                    showConfirmButton: false,
+                    timer: 3000
+                })
+            ''')
+        elif Empleado.objects.get(
             fechaingreso = fecha_ingreso,
-            personaid = Persona.objects.get(runcuerpo=run_cuerpo, dv=dv),
-            cargoid = Cargo.objects.get(descripcion="Empleado"),
-            estadoid = Estado.objects.get(descripcion="Activo")
-        )
-
-        if Empleado is not None:
+            personaid = Persona.objects.get(runcuerpo=run_cuerpo, dv=dv)) is not None:
             messages.warning(request, '''
-                        Swal.fire({
-                            icon: 'success',
-                            text: "Empleado creado correctamente",
-                            showConfirmButton: false,
-                            timer: 3000
-                        })
-                    ''')
-            return redirect('listar_vendedores')
+                Swal.fire({
+                    icon: 'error',
+                    text: "El empleado con el run ingresado ya existe",
+                    showConfirmButton: false,
+                    timer: 3000
+                })
+            ''')
+        elif Usuario.objects.get(email = email) is not None:
+            messages.warning(request, '''
+                Swal.fire({
+                    icon: 'error',
+                    text: "El correo ingresado ya existe",
+                    showConfirmButton: false,
+                    timer: 3000
+                })
+            ''')
+        elif (Usuario.objects.get(personaid = Persona.objects.get(runcuerpo=run_cuerpo, dv=dv)) is not None or 
+            Usuario.objects.get(nombreusuario = nombre_usuario) is not None):
+            messages.warning(request, '''
+                Swal.fire({
+                    icon: 'error',
+                    text: "El empleado ya cuenta con un usuario",
+                    showConfirmButton: false,
+                    timer: 3000
+                })
+            ''')
         else:
-            messages.warning(request, '''
-                        Swal.fire({
-                            icon: 'error',
-                            text: "No es posible crear el empleado en este momento",
-                            showConfirmButton: false,
-                            timer: 3000
-                        })
-                    ''')
+
+            user = User.objects.create_user(
+                username = nombre_usuario,
+                first_name = nombres,
+                last_name = apellido_paterno,
+                email = email,
+                is_superuser = False,
+                is_active = True
+            )
+            user.set_password(contraseña)
+            user.set_password(confirme_contraseña)
+            
+            # Estado activo = 1 e inactivo = 2 
+            Persona.objects.create(
+                runcuerpo = run_cuerpo,
+                dv = dv,
+                apellidopaterno = apellido_paterno,
+                apellidomaterno = apellido_materno,
+                nombres = nombres,
+                telefono = telefono,
+                estadoid = Estado.objects.get(descripcion="Activo")
+            )
+
+            Usuario.objects.create(
+                email = email,
+                password = contraseña,
+                personaid = Persona.objects.get(runcuerpo=run_cuerpo, dv=dv),
+                rolid = Rolusuario.objects.get(descripcion="Empleado"),
+                nombreusuario = nombre_usuario
+            )
+
+            Empleado.objects.create(
+                fechaingreso = fecha_ingreso,
+                personaid = Persona.objects.get(runcuerpo=run_cuerpo, dv=dv),
+                cargoid = Cargo.objects.get(descripcion="Empleado"),
+                estadoid = Estado.objects.get(descripcion="Activo")
+            )
+
+            if (Persona is not None and 
+                Usuario is not None and 
+                Empleado is not None and 
+                user is not None):
+
+                user.save()
+                messages.warning(request, '''
+                    Swal.fire({
+                        icon: 'success',
+                        text: "Empleado creado correctamente",
+                        showConfirmButton: false,
+                        timer: 3000
+                    })
+                ''')
+                return redirect('listar_empleados')
+            else:
+                messages.warning(request, '''
+                    Swal.fire({
+                        icon: 'error',
+                        text: "No es posible crear el empleado en este momento",
+                        showConfirmButton: false,
+                        timer: 3000
+                    })
+                ''')
 
     context = {
         'form1': form1,
@@ -964,6 +1118,8 @@ def Editar_empleado(request):
         fecha_ingreso = request.POST.get('fechaingreso')
         email = request.POST.get('email')
 
+        fecha_ingreso = fecha_ingreso[6:10] + '-' + fecha_ingreso[3:5] + '-' + fecha_ingreso[0:2]
+
         empleadoEm, created = Empleado.objects.get_or_create(empleadoid=old_post['EditarEmpleado'])
         empleadoEm.fechaingreso = fecha_ingreso 
         empleadoEm.personaid.runcuerpo = run_cuerpo
@@ -997,13 +1153,13 @@ def Editar_empleado(request):
         user_django.save()
 
         messages.warning(request, '''
-                        Swal.fire({
-                            icon: 'success',
-                            text: "Empleado actualizado correctamente",
-                            showConfirmButton: false,
-                            timer: 3000
-                        })
-                    ''')
+            Swal.fire({
+                icon: 'success',
+                text: "Empleado actualizado correctamente",
+                showConfirmButton: false,
+                timer: 3000
+            })
+        ''')
         return redirect('listar_empleados')
 
     context = {
@@ -1014,16 +1170,21 @@ def Editar_empleado(request):
 
     return render(request, 'empleados/editar_empleado.html', context)
 
-
 def Cambiar_estado_empleado(id_empleado):
 
     empleado = Empleado.objects.get(empleadoid = id_empleado)
-
+    persona_id = Empleado.objects.filter(empleadoid = id_empleado).values('personaid')
+    usuario = Usuario.objects.filter(personaid = persona_id[0]['personaid']).values('nombreusuario')
+    user = User.objects.filter(username = usuario)
     if empleado.estadoid.descripcion == 'Activo':
         empleado.estadoid = Estado.objects.get(descripcion = "Inactivo")
         empleado.save()
+        user.is_active = False
+        user.save()
     else: 
         empleado.estadoid = Estado.objects.get(descripcion = "Activo")
         empleado.save()
+        user.is_active = True
+        user.save()
 
 #***************************************************************************************************
