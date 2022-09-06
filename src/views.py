@@ -53,7 +53,7 @@ def Ingreso(request):
 ##********************Productos*******************************************************************
 
 def Agregar_productos(request):
-    form = addproductsForm()
+    form = addproductsForm(request.POST, request.FILES)
 
     if request.method == 'POST':
         nombre = request.POST.get('nombre')
@@ -72,11 +72,12 @@ def Agregar_productos(request):
         familia_producto = Familiaproducto.objects.get(familiaproid=familiaproid)
         Estado_producto = Estado.objects.get(estadoid=estadoid)
 
-        fecha = fechavencimiento.split("/")
         if len(fechavencimiento) == 10:  
+            fecha = fechavencimiento.split("/")
             fechavencimiento = f"{fecha[2]}-{fecha[1]}-{fecha[0]}"
             fechacodigo = f"{fecha[2]}{fecha[1]}{fecha[0]}"
         else:
+            fechavencimiento = None
             fechacodigo = "00000000"    
 
         codigo = f"{proveedor.proveedorid}{familia_producto.familiaproid}{fechacodigo}{tipo_producto.tipoproductoid}"
@@ -101,7 +102,7 @@ def Agregar_productos(request):
 
         except Exception as error:
             print(error)
-            messages.error(request, error)
+            messages.warning(request, error)
 
     context = {
         'form': form,
@@ -134,6 +135,14 @@ def Listar_productos(request):
         'productos': productos
     }
 
+    from pathlib import Path
+    BASE_DIR = Path(__file__).resolve().parent.parent
+
+    producto =  Producto.objects.get(nombre="Tornillo volcanita")
+    print(producto.imagen.path)
+    print(producto.imagen.url)
+    print(BASE_DIR)
+    
     return render(request, 'productos/listar_productos.html', context)
 
 def Cambiar_estado_producto(id_producto):
