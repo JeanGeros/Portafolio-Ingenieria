@@ -13,6 +13,7 @@
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa" crossorigin="anonymous"></script>
         <!-- JavaScript Fontawesome -->
         <script src="https://kit.fontawesome.com/07b4c2553d.js" crossorigin="anonymous"></script>
+
         <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
         <link href="{% static 'js/jquery-ui-1.12.1/jquery-ui.min.css' %}" rel="stylesheet">
@@ -23,6 +24,7 @@
         <link href="{% static 'js/jquery-timepicker-1.3.5/jquery.timepicker.min.css' %}" rel="stylesheet">
         <link href="{% static 'js/jquery-timepicker-1.3.5/jquery.timepicker.min.js' %}" rel="stylesheet">
         <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/timepicker/1.3.5/jquery.timepicker.min.css">
+
     </head>
     <body>
         <nav class="navbar navbar-expand-lg">
@@ -100,5 +102,7 @@
         <script src="{% static 'js/custom.js' %}"></script>
         <script src="{% static 'js/jquery-timepicker-1.3.5/jquery.timepicker.min.js' %}"></script>
         <script src="//cdnjs.cloudflare.com/ajax/libs/timepicker/1.3.5/jquery.timepicker.min.js"></script>
+        {% load sweetify %}
+        {% sweetify %}
     </body>
 </html>

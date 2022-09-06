@@ -8,15 +8,7 @@
     <div class="container text-end caja rounded">
         
         <h1 class="text-center pb-2">Editar Cliente</h1>
-        {% if messages %}
-            <ul class="messages list-group mb-3">
-                {% for message in messages %}
-                    <script>
-                        "{{message}}"
-                    </script>
-                {% endfor %}
-            </ul>
-        {% endif %}
+        
         <form method="post" action="" class="">
             {% csrf_token %}        
 

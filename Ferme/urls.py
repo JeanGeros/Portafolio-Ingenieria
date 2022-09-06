@@ -20,6 +20,7 @@ from src import views, static
 
 urlpatterns = [
     path('accounts/', include('django.contrib.auth.urls')),
+    # path('', include('pwa.urls')),
     path('admin/', admin.site.urls),
     path('index/', views.Index, name="index"),
     path('ingreso_usuarios/', views.Ingreso, name="ingreso"),
