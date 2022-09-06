@@ -1,0 +1,82 @@
+{% extends 'layout.html' %}
+{% load widget_tweaks %}
+{% load static %}
+
+{% block content %}
+    <link rel="stylesheet" href="{% static 'css/modulo_proveedores.css' %}">
+
+    <div class="container text-end caja rounded">
+        
+        <h1 class="text-center pb-2">Editar Proveedor</h1>
+        {% if messages %}
+            <ul class="messages list-group mb-3">
+                {% for message in messages %}
+                    <script>
+                        Swal.fire({
+                            icon: 'success',
+                            text: "{{message}}",
+                            showConfirmButton: false,
+                            timer: 2000
+                        })
+                    </script>
+                {% endfor %}
+            </ul>
+        {% endif %}
+        <form method="post" action="" class="">
+            {% csrf_token %}        
+                <div class="form-group row pb-3">
+                    <div class="col-md-2 mt-1 textos p-0">
+                        <label class="txt_negrita label">RUT:</label><br>
+                        <label class="txt_negrita label">Razon Social:</label><br>
+                        <label class="txt_negrita label">Fono:</label><br>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="run">
+                            {% render_field form.rutcuerpo class="form-control border border-secondary input-rutcuerpo" name="rutcuerpo"%}
+                            <label class="txt_negrita guion">-</label>
+                            {% render_field form.dv class="form-control input-dv border border-secondary" name="dv"%}
+                        </div>
+                        {% render_field form.razonsocial class="form-control input border border-secondary" name="nombres" %}
+                        {% render_field form.fono class="form-control input border border-secondary" name="apellido_paterno" %}
+                        
+                    </div>
+                    <div class="col-md-2 mt-1 textos p-0">
+                        <label class="txt_negrita label">Rubro:</label><br>
+                        <label class="txt_negrita label">Dirección:</label><br>
+                        <label class="txt_negrita label">Estado:</label><br>
+                    </div>
+                    <div class="col-md-2">
+                        {% render_field form.rubroid class="form-control input border border-secondary" name="rubroid" %}
+                        {% render_field form.direccionid class="form-control input border border-secondary" name="direccionid" %}
+                        {% render_field form.estadoid class="form-control input border border-secondary" name="estadoid" %}
+                    </div>
+                    <div class="row">
+                        <div class="" style="display: flex; justify-content: center;">
+                            <button type="submit" id="boton_aceptar" class="btn btn_aceptar" style="margin-right: 30px;">Aceptar</button>
+                            <a href="/proveedores" type="submit" class="btn">Cancelar</a> 
+                        </div>
+                    </div>
+                </div>
+        </form>
+    </div>
+    <script>
+        function soloNumeros(e) {
+            key = e.keyCode || e.which;
+            tecla = String.fromCharCode(key).toLowerCase();
+            letras = "1234567890";
+            especiales = [8, 37, 39, 46];
+
+            tecla_especial = false
+            for(var i in especiales) {
+                if(key == especiales[i]) {
+                    tecla_especial = true;
+                    break;
+                }
+            }
+
+            if(letras.indexOf(tecla) == -1 && !tecla_especial)
+                return false;
+        }
+    
+    </script>
+{% endblock %}

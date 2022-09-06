@@ -17,6 +17,8 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from src import views, static 
+from django.conf.urls.static import static
+from django.conf import settings
 
 urlpatterns = [
     path('accounts/', include('django.contrib.auth.urls')),
@@ -41,9 +43,17 @@ urlpatterns = [
     path('vendedores/ver_vendedor', views.Ver_vendedor, name="ver_vendedor"),
     path('vendedores/editar_vendedor', views.Editar_vendedor, name="editar_vendedor"),
 
+    path('proveedores/', views.Listar_proveedores, name="listar_proveedores"),
+    path('proveedores/agregar_proveedor/', views.Agregar_proveedor, name="agregar_proveedor"),
+    path('proveedores/ver_proveedor', views.Ver_proveedor, name="ver_proveedor"),
+    path('proveedores/editar_proveedor', views.Editar_proveedor, name="editar_proveedor"),
+    
     path('empleados/', views.Listar_empleados, name="listar_empleados"),
     path('empleados/agregar_empleado', views.Agregar_empleado, name="agregar_empleado"),
     path('empleados/ver_empleado', views.Ver_empleado, name="ver_empleado"),
     path('empleados/editar_empleado', views.Editar_empleado, name="editar_empleado"),
 
 ]
+
+if settings.DEBUG:
+    urlpatterns+= static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
