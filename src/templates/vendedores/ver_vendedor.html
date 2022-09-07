@@ -36,7 +36,11 @@
             <tbody style="text-align:center">
                 <tr>
                     <td class="border border-secondary">{{vendedor.fechaingreso}}</td>
-                    <td class="border border-secondary">{{vendedor.fechadesvinculacion}}</td>
+                    {% if vendedor.fechadesvinculacion != None %}
+                        <td class="border border-secondary">{{vendedor.fechadesvinculacion}}</td>
+                    {% else %}
+                        <td class="border border-secondary">--</td>
+                    {% endif %}
                     <td class="border border-secondary">{{vendedor.cargoid.descripcion}}</td>
                     <td class="border border-secondary">{{vendedor.estadoid.descripcion}}</td>
                 </tr>

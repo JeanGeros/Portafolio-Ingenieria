@@ -120,7 +120,6 @@ def Listar_productos(request):
     if request.method == 'POST':
         if request.POST.get('CambiarEstado') is not None:
             id_producto = request.POST.get('CambiarEstado')
-            print(id_producto)
             Cambiar_estado_producto(id_producto)
             producto = Producto.objects.get(productoid = id_producto)
             sweetify.success(request, f'El producto {producto.nombre} ha quedado {producto.estadoid.descripcion} correctamente')
@@ -138,14 +137,6 @@ def Listar_productos(request):
         'productos': productos
     }
 
-    from pathlib import Path
-    BASE_DIR = Path(__file__).resolve().parent.parent
-
-    producto =  Producto.objects.get(nombre="Tornillo volcanita")
-    print(producto.imagen.path)
-    print(producto.imagen.url)
-    print(BASE_DIR)
-    
     return render(request, 'productos/listar_productos.html', context)
 
 def Cambiar_estado_producto(id_producto):
@@ -184,7 +175,7 @@ def Editar_producto(request):
         stock = request.POST.get('stock')
         stockcritico = request.POST.get('stockcritico')
         fechavencimiento = request.POST.get('fechavencimiento')
-        imagen = request.POST.get('imagen')
+        imagen = request.FILES.get('imagen')
         proveedorid = request.POST.get('proveedorid')
         tipoproductoid = request.POST.get('tipoproductoid')
         familiaproid = request.POST.get('familiaproid')
@@ -268,7 +259,7 @@ def Registro_clientes(request):
         elif usuarioRegistro == True:
             sweetify.warning(request,"El correo ingresado ya existe")
         elif usuarioRegistro3 == True:
-            sweetify.warning(request,"El cliente ya cuenta con un usuario")
+            sweetify.warning(request,"El usuario ingresado ya esta registrado")
         else: 
             user = User.objects.create_user(
                 username = nombre_usuario,
@@ -330,7 +321,7 @@ def Registro_clientes(request):
                 user.save()
 
                 sweetify.success(request,"Se ha registrado correctamente")
-                return redirect('registro_clientes')
+                return redirect('index')
             else:
                 sweetify.error(request,"No es posible registrarse en este momento")
 
@@ -482,7 +473,7 @@ def Cambiar_estado_cliente(id_cliente):
     cliente = Cliente.objects.get(clienteid = id_cliente)
     persona_id = Cliente.objects.filter(clienteid = id_cliente).values('personaid')
     usuario = Usuario.objects.filter(personaid = persona_id[0]['personaid']).values('nombreusuario')
-    user = User.objects.get(email = usuario[0]['nombreusuario'])
+    user = User.objects.get(username = usuario[0]['nombreusuario'])
 
     if cliente.estadoid.descripcion == 'Activo':
         cliente.estadoid = Estado.objects.get(descripcion = "Inactivo")
@@ -534,9 +525,10 @@ def Editar_cliente(request):
         tipo_vivienda_id = request.POST.get('tipoviviendaid')
         tipo_barrio_id = request.POST.get('tipobarrioid')
         nombre_sector = request.POST.get('nombresector')
-        nombre_usuario = request.POST.get('nombreusuario')
+        # nombre_usuario = request.POST.get('nombreusuario')
+        print(run_cuerpo)
 
-        cliente_persona = Persona.objects.get_or_create(personaid=cliente[0]['personaid'])
+        cliente_persona, created = Persona.objects.get_or_create(personaid=cliente[0]['personaid'])
         cliente_persona.runcuerpo = run_cuerpo
         cliente_persona.dv = dv
         cliente_persona.apellidopaterno = apellido_paterno
@@ -545,7 +537,7 @@ def Editar_cliente(request):
         cliente_persona.telefono = telefono
         cliente_persona.save()
 
-        cliente_direccion = Direccion.objects.get_or_create(direccionid=cliente[0]['direccionid'])
+        cliente_direccion, created = Direccion.objects.get_or_create(direccionid=cliente[0]['direccionid'])
         cliente_direccion.calle = calle
         cliente_direccion.numero = numero
         cliente_direccion.comunaid = Comuna.objects.get(comunaid=comuna_id)
@@ -554,16 +546,17 @@ def Editar_cliente(request):
         cliente_direccion.nombresector = nombre_sector
         cliente_direccion.save()
 
-        cliente_usuario = Usuario.objects.get_or_create(personaid=cliente[0]['personaid'])
+        cliente_usuario, created = Usuario.objects.get_or_create(personaid=cliente[0]['personaid'])
         cliente_usuario.email = email
         cliente_usuario.save()
 
         user_django = User.objects.get(email=cliente_usuario)
-        user_django.username = nombre_usuario
+        user_django.username = user_django.username
         user_django.first_name = nombres
         user_django.last_name = apellido_paterno
         user_django.email = email
         user_django.save()
+
         sweetify.success(request,"Cliente actualizado correctamente")
         return redirect('listar_clientes')
 
@@ -764,7 +757,7 @@ def Editar_vendedor(request):
         persona.save()
 
         user_django = User.objects.get(email=vendedor_usuario)
-        user_django.username = nombre_usuario
+        user_django.username = user_django.username
         user_django.first_name = nombres
         user_django.last_name = apellido_paterno
         user_django.email = email
@@ -780,6 +773,24 @@ def Editar_vendedor(request):
     }
 
     return render(request, 'vendedores/editar_vendedor.html', context)
+
+def Cambiar_estado_vendedor(id_vendedor):
+
+    vendedor = Empleado.objects.get(empleadoid = id_vendedor)
+    persona_id = Empleado.objects.filter(empleadoid = id_vendedor).values('personaid')
+    usuario = Usuario.objects.filter(personaid = persona_id[0]['personaid']).values('nombreusuario')
+    user = User.objects.get(username = usuario[0]['nombreusuario'])
+
+    if vendedor.estadoid.descripcion == 'Activo':
+        vendedor.estadoid = Estado.objects.get(descripcion = "Inactivo")
+        vendedor.save()
+        user.is_active = False
+        user.save()
+    else: 
+        vendedor.estadoid = Estado.objects.get(descripcion = "Activo")
+        vendedor.save()
+        user.is_active = True
+        user.save()
 
 ##********************Proveedores*******************************************************************
 
@@ -918,24 +929,6 @@ def Editar_proveedor(request):
     }
 
     return render(request, 'proveedores/editar_proveedor.html', context)
-
-def Cambiar_estado_vendedor(id_vendedor):
-
-    vendedor = Empleado.objects.get(empleadoid = id_vendedor)
-    persona_id = Empleado.objects.filter(empleadoid = id_vendedor).values('personaid')
-    usuario = Usuario.objects.filter(personaid = persona_id[0]['personaid']).values('nombreusuario')
-    user = User.objects.get(username = usuario[0]['nombreusuario'])
-
-    if vendedor.estadoid.descripcion == 'Activo':
-        vendedor.estadoid = Estado.objects.get(descripcion = "Inactivo")
-        vendedor.save()
-        user.is_active = False
-        user.save()
-    else: 
-        vendedor.estadoid = Estado.objects.get(descripcion = "Activo")
-        vendedor.save()
-        user.is_active = True
-        user.save()
 
 #***************************************************************************************************
 
@@ -1126,7 +1119,7 @@ def Editar_empleado(request):
         persona.save()
 
         user_django = User.objects.get(email=empleado_usuario)
-        user_django.username = nombre_usuario
+        user_django.username = user_django.username
         user_django.first_name = nombres
         user_django.last_name = apellido_paterno
         user_django.email = email
@@ -1148,7 +1141,8 @@ def Cambiar_estado_empleado(id_empleado):
     empleado = Empleado.objects.get(empleadoid = id_empleado)
     persona_id = Empleado.objects.filter(empleadoid = id_empleado).values('personaid')
     usuario = Usuario.objects.filter(personaid = persona_id[0]['personaid']).values('nombreusuario')
-    user = User.objects.filter(username = usuario[0]['nombreusuario'])
+    user = User.objects.get(username = usuario[0]['nombreusuario'])
+
     if empleado.estadoid.descripcion == 'Activo':
         empleado.estadoid = Estado.objects.get(descripcion = "Inactivo")
         empleado.save()

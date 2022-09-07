@@ -36,7 +36,11 @@
             <tbody style="text-align:center">
                 <tr>
                     <td class="border border-secondary">{{empleado.fechaingreso}}</td>
-                    <td class="border border-secondary">{{empleado.fechadesvinculacion}}</td>
+                    {% if empleado.fechadesvinculacion != None %}
+                        <td class="border border-secondary">{{empleado.fechadesvinculacion}}</td>
+                    {% else %}
+                        <td class="border border-secondary">--</td>
+                    {% endif %}
                     <td class="border border-secondary">{{empleado.cargoid.descripcion}}</td>
                     <td class="border border-secondary">{{empleado.estadoid.descripcion}}</td>
                 </tr>
