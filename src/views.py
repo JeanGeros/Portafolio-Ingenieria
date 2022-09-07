@@ -1,9 +1,12 @@
+import email
 from django.shortcuts import render, redirect
 from django.http import HttpResponseRedirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
+import sweetify 
 import datetime 
+
 from django.contrib import messages
 from src.forms import (
     FormClienteNormal1, FormClienteNormal2, FormClienteNormal3, addproductsForm, FormVendedorPersona,
@@ -38,11 +41,12 @@ def Ingreso(request):
 
             if user is not None:
                 login(request, user)
+                sweetify.success(request, 'Ingreso realizado con exito')
                 return render(request, 'index.html')
             else:
-                messages.warning(request, 'Email y/o contraseña inválidos.')
+                sweetify.warning(request, 'Usuario y/o contraseña inválidos.')
         else:
-            messages.warning(request, 'Email y/o contraseña inválidos.')
+            sweetify.warning(request, 'Usuario y/o contraseña inválidos.')
 
     context = {
 
@@ -61,7 +65,7 @@ def Agregar_productos(request):
         stock = request.POST.get('stock')
         stockcritico = request.POST.get('stockcritico')
         fechavencimiento = request.POST.get('fechavencimiento')
-        imagen = request.POST.get('imagen')
+        imagen = request.FILES.get('imagen')
         proveedorid = request.POST.get('proveedorid')
         tipoproductoid = request.POST.get('tipoproductoid')
         familiaproid = request.POST.get('familiaproid')
@@ -97,12 +101,11 @@ def Agregar_productos(request):
             )
 
             if product is not None:
-                messages.warning(request, 'Producto creado correctamente')
+                sweetify.success(request, 'Producto creado correctamente')
                 return redirect('listar_productos')
 
         except Exception as error:
-            print(error)
-            messages.warning(request, error)
+            sweetify.warning(request, error)
 
     context = {
         'form': form,
@@ -120,7 +123,7 @@ def Listar_productos(request):
             print(id_producto)
             Cambiar_estado_producto(id_producto)
             producto = Producto.objects.get(productoid = id_producto)
-            messages.warning(request, f'El producto {producto.nombre} ha quedado {producto.estadoid.descripcion} correctamente')
+            sweetify.success(request, f'El producto {producto.nombre} ha quedado {producto.estadoid.descripcion} correctamente')
             return redirect('listar_productos')
         
         if request.POST.get('VerProducto') is not None:
@@ -216,13 +219,12 @@ def Editar_producto(request):
             producto.imagen = imagen
             producto.save()
 
-            messages.warning(request, 'Producto actualizado correctamente')
+            sweetify.success(request, 'Producto actualizado correctamente')
             return redirect('listar_productos')
             
         except Exception as error:
             print(error)
-            messages.error(request, error)
-
+            sweetify.error(request, error)
 
     context = {
         'form': form,
@@ -257,51 +259,16 @@ def Registro_clientes(request):
         contraseña = request.POST.get('password')
         confirme_contraseña = request.POST.get('confirme_contraseña')
 
-        if Persona.objects.get(runcuerpo=run_cuerpo, dv=dv) is not None:
-            messages.warning(request, '''
-                Swal.fire({
-                    icon: 'success',
-                    text: "El run ingresado ya existe",
-                    showConfirmButton: false,
-                    timer: 3000
-                })
-            ''')
-        elif Cliente.objects.get(personaid = Persona.objects.get(runcuerpo=run_cuerpo, dv=dv)) is not None:
-            messages.warning(request, '''
-                Swal.fire({
-                    icon: 'success',
-                    text: "El cliente con el run ingresado ya existe",
-                    showConfirmButton: false,
-                    timer: 3000
-                })
-            ''')
-        elif Usuario.objects.create(email = email) is not None:
-            messages.warning(request, '''
-                Swal.fire({
-                    icon: 'success',
-                    text: "El correo ingresado ya existe",
-                    showConfirmButton: false,
-                    timer: 3000
-                })
-            ''')
-        elif Usuario.objects.get(personaid = Persona.objects.get(runcuerpo=run_cuerpo, dv=dv)) is not None:
-            messages.warning(request, '''
-                Swal.fire({
-                    icon: 'error',
-                    text: "El cliente ya cuenta con un usuario",
-                    showConfirmButton: false,
-                    timer: 3000
-                })
-            ''')
-        elif Usuario.objects.get(nombreusuario = nombre_usuario) is not None:
-            messages.warning(request, '''
-                Swal.fire({
-                    icon: 'error',
-                    text: "El cliente ya cuenta con un usuario",
-                    showConfirmButton: false,
-                    timer: 3000
-                })
-            ''')
+        personaRegistro = Persona.objects.filter(runcuerpo=run_cuerpo, dv=dv).exists()
+        usuarioRegistro = Usuario.objects.filter(email = email).exists()
+        usuarioRegistro3 = Usuario.objects.filter(nombreusuario = nombre_usuario).exists()
+
+        if personaRegistro == True:
+            sweetify.warning(request,"El run ingresado ya existe")
+        elif usuarioRegistro == True:
+            sweetify.warning(request,"El correo ingresado ya existe")
+        elif usuarioRegistro3 == True:
+            sweetify.warning(request,"El cliente ya cuenta con un usuario")
         else: 
             user = User.objects.create_user(
                 username = nombre_usuario,
@@ -324,10 +291,12 @@ def Registro_clientes(request):
                 telefono = telefono,
                 estadoid = Estado.objects.get(descripcion="Activo")
             )
-
-            if Direccion.objects.get(calle = calle, 
+            
+            ValidarDireccion = Direccion.objects.filter(calle = calle, 
                 numero = numero, 
-                tipoviviendaid = Tipovivienda.objects.get(tipoviviendaid=tipo_vivienda_id)) is None:
+                tipoviviendaid = tipo_vivienda_id).exists()
+
+            if ValidarDireccion == False:
 
                 Direccion.objects.create(
                     calle = calle,
@@ -353,30 +322,17 @@ def Registro_clientes(request):
             )
 
             if (Persona is not None and 
-                Direccion  is not None and 
-                Usuario  is not None and 
+                Direccion is not None and 
+                Usuario is not None and 
                 Cliente is not None and 
                 user is not None):
                 
                 user.save()
-                messages.warning(request, '''
-                    Swal.fire({
-                        icon: 'success',
-                        text: "Se ha registrado correctamente",
-                        showConfirmButton: false,
-                        timer: 3000
-                    })
-                ''')
+
+                sweetify.success(request,"Se ha registrado correctamente")
                 return redirect('registro_clientes')
             else:
-                messages.warning(request, '''
-                    Swal.fire({
-                        icon: 'error',
-                        text: "No es posible registrarse en este momento",
-                        showConfirmButton: false,
-                        timer: 3000
-                    })
-                ''')
+                sweetify.error(request,"No es posible registrarse en este momento")
 
     context = {
         'form1': form1,
@@ -411,53 +367,17 @@ def Agregar_cliente(request):
         contraseña = request.POST.get('password')
         confirme_contraseña = request.POST.get('confirme_contraseña')
 
-        if Persona.objects.get(runcuerpo=run_cuerpo, dv=dv) is not None:
-            messages.warning(request, '''
-                Swal.fire({
-                    icon: 'error',
-                    text: "El run ingresado ya existe",
-                    showConfirmButton: false,
-                    timer: 3000
-                })
-            ''')
-        elif Cliente.objects.get(personaid = Persona.objects.get(runcuerpo=run_cuerpo, dv=dv)) is not None:
-            messages.warning(request, '''
-                Swal.fire({
-                    icon: 'error',
-                    text: "El cliente con el run ingresado ya existe",
-                    showConfirmButton: false,
-                    timer: 3000
-                })
-            ''')
-        elif Usuario.objects.create(email = email) is not None:
-            messages.warning(request, '''
-                Swal.fire({
-                    icon: 'error',
-                    text: "El correo ingresado ya existe",
-                    showConfirmButton: false,
-                    timer: 3000
-                })
-            ''')
-        elif Usuario.objects.get(personaid = Persona.objects.get(runcuerpo=run_cuerpo, dv=dv)) is not None:
-            messages.warning(request, '''
-                Swal.fire({
-                    icon: 'error',
-                    text: "El cliente ya cuenta con un usuario",
-                    showConfirmButton: false,
-                    timer: 3000
-                })
-            ''')
-        elif Usuario.objects.get(nombreusuario = nombre_usuario) is not None:
-            messages.warning(request, '''
-                Swal.fire({
-                    icon: 'error',
-                    text: "El cliente ya cuenta con un usuario",
-                    showConfirmButton: false,
-                    timer: 3000
-                })
-            ''')
-        else: 
+        personaRegistro = Persona.objects.filter(runcuerpo=run_cuerpo, dv=dv).exists()
+        usuarioRegistro = Usuario.objects.filter(email = email).exists()
+        usuarioRegistro3 = Usuario.objects.filter(nombreusuario = nombre_usuario).exists()
 
+        if personaRegistro == True:
+            sweetify.warning(request,"El run ingresado ya existe")
+        elif usuarioRegistro == True:
+            sweetify.warning(request,"El correo ingresado ya existe")
+        elif usuarioRegistro3 == True:
+            sweetify.warning(request,"El cliente ya cuenta con un usuario")
+        else: 
             user = User.objects.create_user(
                 username = nombre_usuario,
                 first_name = nombres,
@@ -479,10 +399,12 @@ def Agregar_cliente(request):
                 telefono = telefono,
                 estadoid = Estado.objects.get(descripcion="Activo")
             )
-
-            if Direccion.objects.get(calle = calle, 
+            
+            ValidarDireccion = Direccion.objects.filter(calle = calle, 
                 numero = numero, 
-                tipoviviendaid = Tipovivienda.objects.get(tipoviviendaid=tipo_vivienda_id)) is None:
+                tipoviviendaid = tipo_vivienda_id).exists()
+
+            if ValidarDireccion == False:
 
                 Direccion.objects.create(
                     calle = calle,
@@ -509,30 +431,16 @@ def Agregar_cliente(request):
 
             if (Persona is not None and 
                 Direccion is not None and 
-                Cliente is not None and 
                 Usuario is not None and 
+                Cliente is not None and 
                 user is not None):
                 
                 user.save()
-                
-                messages.warning(request, '''
-                    Swal.fire({
-                        icon: 'success',
-                        text: "Cliente creado correctamente",
-                        showConfirmButton: false,
-                        timer: 3000
-                    })
-                ''')
+
+                sweetify.success(request,"Cliente creado correctamente")
                 return redirect('registro_clientes')
             else:
-                messages.warning(request, '''
-                    Swal.fire({
-                        icon: 'error',
-                        text: "No es posible crear el cliente en este momento",
-                        showConfirmButton: false,
-                        timer: 3000
-                    })
-                ''')
+                sweetify.error(request,"No es posible crear el cliente en este momento")
 
     context = {
         'form1': form1,
@@ -552,7 +460,7 @@ def Listar_clientes(request):
             id_cliente = request.POST.get('CambiarEstado')
             Cambiar_estado_cliente(id_cliente)
             cliente = Cliente.objects.get(clienteid = id_cliente)
-            messages.warning(request, f'El cliente {cliente.personaid.runcuerpo} - {cliente.personaid.dv} ha quedado {cliente.estadoid.descripcion} correctamente')
+            sweetify.success(request,f'El cliente {cliente.personaid.runcuerpo} - {cliente.personaid.dv} ha quedado {cliente.estadoid.descripcion} correctamente')
             return redirect('listar_clientes')
         
         if request.POST.get('VerCliente') is not None:
@@ -572,9 +480,9 @@ def Listar_clientes(request):
 def Cambiar_estado_cliente(id_cliente):
 
     cliente = Cliente.objects.get(clienteid = id_cliente)
-    persona_id = Empleado.objects.filter(empleadoid = id_cliente).values('personaid')
+    persona_id = Cliente.objects.filter(clienteid = id_cliente).values('personaid')
     usuario = Usuario.objects.filter(personaid = persona_id[0]['personaid']).values('nombreusuario')
-    user = User.objects.filter(username = usuario)
+    user = User.objects.get(email = usuario[0]['nombreusuario'])
 
     if cliente.estadoid.descripcion == 'Activo':
         cliente.estadoid = Estado.objects.get(descripcion = "Inactivo")
@@ -656,15 +564,7 @@ def Editar_cliente(request):
         user_django.last_name = apellido_paterno
         user_django.email = email
         user_django.save()
-
-        messages.warning(request, '''
-            Swal.fire({
-                icon: 'success',
-                text: "Cliente actualizado correctamente",
-                showConfirmButton: false,
-                timer: 3000
-            })
-        ''')
+        sweetify.success(request,"Cliente actualizado correctamente")
         return redirect('listar_clientes')
 
     context = {
@@ -690,7 +590,7 @@ def Listar_vendedores(request):
             id_vendedor = request.POST.get('CambiarEstado')
             Cambiar_estado_vendedor(id_vendedor)
             vendedor = Empleado.objects.get(empleadoid = id_vendedor)
-            messages.warning(request, f'El vendedor {vendedor.personaid.runcuerpo} - {vendedor.personaid.dv} ha quedado {vendedor.estadoid.descripcion} correctamente')
+            sweetify.success(request, f'El vendedor {vendedor.personaid.runcuerpo} - {vendedor.personaid.dv} ha quedado {vendedor.estadoid.descripcion} correctamente')
             return redirect('listar_vendedores')
 
         if request.POST.get('VerVendedor') is not None:
@@ -729,55 +629,20 @@ def Agregar_vendedor(request):
 
         fecha_ingreso = fecha_ingreso[6:10] + '-' + fecha_ingreso[3:5] + '-' + fecha_ingreso[0:2]
 
-        if Persona.objects.get(runcuerpo=run_cuerpo, dv=dv) is not None:
-            messages.warning(request, '''
-                Swal.fire({
-                    icon: 'error',
-                    text: "El run ingresado ya existe",
-                    showConfirmButton: false,
-                    timer: 3000
-                })
-            ''')
-        elif Empleado.objects.get(
-            fechaingreso = fecha_ingreso,
-            personaid = Persona.objects.get(runcuerpo=run_cuerpo, dv=dv)) is not None:
-            messages.warning(request, '''
-                Swal.fire({
-                    icon: 'error',
-                    text: "El vendedor con el run ingresado ya existe",
-                    showConfirmButton: false,
-                    timer: 3000
-                })
-            ''')
-        elif Usuario.objects.get(email = email) is not None:
-            messages.warning(request, '''
-                Swal.fire({
-                    icon: 'error',
-                    text: "El correo ingresado ya existe",
-                    showConfirmButton: false,
-                    timer: 3000
-                })
-            ''')
-        elif Usuario.objects.get(personaid = Persona.objects.get(runcuerpo=run_cuerpo, dv=dv)) is not None:
-            messages.warning(request, '''
-                Swal.fire({
-                    icon: 'error',
-                    text: "El vendedor ya cuenta con un usuario",
-                    showConfirmButton: false,
-                    timer: 3000
-                })
-            ''')
-        elif Usuario.objects.get(nombreusuario = nombre_usuario) is not None:
-            messages.warning(request, '''
-                Swal.fire({
-                    icon: 'error',
-                    text: "El vendedor ya cuenta con un usuario",
-                    showConfirmButton: false,
-                    timer: 3000
-                })
-            ''')
-        else:
+        personaRegistro = Persona.objects.filter(runcuerpo=run_cuerpo, dv=dv).exists()
+        usuarioRegistro = Usuario.objects.filter(email = email).exists()
+        usuarioRegistro3 = Usuario.objects.filter(nombreusuario = nombre_usuario).exists()
 
+        if personaRegistro:
+            sweetify.error(request,"El run ingresado ya existe")
+            
+        elif usuarioRegistro:
+            sweetify.error(request,"El correo ingresado ya existe")
+            
+        elif usuarioRegistro3:
+            sweetify.error(request,"El vendedor ya cuenta con un usuario")
+            
+        else:
             user = User.objects.create_user(
                 username = nombre_usuario,
                 first_name = nombres,
@@ -815,28 +680,17 @@ def Agregar_vendedor(request):
                 estadoid = Estado.objects.get(descripcion="Activo")
             )
 
-            if Persona is not None and Usuario is not None and Empleado is not None and user is not None:
+            if (Persona is not None and 
+                Usuario is not None and 
+                Empleado is not None and 
+                user is not None):
 
                 user.save()
-
-                messages.warning(request, '''
-                            Swal.fire({
-                                icon: 'success',
-                                text: "Vendedor creado correctamente",
-                                showConfirmButton: false,
-                                timer: 3000
-                            })
-                        ''')
+                sweetify.success(request,"Vendedor creado correctamente")
                 return redirect('listar_vendedores')
+
             else:
-                messages.warning(request, '''
-                            Swal.fire({
-                                icon: 'error',
-                                text: "No es posible crear el vendedor en este momento",
-                                showConfirmButton: false,
-                                timer: 3000
-                            })
-                        ''')
+                sweetify.error(request,"No es posible crear el vendedor en este momento")
 
     context = {
         'form1': form1,
@@ -916,14 +770,7 @@ def Editar_vendedor(request):
         user_django.email = email
         user_django.save()
 
-        messages.warning(request, '''
-                        Swal.fire({
-                            icon: 'success',
-                            text: "Vendedor actualizado correctamente",
-                            showConfirmButton: false,
-                            timer: 3000
-                        })
-                    ''')
+        sweetify.success(request,"Vendedor actualizado correctamente")
         return redirect('listar_vendedores')
 
     context = {
@@ -1077,7 +924,7 @@ def Cambiar_estado_vendedor(id_vendedor):
     vendedor = Empleado.objects.get(empleadoid = id_vendedor)
     persona_id = Empleado.objects.filter(empleadoid = id_vendedor).values('personaid')
     usuario = Usuario.objects.filter(personaid = persona_id[0]['personaid']).values('nombreusuario')
-    user = User.objects.filter(username = usuario)
+    user = User.objects.get(username = usuario[0]['nombreusuario'])
 
     if vendedor.estadoid.descripcion == 'Activo':
         vendedor.estadoid = Estado.objects.get(descripcion = "Inactivo")
@@ -1105,7 +952,7 @@ def Listar_empleados(request):
             id_empleado = request.POST.get('CambiarEstado')
             Cambiar_estado_empleado(id_empleado)
             empleado = Empleado.objects.get(empleadoid = id_empleado)
-            messages.warning(request, f'El empleado {empleado.personaid.runcuerpo} - {empleado.personaid.dv} ha quedado {empleado.estadoid.descripcion} correctamente')
+            sweetify.success(request, f'El empleado {empleado.personaid.runcuerpo} - {empleado.personaid.dv} ha quedado {empleado.estadoid.descripcion} correctamente')
             return redirect('listar_empleados')
 
         if request.POST.get('VerEmpleado') is not None:
@@ -1144,47 +991,20 @@ def Agregar_empleado(request):
 
         fecha_ingreso = fecha_ingreso[6:10] + '-' + fecha_ingreso[3:5] + '-' + fecha_ingreso[0:2]
 
-        if Persona.objects.get(runcuerpo=run_cuerpo, dv=dv) is not None:
-            messages.warning(request, '''
-                Swal.fire({
-                    icon: 'error',
-                    text: "El run ingresado ya existe",
-                    showConfirmButton: false,
-                    timer: 3000
-                })
-            ''')
-        elif Empleado.objects.get(
-            fechaingreso = fecha_ingreso,
-            personaid = Persona.objects.get(runcuerpo=run_cuerpo, dv=dv)) is not None:
-            messages.warning(request, '''
-                Swal.fire({
-                    icon: 'error',
-                    text: "El empleado con el run ingresado ya existe",
-                    showConfirmButton: false,
-                    timer: 3000
-                })
-            ''')
-        elif Usuario.objects.get(email = email) is not None:
-            messages.warning(request, '''
-                Swal.fire({
-                    icon: 'error',
-                    text: "El correo ingresado ya existe",
-                    showConfirmButton: false,
-                    timer: 3000
-                })
-            ''')
-        elif (Usuario.objects.get(personaid = Persona.objects.get(runcuerpo=run_cuerpo, dv=dv)) is not None or 
-            Usuario.objects.get(nombreusuario = nombre_usuario) is not None):
-            messages.warning(request, '''
-                Swal.fire({
-                    icon: 'error',
-                    text: "El empleado ya cuenta con un usuario",
-                    showConfirmButton: false,
-                    timer: 3000
-                })
-            ''')
-        else:
+        personaRegistro = Persona.objects.filter(runcuerpo=run_cuerpo, dv=dv).exists()
+        usuarioRegistro = Usuario.objects.filter(email = email).exists()
+        usuarioRegistro3 = Usuario.objects.filter(nombreusuario = nombre_usuario).exists()
 
+        if personaRegistro:
+            sweetify.error(request,"El run ingresado ya existe")
+            
+        elif usuarioRegistro:
+            sweetify.error(request,"El correo ingresado ya existe")
+            
+        elif usuarioRegistro3:
+            sweetify.error(request,"El empleado ya cuenta con un usuario")
+            
+        else:
             user = User.objects.create_user(
                 username = nombre_usuario,
                 first_name = nombres,
@@ -1228,24 +1048,11 @@ def Agregar_empleado(request):
                 user is not None):
 
                 user.save()
-                messages.warning(request, '''
-                    Swal.fire({
-                        icon: 'success',
-                        text: "Empleado creado correctamente",
-                        showConfirmButton: false,
-                        timer: 3000
-                    })
-                ''')
+                sweetify.success(request,"Empleado creado correctamente")
+                
                 return redirect('listar_empleados')
             else:
-                messages.warning(request, '''
-                    Swal.fire({
-                        icon: 'error',
-                        text: "No es posible crear el empleado en este momento",
-                        showConfirmButton: false,
-                        timer: 3000
-                    })
-                ''')
+                sweetify.warning(request,"No es posible crear el empleado en este momento")
 
     context = {
         'form1': form1,
@@ -1325,14 +1132,7 @@ def Editar_empleado(request):
         user_django.email = email
         user_django.save()
 
-        messages.warning(request, '''
-            Swal.fire({
-                icon: 'success',
-                text: "Empleado actualizado correctamente",
-                showConfirmButton: false,
-                timer: 3000
-            })
-        ''')
+        sweetify.success(request,"Empleado actualizado correctamente")
         return redirect('listar_empleados')
 
     context = {
@@ -1348,7 +1148,7 @@ def Cambiar_estado_empleado(id_empleado):
     empleado = Empleado.objects.get(empleadoid = id_empleado)
     persona_id = Empleado.objects.filter(empleadoid = id_empleado).values('personaid')
     usuario = Usuario.objects.filter(personaid = persona_id[0]['personaid']).values('nombreusuario')
-    user = User.objects.filter(username = usuario)
+    user = User.objects.filter(username = usuario[0]['nombreusuario'])
     if empleado.estadoid.descripcion == 'Activo':
         empleado.estadoid = Estado.objects.get(descripcion = "Inactivo")
         empleado.save()

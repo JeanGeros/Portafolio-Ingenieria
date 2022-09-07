@@ -8,20 +8,7 @@
     <div class="container text-end caja rounded">
         
         <h1 class="text-center pb-2">Editar Empleado</h1>
-        {% if messages %}
-            <ul class="messages list-group mb-3">
-                {% for message in messages %}
-                    <script>
-                        Swal.fire({
-                            icon: 'success',
-                            text: "{{message}}",
-                            showConfirmButton: false,
-                            timer: 2000
-                        })
-                    </script>
-                {% endfor %}
-            </ul>
-        {% endif %}
+        
         <form method="post" action="" class="">
             {% csrf_token %}        
             <div class="form-group row pb-3">
@@ -35,16 +22,16 @@
                 </div>
                 <div class="col-md-3">
                     <div class="run">
-                        {% render_field form1.runcuerpo class="form-control border border-secondary input-run" name="run_cuerpo"%}
+                        {% render_field form1.runcuerpo class="form-control border border-secondary input-run" type="text" placeholder="12345678" minlength="7" maxlength="8" onkeypress="return SoloNumeros(event)" %}
                         <label for="run" class="txt_negrita guion">-</label>
-                        {% render_field form1.dv class="form-control input-dv border border-secondary" name="dv"%}
+                        {% render_field form1.dv class="form-control input-dv border border-secondary" onkeypress="return ValidacionDv(event)" %}
                     </div>
                     
-                    {% render_field form1.nombres class="form-control input border border-secondary" name="nombres" %}
-                    {% render_field form1.apellidopaterno class="form-control input border border-secondary" name="apellido_paterno" %}
-                    {% render_field form1.apellidomaterno class="form-control input border border-secondary" name="apellido_materno" %}
-                    {% render_field form1.telefono class="form-control input border border-secondary" name="telefono" %}
-                    {% render_field form2.email class="form-control input border border-secondary" %}
+                    {% render_field form1.nombres class="form-control input border border-secondary" onkeypress="return SoloLetras(event)" %}
+                    {% render_field form1.apellidopaterno class="form-control input border border-secondary" onkeypress="return SoloLetras(event)" %}
+                    {% render_field form1.apellidomaterno class="form-control input border border-secondary" onkeypress="return SoloLetras(event)" %}
+                    {% render_field form1.telefono class="form-control input border border-secondary" type="text" placeholder="+56999999999 223456789" onkeypress="return ValidacionTelefono(event)" %}
+                    {% render_field form2.email class="form-control input border border-secondary" placeholder="nombre@ejemplo.com" %}
                 </div>
 
                 <div class="col-md-3 mt-1 p-0">
@@ -54,7 +41,7 @@
                 </div>
                 <div class="col-md-3">
                     {% render_field form3.fechaingreso|attr:"readonly:True" class="form-control input border border-secondary dateinput" placeholder="Click aqui" style="width:110px" %}
-                    {% render_field form2.nombreusuario class="form-control input border border-secondary" %}
+                    {% render_field form2.nombreusuario class="form-control input border border-secondary" minlength="4" onkeypress="return ValidacionNombreUsuario(event)" %}
                     <button type="submit" id="boton_aceptar" class="btn btn_aceptar border border-secondary text-black">Aceptar</button>
                     <a href="{% url 'listar_empleados' %}" type="submit" class="btn btn_aceptar border border-secondary text-black">Cancelar</a>
                 </div>
@@ -62,5 +49,7 @@
             </div>
         </form>
     </div>
+
+    <script src="{% static 'js/editar_empleado.js' %}"></script>
 
 {% endblock %}

@@ -8,20 +8,7 @@
     <div class="container text-end caja rounded mt-5 mb-5">
         
         <h1 class="text-center">Registro de empleado</h1>
-        {% if messages %}
-            <ul class="messages list-group mb-3">
-                {% for message in messages %}
-                    <script>
-                        Swal.fire({
-                            icon: 'success',
-                            text: "{{message}}",
-                            showConfirmButton: false,
-                            timer: 2000
-                        })
-                    </script>
-                {% endfor %}
-            </ul>
-        {% endif %}
+        
         <form method="post" action="" class="">
             {% csrf_token %}        
 
@@ -36,16 +23,16 @@
                 </div>
                 <div class="col-md-3">
                     <div class="run">
-                        {% render_field form1.runcuerpo class="form-control border border-secondary input-run"%}
+                        {% render_field form1.runcuerpo class="form-control border border-secondary input-run" type="text" placeholder="12345678" minlength="7" maxlength="9" onkeypress="return SoloNumeros(event)" %}
                         <label for="run" class="txt_negrita guion">-</label>
-                        {% render_field form1.dv class="form-control input-dv border border-secondary"%}
+                        {% render_field form1.dv class="form-control input-dv border border-secondary" onkeypress="return ValidacionDv(event)" %}
                     </div>
                     
-                    {% render_field form1.nombres class="form-control input border border-secondary"%}
-                    {% render_field form1.apellidopaterno class="form-control input border border-secondary"%}
-                    {% render_field form1.apellidomaterno class="form-control input border border-secondary"%}
-                    {% render_field form1.telefono class="form-control input border border-secondary"%}
-                    {% render_field form2.email class="form-control input border border-secondary"%}
+                    {% render_field form1.nombres class="form-control input border border-secondary" onkeypress="return SoloLetras(event)" %}
+                    {% render_field form1.apellidopaterno class="form-control input border border-secondary" onkeypress="return SoloLetras(event)" %}
+                    {% render_field form1.apellidomaterno class="form-control input border border-secondary" onkeypress="return SoloLetras(event)" %}
+                    {% render_field form1.telefono class="form-control input border border-secondary" type="text" placeholder="56999999999 223456789" onkeypress="return ValidacionTelefono(event)" %}
+                    {% render_field form2.email class="form-control input border border-secondary" placeholder="nombre@ejemplo.com" %}
                 </div>
 
                 <div class="col-md-3 mt-1 p-0">
@@ -56,9 +43,9 @@
                 </div>
                 <div class="col-md-3">
                     {% render_field form3.fechaingreso|attr:"readonly:True" class="form-control input border border-secondary dateinput" placeholder="Click aqui" style="width:110px" %}
-                    {% render_field form2.nombreusuario class="form-control input border border-secondary"%}
-                    <input class="form-control input border border-secondary" type="password" id="password" name="password" onkeyup="myFunction()"/>
-                    <input class="form-control input border border-secondary" type="password" id="confirme_contraseña" name="confirme_contraseña" onkeyup="myFunction()"/>
+                    {% render_field form2.nombreusuario class="form-control input border border-secondary" minlength="4" onkeypress="return ValidacionNombreUsuario(event)" %}
+                    <input class="form-control input border border-secondary" type="password" id="password" name="password" minlength="6" onkeyup="ValidacionContraseñas(event)" onkeypress="return SinEspacios(event)" />
+                    <input class="form-control input border border-secondary" type="password" id="confirme_contraseña" name="confirme_contraseña" minlength="6" onkeyup="ValidacionContraseñas()" onkeypress="return SinEspacios(event)"/>
                     <div class="" style="display: flex;">
                         <button type="submit" id="boton_aceptar" class="btn btn_aceptar border border-secondary text-black" style="margin-right: 10px;">Aceptar</button>
                         <a href="{% url 'listar_empleados' %}" type="submit" class="btn btn_aceptar border border-secondary text-black">Cancelar</a>
@@ -68,23 +55,6 @@
         </form>
     </div>
     
-    <!-- <script src="{% static 'js/registro_clientes.js' %}"></script> -->
-    <script>
+    <script src="{% static 'js/agregar_empleado.js' %}"></script>
 
-        let button = document.getElementById('boton_aceptar')
-        button.disabled = true
-
-        function myFunction() {
-
-            var password = document.getElementById('password').value;
-            var confirme_contraseña = document.getElementById('confirme_contraseña').value;
-            if (password !== "" && confirme_contraseña !== "" && password === confirme_contraseña){
-                button.disabled = false
-            }
-            else{
-                button.disabled = true
-            }
-        }
-        
-    </script>
 {% endblock %}

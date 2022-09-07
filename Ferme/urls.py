@@ -52,7 +52,7 @@ urlpatterns = [
     path('empleados/ver_empleado', views.Ver_empleado, name="ver_empleado"),
     path('empleados/editar_empleado', views.Editar_empleado, name="editar_empleado"),
 
-]
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 if settings.DEBUG:
     urlpatterns+= static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
