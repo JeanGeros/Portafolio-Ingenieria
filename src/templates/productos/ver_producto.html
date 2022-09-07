@@ -26,7 +26,11 @@
                     <td class="border border-secondary" >${{ producto.precio}}</td>
                     <td class="border border-secondary" >{{ producto.stock }}</td>
                     <td class="border border-secondary" >{{ producto.stockcritico }}</td>
-                    <td class="border border-secondary" >{{ producto.fechavencimiento }}</td>
+                    {% if producto.fechavencimiento != None %}
+                        <td class="border border-secondary" >{{ producto.fechavencimiento }}</td>
+                    {% else %}
+                        <td class="border border-secondary" >--</td>
+                    {% endif %}
                     <td class="border border-secondary" > <img src="/static/images/{{producto.imagen}}" alt="imagen producto" style="width:100px;height:100px;"> </td>
                 </tr>
             </tbody>

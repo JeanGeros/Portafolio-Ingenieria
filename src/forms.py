@@ -25,7 +25,7 @@ class FormClienteNormal3(forms.ModelForm):
     
     class Meta:
         model = Usuario
-        fields = ("email","password")
+        fields = ("email","password", "nombreusuario")
 
 class FormEditarCliente(forms.ModelForm):
     # def __init__(self, *args, **kwargs):
