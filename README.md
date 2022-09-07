@@ -61,7 +61,7 @@ $ git clone https://github.com/JeanGeros/Portafolio-Ingenieria.git
         $ pip install -r requirements.txt
         $ pip freeze > requirements.txt
         ```
-# Falta proceso de cloud
+# Configuración Cloud
 * ### Para conectar servidor cloud seguir los siguientes pasos:
  * [Configuracion Oracle Cloud](https://blogs.oracle.com/opal/post/connecting-to-oracle-cloud-autonomous-database-with-django)
   
