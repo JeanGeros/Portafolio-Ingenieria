@@ -7,3 +7,4 @@ django-widget-tweaks==1.4.12
 Pillow==9.2.0
 pytz==2022.2.1
 zipp==3.8.1
+sweetify==2.3.1

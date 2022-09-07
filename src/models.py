@@ -357,7 +357,7 @@ class Producto(models.Model):
     stockcritico = models.BigIntegerField()
     fechavencimiento = models.DateField(blank=True, null=True)
     codigo = models.CharField(max_length=17)
-    imagen = models.ImageField(blank=True, null=True, upload_to="")
+    imagen = models.ImageField(blank=True, null=True, upload_to="productos")
     proveedorid = models.ForeignKey('Proveedor', models.DO_NOTHING, db_column='proveedorid')
     tipoproductoid = models.ForeignKey('Tipoproducto', models.DO_NOTHING, db_column='tipoproductoid')
     familiaproid = models.ForeignKey(Familiaproducto, models.DO_NOTHING, db_column='familiaproid')

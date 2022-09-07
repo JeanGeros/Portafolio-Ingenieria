@@ -65,7 +65,7 @@ def Agregar_productos(request):
         stock = request.POST.get('stock')
         stockcritico = request.POST.get('stockcritico')
         fechavencimiento = request.POST.get('fechavencimiento')
-        imagen = request.POST.get('imagen')
+        imagen = request.FILES.get('imagen')
         proveedorid = request.POST.get('proveedorid')
         tipoproductoid = request.POST.get('tipoproductoid')
         familiaproid = request.POST.get('familiaproid')
@@ -101,12 +101,11 @@ def Agregar_productos(request):
             )
 
             if product is not None:
-                messages.warning(request, 'Producto creado correctamente')
+                sweetify.success(request, 'Producto creado correctamente')
                 return redirect('listar_productos')
 
         except Exception as error:
-            print(error)
-            messages.warning(request, error)
+            sweetify.warning(request, error)
 
     context = {
         'form': form,
@@ -124,7 +123,7 @@ def Listar_productos(request):
             print(id_producto)
             Cambiar_estado_producto(id_producto)
             producto = Producto.objects.get(productoid = id_producto)
-            messages.warning(request, f'El producto {producto.nombre} ha quedado {producto.estadoid.descripcion} correctamente')
+            sweetify.success(request, f'El producto {producto.nombre} ha quedado {producto.estadoid.descripcion} correctamente')
             return redirect('listar_productos')
         
         if request.POST.get('VerProducto') is not None:
@@ -220,13 +219,12 @@ def Editar_producto(request):
             producto.imagen = imagen
             producto.save()
 
-            messages.warning(request, 'Producto actualizado correctamente')
+            sweetify.success(request, 'Producto actualizado correctamente')
             return redirect('listar_productos')
             
         except Exception as error:
             print(error)
-            messages.error(request, error)
-
+            sweetify.error(request, error)
 
     context = {
         'form': form,
