@@ -32,9 +32,10 @@
 }
 
 .dateinput {
-    width: 25%;
+    width: 120%;
     height: 10%;
-
+    margin-top: 20px;
+    margin-bottom: 21px;
 }
 
 .input-run {
@@ -55,5 +56,6 @@
 }
 
 #id_imagen {
-    width: 105%;
+    width: 120%;
 }
+
