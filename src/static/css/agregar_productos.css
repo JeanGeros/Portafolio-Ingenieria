@@ -6,18 +6,7 @@
 }
 
 .label {
-    padding: 18px!important;
-}
-
-.imagen-producto {
-    padding-right: 15px!important;
-    padding-bottom: 52px!important;
-}
-
-.modificar-imagen {
-    display: -webkit-inline-box; 
-    text-align: initial!important; 
-    padding-top: 15px;
+    padding: 14px!important;
 }
 
 .caja {
@@ -43,9 +32,10 @@
 }
 
 .dateinput {
-    width: 25%;
+    width: 120%;
     height: 10%;
-
+    margin-top: 20px;
+    margin-bottom: 21px;
 }
 
 .input-run {
@@ -66,10 +56,6 @@
 }
 
 #id_imagen {
-    margin-left: -175px;
-    width: 60%;
+    width: 120%;
 }
 
-#imagen-clear_id {
-    margin-bottom: 3%;
-}

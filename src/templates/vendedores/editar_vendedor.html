@@ -8,20 +8,7 @@
     <div class="container text-end caja rounded">
         
         <h1 class="text-center pb-2">Editar Vendedor</h1>
-        {% if messages %}
-            <ul class="messages list-group mb-3">
-                {% for message in messages %}
-                    <script>
-                        Swal.fire({
-                            icon: 'success',
-                            text: "{{message}}",
-                            showConfirmButton: false,
-                            timer: 2000
-                        })
-                    </script>
-                {% endfor %}
-            </ul>
-        {% endif %}
+        
         <form method="post" action="" class="">
             {% csrf_token %}        
             <div class="form-group row pb-3">
@@ -62,5 +49,7 @@
             </div>
         </form>
     </div>
+
+    <script src="{% static 'js/editar_vendedor.js' %}"></script>
 
 {% endblock %}

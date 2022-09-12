@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 
 from pathlib import Path
 import os
+from threading import Timer
+import sweetify
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -40,7 +42,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'src',
     'widget_tweaks',
-    'django.contrib.humanize'
+    'django.contrib.humanize',
+    'sweetify'
 ]
 
 MIDDLEWARE = [
@@ -124,9 +127,11 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = '/static/'
-
 MEDIA_URL = '/images/'
-MEDIA_ROOT = os.path.join(STATIC_URL, "images")
-
+MEDIA_ROOT = os.path.join(BASE_DIR, "src/static/images")
 STATIC_ROOT = os.path.join(BASE_DIR, "static")
 
+
+# configuracion de sweetalert
+SWEETIFY_SWEETALERT_LIBRARY = 'sweetalert2'
+sweetify.DEFAULT_OPTS = { "timer": 3000}

@@ -8,26 +8,13 @@
     <div class="container text-end caja rounded">
         
         <h1 class="text-center pb-2">Editar Producto</h1>
-        {% if messages %}
-            <ul class="messages list-group mb-3">
-                {% for message in messages %}
-                    <script>
-                        Swal.fire({
-                            icon: 'success',
-                            text: "{{message}}",
-                            showConfirmButton: false,
-                            timer: 2000
-                        })
-                    </script>
-                {% endfor %}
-            </ul>
-        {% endif %}
-        <form method="post" action="" class="">
+        
+        <form method="post" action="" class="" enctype="multipart/form-data">
             {% csrf_token %}        
 
                 <div class="form-group row pb-3">
                     <div class="col-md-3 mt-1 textos p-0">
-                        <label for="run"  class="txt_negrita label">Nombre:</label><br>
+                        <label for="run" class="txt_negrita label">Nombre:</label><br>
                         <label for="run" class="txt_negrita label">Precio:</label><br>
                         <label for="run" class="txt_negrita label">Stock:</label><br>
                         <label for="run" class="txt_negrita label">Stock Critico:</label><br>
@@ -43,7 +30,7 @@
 
                     <div class="col-md-3 mt-1 p-0">
                         <br>
-                        <label class="txt_negrita label">Imagen del Producto:</label><br>
+                        <label class="txt_negrita imagen-producto">Imagen del Producto:</label><br>
                         <label class="txt_negrita label">Proveedor :</label><br>
                         <label class="txt_negrita label">Tipo de Producto :</label><br>
                         <label class="txt_negrita label">familiaproid:</label><br>
@@ -51,7 +38,7 @@
 
                     </div>
                     <div class="col-md-3 p-0">
-                        <div>
+                        <div class="modificar-imagen">
                             {% render_field form.imagen class="form-control input border border-secondary" name="imagen" %}
                         </div>
                         {% render_field form.proveedorid class="form-control input border border-secondary" name="proveedorid" %}
@@ -65,24 +52,7 @@
                 </div>
         </form>
     </div>
-    <script>
-        function soloNumeros(e) {
-            key = e.keyCode || e.which;
-            tecla = String.fromCharCode(key).toLowerCase();
-            letras = "1234567890";
-            especiales = [8, 37, 39, 46];
 
-            tecla_especial = false
-            for(var i in especiales) {
-                if(key == especiales[i]) {
-                    tecla_especial = true;
-                    break;
-                }
-            }
+    <script src="{% static 'js/editar_productos.js' %}"></script>
 
-            if(letras.indexOf(tecla) == -1 && !tecla_especial)
-                return false;
-        }
-    
-    </script>
 {% endblock %}

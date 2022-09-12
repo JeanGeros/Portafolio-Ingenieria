@@ -3,13 +3,12 @@
 {% load static %}
 
 {% block content %}
-
     <link rel="stylesheet" href="{% static 'css/modulo_productos.css' %}">
-    <div class="container p-5">
-        <h1 class="text-center" >Detalles del Cliente</h1>
+    <div class="container text-end caja rounded mt-5">
+        <h1 class="text-center" >Detalles del Producto</h1>
 
-        <table class="table table-striped table-hover">
-            <thead>
+        <table class="table table-striped table-hover" style="background-color: white; margin-bottom: 35px;">
+            <thead class="table-dark" style="text-align:center">
                 <tr>
                     <th>Nombre</th>
                     <th>Precio</th>
@@ -20,17 +19,42 @@
                
                 </tr>
             </thead>
-            <tbody>
+            <tbody style="text-align:center">
                 <tr>
                     <td class="border border-secondary" >{{ producto.nombre}}</td>
                     <td class="border border-secondary" >${{ producto.precio}}</td>
                     <td class="border border-secondary" >{{ producto.stock }}</td>
                     <td class="border border-secondary" >{{ producto.stockcritico }}</td>
-                    <td class="border border-secondary" >{{ producto.fechavencimiento }}</td>
-                    <td class="border border-secondary" > <img src="/static/img/{{producto.imagen}}" alt="imagen producto" style="width:100px;height:100px;"> </td>
+                    {% if producto.fechavencimiento != None %}
+                        <td class="border border-secondary" >{{ producto.fechavencimiento }}</td>
+                    {% else %}
+                        <td class="border border-secondary" >--</td>
+                    {% endif %}
+                    <td class="border border-secondary" > <img src="/static/images/{{producto.imagen}}" alt="imagen producto" style="width:100px;height:100px;"> </td>
                 </tr>
             </tbody>
         </table>
+        <table class="table table-striped table-hover" style="background-color: white; margin-bottom: 35px;">
+            <thead class="table-dark" style="text-align:center">
+            <tr>
+                <th>Codigo</th>
+                <th>Proveedor</th>
+                <th>Tipo de Producto</th>
+                <th>Familia del Producto</th>
+                <th>Estado</th>
+            </tr>
+            </thead>
+            <tbody style="text-align:center">
+            <tr>
+                <td class="border border-secondary" >{{ producto.codigo}}</td>
+                <td class="border border-secondary" >{{ producto.proveedorid}}</td>
+                <td class="border border-secondary" >{{ producto.tipoproductoid }}</td>
+                <td class="border border-secondary" >{{ producto.familiaproid }}</td>
+                <td class="border border-secondary" >{{ producto.estadoid }}</td>
+            </tr>
+            </tbody>
+        </table>
+
     
 
         <a href="{% url 'listar_productos' %}" type="submit" class="btn">Volver</a>

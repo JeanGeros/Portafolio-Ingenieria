@@ -5,11 +5,11 @@
 {% block content %}
 
     <link rel="stylesheet" href="{% static 'css/modulo_productos.css' %}">
-    <div class="container p-5">
+    <div class="container text-end caja rounded mt-5">
         <h1 class="text-center" >Detalles del Proveedor</h1>
 
-        <table class="table table-striped table-hover">
-            <thead>
+        <table class="table table-striped table-hover" style="background-color: white; margin-bottom: 35px;">
+            <thead class="table-dark" style="text-align:center">
                 <tr>
                     <th>Razon Social</th>
                     <th>RUT</th>
@@ -20,7 +20,7 @@
                
                 </tr>
             </thead>
-            <tbody>
+            <tbody style="text-align:center">
                 <tr>
                     
                     <td class="border border-secondary" >{{ proveedor.razonsocial }}</td>
