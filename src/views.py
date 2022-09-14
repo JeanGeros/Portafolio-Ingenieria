@@ -15,7 +15,7 @@ from src.forms import (
 )
 
 from .models import (
-    Persona, Direccion, Usuario, Cliente, Estado, Comuna, Tipobarrio, Tipovivienda, Rolusuario,
+    Detalleorden, Ordencompra, Persona, Direccion, Usuario, Cliente, Estado, Comuna, Tipobarrio, Tipovivienda, Rolusuario,
     Proveedor, Tipoproducto, Producto, Familiaproducto, Empleado, Cargo, Tiporubro
 )
 
@@ -1144,4 +1144,98 @@ def Cambiar_estado_empleado(id_empleado):
         user.is_active = True
         user.save()
 
-# ***************************************************************************************************
+# *******************************************ORDENES********************************************************
+# **********************************************************************************************************
+
+def Crear_pedido(request, id = None):
+    # proveedores = Proveedor.objects.all()
+
+    # tiposProductos = Tipoproducto.objects.filter(proveedor=id)
+
+    # listaF = []
+    # for tiposP in tiposProductos:
+    #     famId = Familiaproducto.objects.filter(tipo_producto=tiposP)
+    #     for f in famId:
+    #         listaF.append(f.id)
+
+    # productos = Producto.objects.all()
+
+    # listaProds = []
+    # for prod in productos:
+    #     idFam = Familiaproducto.objects.filter(descripcion=prod.familia_producto)
+
+    #     for idF in idFam:
+    #         for listF in listaF:
+    #             if listF == idF.id:
+    #                 listaProds.append(prod.nombre)
+
+    # if request.method == 'POST':
+
+    #     listaProductos = []
+    #     producto = []
+
+    #     contador2 = 0
+    #     for key,value in request.POST.items():
+    #         contador2 += 1
+
+    #     contador = 0
+    #     fecha = ""
+    #     cont = 0
+    #     for key,value in request.POST.items():
+            
+    #         contador += 1
+    #         if contador == 2:
+    #             proveedorOrden = int(value)
+
+    #         if contador > 2:
+
+    #             if contador == contador2:
+    #                 if value == "":
+    #                     fecha = "1000-10-10"
+    #                 else:
+    #                     fecha = value
+    #                     fecha = fecha[6:10]+ '-' +fecha[3:5]+ '-' + fecha[0:2]
+    #                     print(fecha)
+
+    #             if contador < contador2:
+    #                 cont += 1
+
+    #                 producto.append(value)
+
+    #                 if cont == 2:
+    #                     listaProductos.append(producto)
+    #                     producto = []
+    #                     cont = 0
+
+    #     proveedorOrden = Proveedor.objects.get(id=proveedorOrden)
+
+    #     ordenPedido = Ordencompra.objects.create(
+    #         estado_recepcion = 0,
+    #         proveedor = proveedorOrden,
+    #         fecha_llegada = fecha
+    #     )
+    #     ordenPedido.save()
+
+    #     ordenPedido = Ordencompra.objects.all().last()
+    #     ordenPedido = Ordencompra.objects.get(id = ordenPedido.id)
+
+    #     for listaP in listaProductos:
+            
+    #         prod = Producto.objects.get(nombre=listaP[0])
+
+    #         detallePedido = Detalleorden.objects.create(
+    #             producto = prod,
+    #             cantidad = listaP[1],
+    #             orden_pedido = ordenPedido
+    #         )
+    #         detallePedido.save()
+
+        messages.warning(request, 'Orden de pedido realizada con exito')
+        return redirect('listarPedidos')
+
+
+    context = {
+        'proveedores':proveedores,
+        'listaProds':listaProds
+    }
+    return render(request, 'pedidos/crear_pedido.html', context)
