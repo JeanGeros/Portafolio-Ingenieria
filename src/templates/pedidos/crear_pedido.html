@@ -22,7 +22,7 @@
 
                     {% for prov in proveedores %}
                         
-                        <a href="{{prov.id}}" style="text-decoration:none;" class="btn btn-primary text-white pb-2 mb-2" onclick="GetProveedor('{{prov.id}}')">{{prov.razon_social}}</a>
+                        <a href="{{prov.proveedorid}}" style="text-decoration:none;" class="btn btn-primary text-white pb-2 mb-2" onclick="GetProveedor('{{prov.proveedorid}}')">{{prov.razonsocial}}</a>
                         
                     {% endfor %}
                 </div>
@@ -99,12 +99,102 @@
                 <div class="p-3">
                     <button type="button" id="boton_aceptar" class="btn btn-primary" onclick="validarPedido()">Aceptar</button>
                     <!-- <a href="{{t.id}}"></a> -->
-                    <a href="{% url 'listarPedidos' %}" class="btn btn-primary">Cancelar</a> 
+                    <a href="{% url 'crear_pedido' %}" class="btn btn-primary">Cancelar</a> 
                 </div>
                 
             </form>
         </div>
     </div>
+    <script>
 
+        function GetProveedor(id){
+            localStorage.setItem("proveedor", JSON.stringify(proveedorid));
+            
+        }
+        local = localStorage.getItem("proveedor");
+        local = local.replace(/['"]+/g, '');
+        bloque = document.getElementById('proveedorId');
+            
+        //Creando el input que irá dentro del Div "plazos"
+        prov = document.createElement('input');
+        prov.setAttribute("name", `${local}` );
+        prov.id = 'inputProveedor';
+        prov.setAttribute("readonly", "" );
+        prov.setAttribute("style", "width:40px" );
+        bloque.appendChild(prov);
+        document.getElementById(prov.id).value = local;
+    
+        var incremento = 0;
+        function agregar2(producto, cantidadProd)
+        {
+            // function agregar2(idProd, precioProd, cantidadProd)
+            let coincidencia = document.getElementById(producto).textContent;
+            let cantidad = document.getElementById(cantidadProd).value;
+    
+            incremento++;
+            
+            //Obteniendo el Div "plazos"
+            bloque = document.getElementById('plazos');
+            
+            //Creando el input que irá dentro del Div "plazos"
+            elemento = document.createElement('input');
+            elemento.setAttribute("class", "form-control col-sm-3 mb-2" );
+            elemento.setAttribute("style", "width:300px" );
+            elemento.setAttribute("name", `${coincidencia}` );
+            elemento.id = 'input1.'+incremento;
+            elemento.setAttribute("readonly", "" );
+            bloque.appendChild(elemento);
+    
+            elemento2 = document.createElement('input');
+            elemento2.setAttribute("class", "form-control col-md-3 mb-2" );
+            elemento2.setAttribute("style", "width:50px" );
+            elemento2.setAttribute("name", `${coincidencia}.cantidad` );
+            elemento2.id = 'input2.'+incremento;
+            elemento2.setAttribute("readonly", "" );
+            bloque.appendChild(elemento2);
+            
+            eliminar = document.createElement('input');
+            eliminar.setAttribute("class", `btn btn-secondary btn-sm mb-2`);
+            eliminar.setAttribute("onclick", `borrar(${incremento})`);
+            eliminar.setAttribute("value", "-");
+            eliminar.setAttribute("style", "width:30px");
+            eliminar.id = 'borrar'+incremento;
+            bloque.appendChild(eliminar);
+    
+            document.getElementById(elemento.id).value = coincidencia;
+            document.getElementById(elemento2.id).value = cantidad;
+    
+            br = document.createElement('br');
+            br.id = 'br'+incremento;
+            bloque.appendChild(br);
+    
+        }
+    
+        //Lo que se hará cuando se presione el boton de Borrar
+        function borrar(obj) {
+            
+            document.getElementById(`input1.${obj}`).remove();
+            document.getElementById(`input2.${obj}`).remove();
+            document.getElementById(`borrar${obj}`).remove();
+            document.getElementById(`br${obj}`).remove();
+            
+        }
+    
+        function validarPedido(){
+            bloque = document.getElementById('plazos').innerHTML;
+            localStorage.setItem("producto", JSON.stringify(bloque));
+            local = localStorage.getItem("producto");
+            local = local.length;
+            if (local <= 36){
+                Swal.fire({
+                    icon: 'error',
+                    title: 'No hay productos en el pedido',
+                    showConfirmButton: true,
+                })
+            }else{
+                document.formCrearPedido.submit();
+            }
+        }
+    </script>
 
 {% endblock %}
