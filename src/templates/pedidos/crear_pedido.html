@@ -22,7 +22,7 @@
 
                     {% for prov in proveedores %}
                         
-                        <a href="{{prov.proveedorid}}" style="text-decoration:none;" class="btn btn-primary text-white pb-2 mb-2" onclick="GetProveedor('{{prov.proveedorid}}')">{{prov.razonsocial}}</a>
+                        <a href="crear_pedido/{{prov.proveedorid}}" style="text-decoration:none;" class="btn btn-primary text-white pb-2 mb-2" onclick="GetProveedor('{{prov.proveedorid}}')">{{prov.razonsocial}}</a>
                         
                     {% endfor %}
                 </div>
@@ -130,7 +130,8 @@
             // function agregar2(idProd, precioProd, cantidadProd)
             let coincidencia = document.getElementById(producto).textContent;
             let cantidad = document.getElementById(cantidadProd).value;
-    
+            console.log(coincidencia)
+            console.log(cantidad)
             incremento++;
             
             //Obteniendo el Div "plazos"

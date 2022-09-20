@@ -1148,29 +1148,19 @@ def Cambiar_estado_empleado(id_empleado):
 # **********************************************************************************************************
 
 def Crear_pedido(request, id = None):
-    proveedores = Proveedor.objects.all()
-
-    tiposProductos = Tipoproducto.objects.all()
-
-    listaF = []
-    for tiposP in tiposProductos:
-        famId = Familiaproducto.objects.all()
-        for f in famId:
-            listaF.append(f.familiaproid)
-
-    productos = Producto.objects.all()
+    if id:
+        proveedores = Proveedor.objects.filter(proveedorid=id)
+        for proveedor in proveedores:
+            productos = Producto.objects.filter(proveedorid=proveedor)
+    else:
+        proveedores = Proveedor.objects.all()   
+        productos = Producto.objects.all()
 
     listaProds = []
     for prod in productos:
-        idFam = Familiaproducto.objects.all()
-
-        for idF in idFam:
-            for listF in listaF:
-                if listF == idF.familiaproid:
-                    listaProds.append(prod.nombre)
+        listaProds.append(prod.nombre)
 
     if request.method == 'POST':
-
         listaProductos = []
         producto = []
 
@@ -1182,13 +1172,12 @@ def Crear_pedido(request, id = None):
         fecha = ""
         cont = 0
         for key,value in request.POST.items():
-            
             contador += 1
             if contador == 2:
+                print(int(value))
                 proveedorOrden = int(value)
 
             if contador > 2:
-
                 if contador == contador2:
                     if value == "":
                         fecha = "1000-10-10"
@@ -1199,14 +1188,13 @@ def Crear_pedido(request, id = None):
 
                 if contador < contador2:
                     cont += 1
-
                     producto.append(value)
 
                     if cont == 2:
                         listaProductos.append(producto)
                         producto = []
                         cont = 0
-
+        print(contador)
         proveedorOrden = Proveedor.objects.get(id=proveedorOrden)
 
         ordenPedido = Ordencompra.objects.create(
@@ -1232,7 +1220,6 @@ def Crear_pedido(request, id = None):
 
         messages.warning(request, 'Orden de pedido realizada con exito')
         return redirect('crear_pedido')
-
 
     context = {
         'proveedores':proveedores,
