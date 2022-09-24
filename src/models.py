@@ -151,6 +151,9 @@ class Detalleorden(models.Model):
     def __str__(self):
         return f"{self.detalleid}"
 
+    def __str__(self):
+        return self.productoid
+
     class Meta:
         managed = False
         db_table = 'detalleorden'
@@ -251,7 +254,7 @@ class Estado(models.Model):
     descripcion = models.CharField(max_length=10)
 
     def __str__(self):
-            return self.descripcion
+        return self.descripcion
 
     class Meta:
         managed = False
@@ -263,7 +266,7 @@ class Estadoorden(models.Model):
     descripcion = models.CharField(max_length=30)
 
     def __str__(self):
-            return self.descripcion
+        return self.descripcion
 
     class Meta:
         managed = False

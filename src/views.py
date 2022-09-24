@@ -1155,7 +1155,7 @@ def Crear_pedido(request, id = None):
         for proveedor in proveedores:
             productos = Producto.objects.filter(proveedorid=proveedor)
     else:
-        proveedores = Proveedor.objects.all()   
+        proveedor = Proveedor.objects.all()   
         productos = Producto.objects.all()
 
     listaProds = []
@@ -1227,7 +1227,45 @@ def Crear_pedido(request, id = None):
         return redirect('crear_pedido')
 
     context = {
-        'proveedores':proveedores,
+        'proveedor':proveedor,
         'listaProds':listaProds
     }
     return render(request, 'pedidos/crear_pedido.html', context)
+
+def Listar_pedidos(request):
+    ordenes = Ordencompra.objects.all()
+
+    if request.method == 'POST':
+
+    #     if request.POST.get('CambiarEstado') is not None:
+    #         id_empleado = request.POST.get('CambiarEstado')
+    #         Cambiar_estado_empleado(id_empleado)
+    #         empleado = Empleado.objects.get(empleadoid=id_empleado)
+    #         sweetify.success(request,
+    #                          f'El empleado {empleado.personaid.runcuerpo} - {empleado.personaid.dv} ha quedado {empleado.estadoid.descripcion} correctamente')
+    #         return redirect('listar_empleados')
+
+        if request.POST.get('VerPedido') is not None:
+            request.session['_old_post'] = request.POST
+            return HttpResponseRedirect('ver_pedido')
+
+    context = {
+        'ordenes': ordenes
+    }
+
+    return render(request, 'pedidos/listar_pedidos.html', context)
+
+def Ver_pedidos(request):
+    old_post = request.session.get('_old_post')
+
+    detalle_orden = Detalleorden.objects.filter(ordenid=old_post['VerPedido'])
+
+    context = {
+        'detalle_orden': detalle_orden,
+    }
+
+    return render(request, 'pedidos/ver_pedido.html', context)
+
+
+
+
