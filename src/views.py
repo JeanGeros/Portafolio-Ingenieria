@@ -2,11 +2,13 @@ import email
 from django.shortcuts import render, redirect
 from django.http import HttpResponseRedirect
 from django.contrib.auth import authenticate, login, logout
+from django.views.decorators.csrf import csrf_exempt
+
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 import sweetify
 import datetime 
-
+import qrcode 
 from django.contrib import messages
 from src.forms import (
     FormClienteNormal1, FormClienteNormal2, FormClienteNormal3, addproductsForm, FormVendedorPersona,
@@ -15,7 +17,7 @@ from src.forms import (
 )
 
 from .models import (
-    Detalleorden, Ordencompra, Persona, Direccion, Usuario, Cliente, Estado, Comuna, Tipobarrio, Tipovivienda, Rolusuario,
+    Detalleorden, Estadoorden, Ordencompra, Persona, Direccion, Usuario, Cliente, Estado, Comuna, Tipobarrio, Tipovivienda, Rolusuario,
     Proveedor, Tipoproducto, Producto, Familiaproducto, Empleado, Cargo, Tiporubro
 )
 
@@ -1146,7 +1148,7 @@ def Cambiar_estado_empleado(id_empleado):
 
 # *******************************************ORDENES********************************************************
 # **********************************************************************************************************
-
+@csrf_exempt
 def Crear_pedido(request, id = None):
     if id:
         proveedores = Proveedor.objects.filter(proveedorid=id)
@@ -1163,60 +1165,63 @@ def Crear_pedido(request, id = None):
     if request.method == 'POST':
         listaProductos = []
         producto = []
-
         contador2 = 0
         for key,value in request.POST.items():
             contador2 += 1
-
         contador = 0
         fecha = ""
         cont = 0
         for key,value in request.POST.items():
-            contador += 1
-            if contador == 2:
-                print(int(value))
-                proveedorOrden = int(value)
+            print(key)
+            print(value)
+            try:
+                nomProduct = Producto.objects.get(nombre=key)
+                nomProduct = nomProduct.proveedorid.proveedorid
+                listaProductos.append({'id':nomProduct, 'value':value})
+            except Producto.DoesNotExist:
+                if value == "": value = "1000-10-10" ; value = value
+                listaProductos.append({'id':key, 'value':value})
+                print(listaProductos)
 
-            if contador > 2:
-                if contador == contador2:
-                    if value == "":
-                        fecha = "1000-10-10"
-                    else:
-                        fecha = value
-                        fecha = fecha[6:10]+ '-' +fecha[3:5]+ '-' + fecha[0:2]
-                        print(fecha)
+        # ----------------------------------------------------------------------
+            # contador += 1
+        #     if contador == 2:
+        #         print(f"value:  {value}")
+        #         proveedorOrden = Producto.objects.get(nombre=value)
+        #         proveedorOrden = proveedorOrden.proveedorid.proveedorid
+        #     if contador > 2:
+        #         if contador == contador2:
+        #             if value == "":
+        #                 fecha = "1000-10-10"
+        #             else:
+        #                 fecha = value
+        #                 fecha = fecha[6:10]+ '-' +fecha[3:5]+ '-' + fecha[0:2]
 
-                if contador < contador2:
-                    cont += 1
-                    producto.append(value)
+        #         if contador < contador2:
+        #             cont += 1
+        #             producto.append(value)
+        #             if cont == 2:
+        #                 listaProductos.append(producto)
+        #                 producto = []
+        #                 cont = 0
+        # print(listaProductos)
+        # proveedorOrden = Proveedor.objects.get(proveedorid=proveedorOrden)
+        # estado_orden = Estadoorden.objects.get(estadoordenid=1)
 
-                    if cont == 2:
-                        listaProductos.append(producto)
-                        producto = []
-                        cont = 0
-        print(contador)
-        proveedorOrden = Proveedor.objects.get(id=proveedorOrden)
-
-        ordenPedido = Ordencompra.objects.create(
-            estado_recepcion = 0,
-            proveedor = proveedorOrden,
-            fecha_llegada = fecha
-        )
-        ordenPedido.save()
-
-        ordenPedido = Ordencompra.objects.all().last()
-        ordenPedido = Ordencompra.objects.get(id = ordenPedido.id)
-
-        for listaP in listaProductos:
-            
-            prod = Producto.objects.get(nombre=listaP[0])
-
-            detallePedido = Detalleorden.objects.create(
-                producto = prod,
-                cantidad = listaP[1],
-                orden_pedido = ordenPedido
-            )
-            detallePedido.save()
+        # ordenPedido = Ordencompra.objects.create(
+        #     fechapedido = fecha,
+        #     proveedorid = proveedorOrden,
+        #     estadoordenid = estado_orden
+        # )
+        # #ordenPedido.save()
+        # for listaP in listaProductos:
+        #     prod = Producto.objects.get(nombre=listaP[0])
+        #     detallePedido = Detalleorden.objects.create(
+        #         producto = prod,
+        #         cantidad = listaP[1],
+        #         orden_pedido = ordenPedido
+        #     )
+        #     detallePedido.save()
 
         messages.warning(request, 'Orden de pedido realizada con exito')
         return redirect('crear_pedido')
