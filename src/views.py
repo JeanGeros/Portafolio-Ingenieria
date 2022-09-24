@@ -1153,7 +1153,7 @@ def Crear_pedido(request, id = None):
         for proveedor in proveedores:
             productos = Producto.objects.filter(proveedorid=proveedor)
     else:
-        proveedores = Proveedor.objects.all()   
+        proveedor = Proveedor.objects.all()   
         productos = Producto.objects.all()
 
     listaProds = []
@@ -1167,45 +1167,46 @@ def Crear_pedido(request, id = None):
         contador2 = 0
         for key,value in request.POST.items():
             contador2 += 1
-
+        
         contador = 0
         fecha = ""
         cont = 0
         for key,value in request.POST.items():
-            contador += 1
-            if contador == 2:
-                print(int(value))
-                proveedorOrden = int(value)
+             
+            print(value)
+            # contador += 1
+            # if contador == 2:
+            #     proveedorOrden = int(value)
 
-            if contador > 2:
-                if contador == contador2:
-                    if value == "":
-                        fecha = "1000-10-10"
-                    else:
-                        fecha = value
-                        fecha = fecha[6:10]+ '-' +fecha[3:5]+ '-' + fecha[0:2]
-                        print(fecha)
+            # if contador > 2:
+            #     if contador == contador2:
+            #         if value == "":
+            #             fecha = "1000-10-10"
+            #         else:
+            #             fecha = value
+            #             fecha = fecha[6:10]+ '-' +fecha[3:5]+ '-' + fecha[0:2]
+            #             print(fecha)
 
-                if contador < contador2:
-                    cont += 1
-                    producto.append(value)
+            #     if contador < contador2:
+            #         cont += 1
+            #         producto.append(value)
 
-                    if cont == 2:
-                        listaProductos.append(producto)
-                        producto = []
-                        cont = 0
+            #         if cont == 2:
+            #             listaProductos.append(producto)
+            #             producto = []
+            #             cont = 0
         print(contador)
-        proveedorOrden = Proveedor.objects.get(id=proveedorOrden)
+        # proveedorOrden = Proveedor.objects.get(id=proveedorOrden)
 
-        ordenPedido = Ordencompra.objects.create(
-            estado_recepcion = 0,
-            proveedor = proveedorOrden,
-            fecha_llegada = fecha
-        )
-        ordenPedido.save()
+        # ordenPedido = Ordencompra.objects.create(
+        #     estado_recepcion = 0,
+        #     proveedor = proveedorOrden,
+        #     fecha_llegada = fecha
+        # )
+        # ordenPedido.save()
 
-        ordenPedido = Ordencompra.objects.all().last()
-        ordenPedido = Ordencompra.objects.get(id = ordenPedido.id)
+        # ordenPedido = Ordencompra.objects.all().last()
+        # ordenPedido = Ordencompra.objects.get(id = ordenPedido.id)
 
         for listaP in listaProductos:
             
@@ -1222,7 +1223,45 @@ def Crear_pedido(request, id = None):
         return redirect('crear_pedido')
 
     context = {
-        'proveedores':proveedores,
+        'proveedor':proveedor,
         'listaProds':listaProds
     }
     return render(request, 'pedidos/crear_pedido.html', context)
+
+def Listar_pedidos(request):
+    ordenes = Ordencompra.objects.all()
+
+    if request.method == 'POST':
+
+    #     if request.POST.get('CambiarEstado') is not None:
+    #         id_empleado = request.POST.get('CambiarEstado')
+    #         Cambiar_estado_empleado(id_empleado)
+    #         empleado = Empleado.objects.get(empleadoid=id_empleado)
+    #         sweetify.success(request,
+    #                          f'El empleado {empleado.personaid.runcuerpo} - {empleado.personaid.dv} ha quedado {empleado.estadoid.descripcion} correctamente')
+    #         return redirect('listar_empleados')
+
+        if request.POST.get('VerPedido') is not None:
+            request.session['_old_post'] = request.POST
+            return HttpResponseRedirect('ver_pedido')
+
+    context = {
+        'ordenes': ordenes
+    }
+
+    return render(request, 'pedidos/listar_pedidos.html', context)
+
+def Ver_pedidos(request):
+    old_post = request.session.get('_old_post')
+
+    detalle_orden = Detalleorden.objects.filter(ordenid=old_post['VerPedido'])
+
+    context = {
+        'detalle_orden': detalle_orden,
+    }
+
+    return render(request, 'pedidos/ver_pedido.html', context)
+
+
+
+

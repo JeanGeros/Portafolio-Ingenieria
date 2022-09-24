@@ -20,7 +20,7 @@
                 <div class="col-md-6 border border-secondary rounded p-5">
                     <h3 class="text-center pb-3">Selecciones proveedor para ver sus productos</h3>
 
-                    {% for prov in proveedores %}
+                    {% for prov in proveedor %}
                         
                         <a href="crear_pedido/{{prov.proveedorid}}" style="text-decoration:none;" class="btn btn-primary text-white pb-2 mb-2" onclick="GetProveedor('{{prov.proveedorid}}')">{{prov.razonsocial}}</a>
                         
@@ -73,7 +73,6 @@
                                 <div id="proveedorId">
                                     <label for="state_id" class="control-label">Proveedor:</label>
                                 </div>
-                                
                                 <div class="container pt-3">
                                     <label for="state_id" class="control-label" style="padding-right: 200px;">Producto</label>
                                     <label for="state_id" class="control-label" style="padding-right: 50px;">Cantidad</label>
@@ -105,97 +104,245 @@
             </form>
         </div>
     </div>
-    <script>
+<script>
 
-        function GetProveedor(id){
-            localStorage.setItem("proveedor", JSON.stringify(proveedorid));
-            
-        }
-        local = localStorage.getItem("proveedor");
-        local = local.replace(/['"]+/g, '');
-        bloque = document.getElementById('proveedorId');
-            
+    function GetProveedor(id){
+        localStorage.setItem("proveedor", JSON.stringify(proveedorid));
+        document = proveedorid;
+        
+    }
+    local = localStorage.getItem("proveedor");
+    local = local.replace(/['"]+/g, '');
+    bloque = document.getElementById('proveedorId');
+        
+    //Creando el input que irá dentro del Div "plazos"
+    prov = document.createElement('input');
+    prov.setAttribute("name", `${local}` );
+    prov.id = 'inputProveedor';
+    prov.setAttribute("readonly", "" );
+    prov.setAttribute("style", "width:40px" );
+    bloque.appendChild(prov);
+    document.getElementById(prov.id).value = local;
+
+    var incremento = 0;
+    function agregar2(producto, cantidadProd)
+    {
+        // function agregar2(idProd, precioProd, cantidadProd)
+        let coincidencia = document.getElementById(producto).textContent;
+        let cantidad = document.getElementById(cantidadProd).value;
+        console.log(coincidencia)
+        console.log(cantidad)
+        incremento++;
+        
+        //Obteniendo el Div "plazos"
+        bloque = document.getElementById('plazos');
+        
         //Creando el input que irá dentro del Div "plazos"
-        prov = document.createElement('input');
-        prov.setAttribute("name", `${local}` );
-        prov.id = 'inputProveedor';
-        prov.setAttribute("readonly", "" );
-        prov.setAttribute("style", "width:40px" );
-        bloque.appendChild(prov);
-        document.getElementById(prov.id).value = local;
-    
-        var incremento = 0;
-        function agregar2(producto, cantidadProd)
-        {
-            // function agregar2(idProd, precioProd, cantidadProd)
-            let coincidencia = document.getElementById(producto).textContent;
-            let cantidad = document.getElementById(cantidadProd).value;
-            console.log(coincidencia)
-            console.log(cantidad)
-            incremento++;
-            
-            //Obteniendo el Div "plazos"
-            bloque = document.getElementById('plazos');
-            
-            //Creando el input que irá dentro del Div "plazos"
-            elemento = document.createElement('input');
-            elemento.setAttribute("class", "form-control col-sm-3 mb-2" );
-            elemento.setAttribute("style", "width:300px" );
-            elemento.setAttribute("name", `${coincidencia}` );
-            elemento.id = 'input1.'+incremento;
-            elemento.setAttribute("readonly", "" );
-            bloque.appendChild(elemento);
-    
-            elemento2 = document.createElement('input');
-            elemento2.setAttribute("class", "form-control col-md-3 mb-2" );
-            elemento2.setAttribute("style", "width:50px" );
-            elemento2.setAttribute("name", `${coincidencia}.cantidad` );
-            elemento2.id = 'input2.'+incremento;
-            elemento2.setAttribute("readonly", "" );
-            bloque.appendChild(elemento2);
-            
-            eliminar = document.createElement('input');
-            eliminar.setAttribute("class", `btn btn-secondary btn-sm mb-2`);
-            eliminar.setAttribute("onclick", `borrar(${incremento})`);
-            eliminar.setAttribute("value", "-");
-            eliminar.setAttribute("style", "width:30px");
-            eliminar.id = 'borrar'+incremento;
-            bloque.appendChild(eliminar);
-    
-            document.getElementById(elemento.id).value = coincidencia;
-            document.getElementById(elemento2.id).value = cantidad;
-    
-            br = document.createElement('br');
-            br.id = 'br'+incremento;
-            bloque.appendChild(br);
-    
+        elemento = document.createElement('input');
+        elemento.setAttribute("class", "form-control col-sm-3 mb-2" );
+        elemento.setAttribute("style", "width:300px" );
+        elemento.setAttribute("name", `${coincidencia}` );
+        elemento.id = 'input1.'+incremento;
+        elemento.setAttribute("readonly", "" );
+        bloque.appendChild(elemento);
+
+        elemento2 = document.createElement('input');
+        elemento2.setAttribute("class", "form-control col-md-3 mb-2" );
+        elemento2.setAttribute("style", "width:50px" );
+        elemento2.setAttribute("name", `${coincidencia}.cantidad` );
+        elemento2.id = 'input2.'+incremento;
+        elemento2.setAttribute("readonly", "" );
+        bloque.appendChild(elemento2);
+        
+        eliminar = document.createElement('input');
+        eliminar.setAttribute("class", `btn btn-secondary btn-sm mb-2`);
+        eliminar.setAttribute("onclick", `borrar(${incremento})`);
+        eliminar.setAttribute("value", "-");
+        eliminar.setAttribute("style", "width:30px");
+        eliminar.id = 'borrar'+incremento;
+        bloque.appendChild(eliminar);
+
+        document.getElementById(elemento.id).value = coincidencia;
+        document.getElementById(elemento2.id).value = cantidad;
+
+        br = document.createElement('br');
+        br.id = 'br'+incremento;
+        bloque.appendChild(br);
+    }
+
+    //Lo que se hará cuando se presione el boton de Borrar
+    function borrar(obj) {
+        document.getElementById(`input1.${obj}`).remove();
+        document.getElementById(`input2.${obj}`).remove();
+        document.getElementById(`borrar${obj}`).remove();
+        document.getElementById(`br${obj}`).remove();
+        
+    }
+
+    function validarPedido(){
+        bloque = document.getElementById('plazos').innerHTML;
+        localStorage.setItem("producto", JSON.stringify(bloque));
+        local = localStorage.getItem("producto");
+        local = local.length;
+        if (local <= 36){
+            Swal.fire({
+                icon: 'error',
+                title: 'No hay productos en el pedido',
+                showConfirmButton: true,
+            })
+        }else{
+            document.formCrearPedido.submit();
+            print(document.formCrearPedido)
         }
-    
-        //Lo que se hará cuando se presione el boton de Borrar
-        function borrar(obj) {
-            
-            document.getElementById(`input1.${obj}`).remove();
-            document.getElementById(`input2.${obj}`).remove();
-            document.getElementById(`borrar${obj}`).remove();
-            document.getElementById(`br${obj}`).remove();
-            
+    }
+</script>
+
+<!-- <script>
+
+    function GetProveedor(id){
+        localStorage.setItem("proveedor", JSON.stringify(id));
+        
+    }
+    local = localStorage.getItem("proveedor");
+    local = local.replace(/['"]+/g, '');
+    bloque = document.getElementById('proveedorId');
+        
+    //Creando el input que irá dentro del Div "plazos"
+    prov = document.createElement('input');
+    prov.setAttribute("name", `${local}` );
+    prov.id = 'inputProveedor';
+    prov.setAttribute("readonly", "" );
+    prov.setAttribute("style", "width:40px" );
+    bloque.appendChild(prov);
+    document.getElementById(prov.id).value = local;
+
+    var incremento = 0;
+    function agregar2(producto, cantidadProd)
+    {
+        // function agregar2(idProd, precioProd, cantidadProd)
+        let coincidencia = document.getElementById(producto).textContent;
+        let cantidad = document.getElementById(cantidadProd).value;
+
+        incremento++;
+        
+        //Obteniendo el Div "plazos"
+        bloque = document.getElementById('plazos');
+        
+        //Creando el input que irá dentro del Div "plazos"
+        elemento = document.createElement('input');
+        elemento.setAttribute("class", "form-control col-sm-3 mb-2" );
+        elemento.setAttribute("style", "width:300px" );
+        elemento.setAttribute("name", `${coincidencia}` );
+        elemento.id = 'input1.'+incremento;
+        elemento.setAttribute("readonly", "" );
+        bloque.appendChild(elemento);
+
+        elemento2 = document.createElement('input');
+        elemento2.setAttribute("class", "form-control col-md-3 mb-2" );
+        elemento2.setAttribute("style", "width:50px" );
+        elemento2.setAttribute("name", `${coincidencia}.cantidad` );
+        elemento2.id = 'input2.'+incremento;
+        elemento2.setAttribute("readonly", "" );
+        bloque.appendChild(elemento2);
+        
+        eliminar = document.createElement('input');
+        eliminar.setAttribute("class", `btn btn-secondary btn-sm mb-2`);
+        eliminar.setAttribute("onclick", `borrar(${incremento})`);
+        eliminar.setAttribute("value", "-");
+        eliminar.setAttribute("style", "width:30px");
+        eliminar.id = 'borrar'+incremento;
+        bloque.appendChild(eliminar);
+
+        document.getElementById(elemento.id).value = coincidencia;
+        document.getElementById(elemento2.id).value = cantidad;
+
+        br = document.createElement('br');
+        br.id = 'br'+incremento;
+        bloque.appendChild(br);
+
+    }
+
+    //Lo que se hará cuando se presione el boton de Borrar
+    function borrar(obj) {
+        
+        document.getElementById(`input1.${obj}`).remove();
+        document.getElementById(`input2.${obj}`).remove();
+        document.getElementById(`borrar${obj}`).remove();
+        document.getElementById(`br${obj}`).remove();
+        
+    }
+
+    function validarPedido(){
+        bloque = document.getElementById('plazos').innerHTML;
+        localStorage.setItem("producto", JSON.stringify(bloque));
+        local = localStorage.getItem("producto");
+        local = local.length;
+        if (local <= 36){
+            Swal.fire({
+                icon: 'error',
+                title: 'No hay productos en el pedido',
+                showConfirmButton: true,
+            })
+        }else{
+            document.formCrearPedido.submit();
         }
-    
-        function validarPedido(){
-            bloque = document.getElementById('plazos').innerHTML;
-            localStorage.setItem("producto", JSON.stringify(bloque));
-            local = localStorage.getItem("producto");
-            local = local.length;
-            if (local <= 36){
-                Swal.fire({
-                    icon: 'error',
-                    title: 'No hay productos en el pedido',
-                    showConfirmButton: true,
-                })
-            }else{
-                document.formCrearPedido.submit();
+    }
+</script>
+<script> 
+    function doSearch()
+    {
+        const tableReg = document.getElementById('datos');
+        const searchText = document.getElementById('searchTerm').value.toLowerCase();
+        let total = 0;
+
+        // Recorremos todas las filas con contenido de la tabla
+        for (let i = 1; i < tableReg.rows.length; i++) {
+
+            // Si el td tiene la clase "noSearch" no se busca en su cntenido
+            if (tableReg.rows[i].classList.contains("noSearch")) {
+                continue;
+            }
+
+            let found = false;
+            const cellsOfRow = tableReg.rows[i].getElementsByTagName('td');
+
+            // Recorremos todas las celdas
+            for (let j = 0; j < cellsOfRow.length && !found; j++) {
+
+                const compareWith = cellsOfRow[j].innerHTML.toLowerCase();
+
+                // Buscamos el texto en el contenido de la celda
+                if (searchText.length == 0 || compareWith.indexOf(searchText) > -1) {
+                    found = true;
+                    total++;
+                }
+            }
+
+            if (found) {
+                tableReg.rows[i].style.display = '';
+            } 
+            else {
+                // si no ha encontrado ninguna coincidencia, esconde la
+                // fila de la tabla
+                tableReg.rows[i].style.display = 'none';
             }
         }
-    </script>
 
+        // mostramos las coincidencias
+        const lastTR=tableReg.rows[tableReg.rows.length-1];
+        const td=lastTR.querySelector("td");
+        lastTR.classList.remove("hide", "red");
+
+        if (searchText == "") {
+            lastTR.classList.add("hide");
+        } 
+        else if (total) {
+            td.innerHTML="Se ha encontrado "+total+" coincidencia"+((total>1)?"s":"");
+        } 
+        else {
+            lastTR.classList.add("red");
+            td.innerHTML="No se han encontrado coincidencias";
+        }
+    }
+</script> -->
 {% endblock %}
