@@ -149,10 +149,7 @@ class Detalleorden(models.Model):
     ordenid = models.ForeignKey('Ordencompra', models.DO_NOTHING, db_column='ordenid')
     
     def __str__(self):
-        return f"{self.detalleid}"
-
-    def __str__(self):
-        return self.productoid
+        return f"{self.detalleid} {self.productoid}"
 
     class Meta:
         managed = False
@@ -376,7 +373,7 @@ class Producto(models.Model):
     estadoid = models.ForeignKey(Estado, models.DO_NOTHING, db_column='estadoid')
 
     def __str__(self):
-        return self.nombre
+        return f"{self.nombre}"
 
     class Meta:
         managed = False

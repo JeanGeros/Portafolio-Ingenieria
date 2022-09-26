@@ -1150,81 +1150,62 @@ def Cambiar_estado_empleado(id_empleado):
 # **********************************************************************************************************
 @csrf_exempt
 def Crear_pedido(request, id = None):
-    if id:
-        proveedores = Proveedor.objects.filter(proveedorid=id)
-        for proveedor in proveedores:
-            productos = Producto.objects.filter(proveedorid=proveedor)
-    else:
-        proveedor = Proveedor.objects.all()   
-        productos = Producto.objects.all()
-
+    proveedor = Proveedor.objects.filter(proveedorid=id)
+    for prov in proveedor:
+        productos = Producto.objects.filter(proveedorid=prov)
     listaProds = []
     for prod in productos:
         listaProds.append(prod.nombre)
 
     if request.method == 'POST':
         listaProductos = []
-        producto = []
-        contador2 = 0
         for key,value in request.POST.items():
-            contador2 += 1
-        contador = 0
-        fecha = ""
-        cont = 0
-        for key,value in request.POST.items():
-            print(key)
-            print(value)
+            print(f"key: {key}  value  {value}")
             try:
                 nomProduct = Producto.objects.get(nombre=key)
-                nomProduct = nomProduct.proveedorid.proveedorid
-                listaProductos.append({'id':nomProduct, 'value':value})
+                idProduct = nomProduct.productoid
+                if len(listaProductos) == 0 :
+                    listaProductos.append({'id':idProduct, 'value':value})
+                else:
+                    for product in listaProductos:
+                        if product['id'] == str(idProduct):
+                            print("found")
+                            sum_value = int(product['value']) + int(value)
+                            product.update({'value': sum_value})
+                            break
+                        else:
+                            print("not found")
+                            listaProductos.append({'id':idProduct, 'value':value})
             except Producto.DoesNotExist:
-                if value == "": value = "1000-10-10" ; value = value
-                listaProductos.append({'id':key, 'value':value})
-                print(listaProductos)
+                if key == "fecha_vencimiento" and len(value) == 0:
+                    fecha = "1000-10-10"
+                else:
+                    fecha=value
 
-        # ----------------------------------------------------------------------
-            # contador += 1
-        #     if contador == 2:
-        #         print(f"value:  {value}")
-        #         proveedorOrden = Producto.objects.get(nombre=value)
-        #         proveedorOrden = proveedorOrden.proveedorid.proveedorid
-        #     if contador > 2:
-        #         if contador == contador2:
-        #             if value == "":
-        #                 fecha = "1000-10-10"
-        #             else:
-        #                 fecha = value
-        #                 fecha = fecha[6:10]+ '-' +fecha[3:5]+ '-' + fecha[0:2]
+        proveedorOrden = Proveedor.objects.get(proveedorid=int(id))
+        estado_orden = Estadoorden.objects.get(estadoordenid=1)
+        
+        ordenPedido = Ordencompra.objects.create(
+            fechapedido = fecha,
+            proveedorid = proveedorOrden,
+            estadoordenid = estado_orden
+        )
 
-        #         if contador < contador2:
-        #             cont += 1
-        #             producto.append(value)
-        #             if cont == 2:
-        #                 listaProductos.append(producto)
-        #                 producto = []
-        #                 cont = 0
-        # print(listaProductos)
-        # proveedorOrden = Proveedor.objects.get(proveedorid=proveedorOrden)
-        # estado_orden = Estadoorden.objects.get(estadoordenid=1)
+        last_orden_compra = Ordencompra.objects.order_by('ordenid').last()
+        print(listaProductos)
 
-        # ordenPedido = Ordencompra.objects.create(
-        #     fechapedido = fecha,
-        #     proveedorid = proveedorOrden,
-        #     estadoordenid = estado_orden
-        # )
-        # #ordenPedido.save()
-        # for listaP in listaProductos:
-        #     prod = Producto.objects.get(nombre=listaP[0])
-        #     detallePedido = Detalleorden.objects.create(
-        #         producto = prod,
-        #         cantidad = listaP[1],
-        #         orden_pedido = ordenPedido
-        #     )
-        #     detallePedido.save()
+        for products in listaProductos:
+            producto = Producto.objects.get(productoid= int(products['id']))
+
+            detallePedido = Detalleorden.objects.create(
+                productoid = producto,
+                cantidad = products['value'],
+                ordenid = last_orden_compra
+            )
+            detallePedido.save()
 
         messages.warning(request, 'Orden de pedido realizada con exito')
-        return redirect('crear_pedido')
+        return redirect('listar_pedidos')
 
     context = {
         'proveedor':proveedor,
@@ -1232,18 +1213,38 @@ def Crear_pedido(request, id = None):
     }
     return render(request, 'pedidos/crear_pedido.html', context)
 
+
+def filtro_proveedor(request):
+    proveedores = Proveedor.objects.all()   
+    context = {
+        'proveedores':proveedores,
+    }
+    
+    return render(request, 'pedidos/crear_pedido_proveedores.html', context)
+
+
+#--------------------------------------------------------------
+def cambiar_estado_pedido(id_pedido):
+    orden_compra = Ordencompra.objects.get(ordenid=int(id_pedido))
+
+    estado_eliminado = Estadoorden.objects.get(estadoordenid=25)
+
+    if orden_compra.estadoordenid.estadoordenid == 1:
+        orden_compra.estadoordenid = estado_eliminado
+        orden_compra.save()
+#--------------------------------------------------------------
 def Listar_pedidos(request):
     ordenes = Ordencompra.objects.all()
 
     if request.method == 'POST':
-
-    #     if request.POST.get('CambiarEstado') is not None:
-    #         id_empleado = request.POST.get('CambiarEstado')
-    #         Cambiar_estado_empleado(id_empleado)
-    #         empleado = Empleado.objects.get(empleadoid=id_empleado)
-    #         sweetify.success(request,
-    #                          f'El empleado {empleado.personaid.runcuerpo} - {empleado.personaid.dv} ha quedado {empleado.estadoid.descripcion} correctamente')
-    #         return redirect('listar_empleados')
+        if request.POST.get('CambiarEstado') is not None:
+            id_pedido = request.POST.get('CambiarEstado')
+            print(id_pedido)
+            cambiar_estado_pedido(id_pedido)
+            orden_compra = Ordencompra.objects.get(ordenid=id_pedido)
+            sweetify.success(request,
+                             f'La Nro:{orden_compra.ordenid} se elimino correctamente')
+            return redirect('listar_pedidos')
 
         if request.POST.get('VerPedido') is not None:
             request.session['_old_post'] = request.POST
@@ -1257,9 +1258,9 @@ def Listar_pedidos(request):
 
 def Ver_pedidos(request):
     old_post = request.session.get('_old_post')
-
+    print(old_post['VerPedido'])
     detalle_orden = Detalleorden.objects.filter(ordenid=old_post['VerPedido'])
-
+    print(detalle_orden)
     context = {
         'detalle_orden': detalle_orden,
     }

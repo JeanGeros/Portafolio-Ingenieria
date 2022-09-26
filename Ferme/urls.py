@@ -53,7 +53,7 @@ urlpatterns = [
     path('empleados/editar_empleado', views.Editar_empleado, name="editar_empleado"),
 
     path('pedidos/', views.Listar_pedidos, name="listar_pedidos"),
-    path('pedidos/crear_pedido', views.Crear_pedido, name="crear_pedido"),
+    path('pedidos/crear_pedido_proveedores', views.filtro_proveedor, name="crear_pedido_proveedores"),
     path('pedidos/crear_pedido/<int:id>', views.Crear_pedido, name="crear_pedido"),
     path('pedidos/ver_pedido', views.Ver_pedidos, name="ver_pedido"),
 
