@@ -56,6 +56,9 @@ urlpatterns = [
     path('pedidos/crear_pedido_proveedores', views.filtro_proveedor, name="crear_pedido_proveedores"),
     path('pedidos/crear_pedido/<int:id>', views.Crear_pedido, name="crear_pedido"),
     path('pedidos/ver_pedido', views.Ver_pedidos, name="ver_pedido"),
+    
+    path('recepcionar_pedido/<int:id>', views.RecepcionPedido, name="recepcion_pedidos"),
+
 
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 

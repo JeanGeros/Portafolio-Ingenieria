@@ -23,7 +23,6 @@
                         <a href="crear_pedido/{{prov.proveedorid}}" style="text-decoration:none;" class="btn btn-primary text-white pb-2 mb-2" onclick="ActivarCampoOtroTema()" onclick="GetProveedor('{{prov.proveedorid}}')">{{prov.razonsocial}}</a>
                     {% endfor %}
                 </div>
-
                 <div id="ListaProductos" class="col-md-6 border border-secondary rounded p-5">
                     <h3 class="text-center pb-3">Seleccione producto para el pedido</h3>
                     <form>
@@ -36,7 +35,6 @@
                             </tr>
                             {% for value in listaProds %}
                                 <tr class="border border-secondary rounded-3 p-2">
-
                                     <td id="{{value}}">{{value}}</td>
                                     <td><input id="{{value}}.cantidad" type="number" name="numero" value="1" min="1" max="50" step="1" /></td>
                                     <td><input class="btn btn-secondary btn-sm" type="button" title="Agregar Producto" Value="Agregar" onclick="agregar2('{{value}}','{{value}}.cantidad')"></td>

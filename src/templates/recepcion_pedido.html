@@ -1,0 +1,303 @@
+{% extends 'layout.html' %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/recepcion_productos.css' %}">
+
+<h1 class="text-center pt-5 ">Recepcion de pedidos</h1>
+<div class="row p-4 divPadre">
+    <div class="border border-secondary divHijo rounded p-5">
+        <h3 class="text-center">Detalle del Pedido y sus productos</h3>
+
+        <br>
+        <div class=" container border border-dark rounded p-3 mt-3">
+            <h4>Detalles del Pedido:</h4>
+            {% for orden in ordenPedido %}
+                <strong>Nro de Compra: </strong>{{orden.ordenid}}<br>
+                <strong>Fecha de Creacion: </strong>{{orden.fechapedido}}<br>
+                <strong>Proveedor: </strong>{{orden.proveedorid}}
+                <br>
+                
+            {% endfor %}
+            <br>
+            <h4>Productos:</h4>
+            {% for detalle in detalleOrden %}
+                <label  class="detallePedidoP" id="detallePedidoP">{{detalle.productoid | capfirst }}</label><br>
+            {% endfor %}
+        </div>
+
+        <!-- Productos -->
+        <div class="form-group border rounded p-2 border-dark mt-3"> 
+            
+            <h4 class="m-3">Productos seleccionados</h4>
+            
+            <!-- Div donde se añadiran los Selects -->
+            <div id="plazos" class="row" style="padding-left: 20px;padding-right: 60px;">
+            </div>
+
+            <br>  
+        </div>
+        
+    </div>
+    <div class="border border-secondary divHijo  rounded p-5">
+        <h3 class="text-center pb-3">Seleccione producto a recepcionar</h3>
+        <form>
+            Buscar producto <input id="searchTerm" type="text" onkeyup="doSearch()" />
+        </form>
+        <p>
+            <table id="datos">
+                <tr>
+                    <th>Nombre</th><th class="text-center">Accion</th>
+                </tr>
+                {% for value in productos %}
+                    <tr class="border border-secondary rounded-3 p-2">
+                        <td id="{{value}}">{{value| capfirst }}</td>
+                        <td ><input style="margin-left: 1rem;" class="btn btn-secondary btn-sm" type="button" title="Agregar Producto" Value="Confirmar" onclick="agregar2('{{value}}')"></td>
+                    </tr>
+                {% endfor %}
+                
+                <tr class='noSearch hide'>
+                    <td colspan="5"></td>
+                </tr>
+            </table>
+        </p>
+    </div>
+</div>
+
+<form method="post" action="" name="formulario" id="formulario">
+    {% csrf_token %}
+</form>
+
+<div class="text-center pb-4 d-grid gap-2 col-6 mx-auto">
+    <button class="btn btn-success" onclick="ValidarPedido()">Recepcionar Pedido</button>
+</div>
+<!-- <script>
+    function manual(){
+        Swal.fire({
+            title: 'Manual',
+            html: `Dentro de este módulo, nosotros podremos observar el 
+            formulario con todos los elementos que deberemos completar 
+            para poder recepcionar pedidos. 
+            <br><br>
+            En la parte izquierda de la página, nosotros podemos observar un 
+            texto que nos invita a seleccionar un pedido para poder visualizar 
+            así su detalle y productos correspondientes.
+            Debajo de este apartado, podremos encontrar los pedidos que fueron 
+            creados con anterioridad, nosotros deberemos seleccionar el pedido 
+            que deseemos recepcionar.
+            Al seleccionar uno de estos pedidos, podremos visualizar debajo de 
+            este recuadro el detalle de este, junto a los productos que tiene asignados.
+            Además, en la parte derecha de esta interfaz podremos observar un 
+            recuadro en el cual automáticamente se cargarán todos los productos, 
+            para poder proceder a la recepción del pedido. 
+            <br><br>
+            Desde este apartado podremos ir agregando productos, estos irán 
+            agregándose automáticamente al apartado de productos seleccionados, 
+            que podemos encontrar en la parte inferior izquierda de la interfaz.
+            La búsqueda de productos la podremos realizar de forma manual o 
+            mediante búsqueda por coincidencias.
+            En este caso, debemos indicar en la barra de búsqueda el nombre del 
+            producto a buscar, y a medida el campo se vaya llenando, este irá 
+            automáticamente sugiriendo productos en base al criterio de búsqueda 
+            ingresado.
+            En caso de no encontrar ninguna coincidencia, el propio sistema nos 
+            dará aviso con el siguiente mensaje: “No se han encontrado coincidencias”
+            <br><br>
+            Tras encontrar e identificar el producto que deseemos, procederemos a 
+            seleccionar la opción “Agregar”, que podemos encontrar en el lado derecho 
+            de cada producto presente en la lista.
+            Al seleccionar un producto, este será agregado al apartado de productos 
+            seleccionados.
+            Junto a cada producto, encontraremos una opción con el signo “-“, si 
+            seleccionamos esta opción, podremos eliminar dicho producto del apartado 
+            de selección. 
+            <br><br>
+            Tras tener listos todos los productos que deseemos recepcionar, podremos 
+            seleccionar la opción de “Recepcionar Pedido” que se encuentra en la 
+            parte inferior de la página. 
+            <br><br>
+            En caso de que existan productos que no coincidan con los registros 
+            pertenecientes al pedido realizado, se nos mostrará un mensaje contenido 
+            dentro de una ventana emergente, la cual nos mostrará el siguiente texto: 
+            “Hay productos que no se pueden recepcionar ya que no coinciden con los 
+            productos del pedido seleccionado”.
+            Podremos cerrar dicha ventana presionando la opción “Ok” 
+            <br><br>
+            Si los productos seleccionados coinciden con los presentes en el pedido, 
+            entonces nos aparecerá un mensaje en una pequeña ventana emergente, con 
+            el siguiente texto: “El pedido fue recepcionado correctamente”.
+            `,
+            showConfirmButton: true,
+            confirmButtonText: 'Continuar',
+        })
+    }
+</script> -->
+<script language="JavaScript">
+    //Creacion de Variable incremental
+    var incremento = 0;
+    
+    function agregar2(idProd)
+    {
+        let coincidencia = document.getElementById(idProd).textContent;
+        incremento++;
+        //Obteniendo el Div "plazos"
+        bloque = document.getElementById('plazos');
+        console.log(coincidencia)
+        console.log(incremento)
+
+        //Creando el input que irá dentro del Div "plazos"
+        elemento = document.createElement('input');
+        elemento.setAttribute("class", "form-control col-sm-3 mb-2 productoSeleccionado" );
+        elemento.setAttribute("style", "width:300px" );
+        elemento.setAttribute("name", `${coincidencia}` );
+        elemento.id = 'input1.'+incremento;
+        elemento.setAttribute("readonly", "" );
+        bloque.appendChild(elemento);
+        
+        eliminar = document.createElement('input');
+        eliminar.setAttribute("class", "btn btn-secondary btn-sm mb-2");
+        eliminar.setAttribute("onclick", `borrar(${incremento})`);
+        eliminar.setAttribute("value", "-");
+        eliminar.setAttribute("style", "width:30px");
+        eliminar.id = ''+incremento;
+        bloque.appendChild(eliminar);
+
+        document.getElementById(elemento.id).value = coincidencia;
+
+        br = document.createElement('br');
+        br.id = 'br'+incremento;
+        bloque.appendChild(br);
+    }
+
+    //Lo que se hará cuando se presione el boton de Borrar
+    function borrar(obj) {
+        document.getElementById(`input1.${obj}`).remove();
+        document.getElementById(`${obj}`).remove();
+        document.getElementById(`br${obj}`).remove();
+    }
+
+    function ValidarPedido(){
+        bloque = document.getElementById('plazos').innerHTML;
+        localStorage.setItem("producto", JSON.stringify(bloque));
+        local = localStorage.getItem("producto");
+        local = local.length;
+        if (local <= 36){
+            Swal.fire({
+                icon: 'error',
+                title: 'No hay productos seleccionados',
+                showConfirmButton: true,
+            })
+        }else{
+            productos = document.querySelectorAll('.detallePedidoP');
+            productosSeleccionados = document.querySelectorAll('.productoSeleccionado');
+            contador = 0
+            contador2 = 0
+            productos.forEach( function(valor) {
+                valor1 = valor.innerHTML;
+                contador2 = contador2 + 1
+                productosSeleccionados.forEach( function(valor) {
+                    valor2 = valor.value;
+                    if(valor1 == valor2){
+                        contador = contador + 1
+                    }
+                });
+                
+            });
+            if(contador == contador2 ){
+                Swal.fire({
+                    icon: 'success',
+                    title: 'El pedido fue recepcionado correctamente',
+                    showConfirmButton: false,
+                    timer: 3000
+                })
+                setTimeout(function(){
+                    bloque = document.getElementById('formulario');
+                    elemento = document.createElement('input');
+                    elemento.setAttribute("class", "form-control col-sm-3 mb-2 bg-dark" );
+                    elemento.setAttribute("style", "width:5px" );
+                    elemento.setAttribute("name", `validado` );
+                    elemento.id = 'validado';
+                    elemento.setAttribute("readonly", "" );
+                    bloque.appendChild(elemento);
+                    document.getElementById(elemento.id).value = "validado";
+
+                    document.formulario.submit();
+
+                }, 3000);
+            }   
+            else{
+                
+                
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Hay productos que no se pueden recepcionar ya que no coinciden con los productos del pedido seleccionado',
+                    showConfirmButton: true,
+                
+                })
+                
+            }
+        }
+    }
+
+</script>
+
+<script> 
+    function doSearch()
+    {
+        const tableReg = document.getElementById('datos');
+        const searchText = document.getElementById('searchTerm').value.toLowerCase();
+        let total = 0;
+
+        // Recorremos todas las filas con contenido de la tabla
+        for (let i = 1; i < tableReg.rows.length; i++) {
+
+            // Si el td tiene la clase "noSearch" no se busca en su cntenido
+            if (tableReg.rows[i].classList.contains("noSearch")) {
+                continue;
+            }
+
+            let found = false;
+            const cellsOfRow = tableReg.rows[i].getElementsByTagName('td');
+
+            // Recorremos todas las celdas
+            for (let j = 0; j < cellsOfRow.length && !found; j++) {
+
+                const compareWith = cellsOfRow[j].innerHTML.toLowerCase();
+
+                // Buscamos el texto en el contenido de la celda
+                if (searchText.length == 0 || compareWith.indexOf(searchText) > -1) {
+                    found = true;
+                    total++;
+                }
+            }
+
+            if (found) {
+                tableReg.rows[i].style.display = '';
+            } 
+            else {
+                // si no ha encontrado ninguna coincidencia, esconde la
+                // fila de la tabla
+                tableReg.rows[i].style.display = 'none';
+            }
+        }
+
+        // mostramos las coincidencias
+        const lastTR=tableReg.rows[tableReg.rows.length-1];
+        const td=lastTR.querySelector("td");
+        lastTR.classList.remove("hide", "red");
+
+        if (searchText == "") {
+            lastTR.classList.add("hide");
+        } 
+        else if (total) {
+            td.innerHTML="Se ha encontrado "+total+" coincidencia"+((total>1)?"s":"");
+        } 
+        else {
+            lastTR.classList.add("red");
+            td.innerHTML="No se han encontrado coincidencias";
+        }
+    }
+</script>
+
+{% endblock %}

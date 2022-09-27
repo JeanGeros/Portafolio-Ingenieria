@@ -379,6 +379,7 @@ class Producto(models.Model):
         managed = False
         db_table = 'producto'
 
+
 class Proveedor(models.Model):
     proveedorid = models.BigIntegerField(primary_key=True)
     razonsocial = models.CharField(max_length=50)

@@ -8,7 +8,11 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 import sweetify
 import datetime 
+
+
 import qrcode 
+
+
 from django.contrib import messages
 from src.forms import (
     FormClienteNormal1, FormClienteNormal2, FormClienteNormal3, addproductsForm, FormVendedorPersona,
@@ -57,7 +61,7 @@ def Ingreso(request):
 
     return render(request, 'ingreso/ingreso_usuarios.html', context)
 
-
+#************************************Productos*********************************************
 def Agregar_productos(request):
     form = addproductsForm(request.POST, request.FILES)
 
@@ -226,7 +230,7 @@ def Editar_producto(request):
 
     return render(request, 'productos/editar_productos.html', context)
 
-
+#*********************************Clientes*************************************************
 def Registro_clientes(request):
     form1 = FormClienteNormal1()
     form2 = FormClienteNormal2()
@@ -566,11 +570,7 @@ def Editar_cliente(request):
 
     return render(request, 'clientes/editar_cliente.html', context)
 
-
-##******************************************************************************************
-
-##********************************Vendedores************************************************
-
+#********************************Vendedores************************************************
 def Listar_vendedores(request):
     vendedores = Cargo.objects.get(descripcion="Vendedor")
     vendedores = Empleado.objects.filter(cargoid=vendedores)
@@ -789,7 +789,7 @@ def Cambiar_estado_vendedor(id_vendedor):
         user.is_active = True
         user.save()
 
-
+#********************************Vendedores************************************************
 def Agregar_proveedor(request):
     old_post_ingreso = request.session.get('old_post_ingreso') 
     old_post_conexion = request.session.get('old_post_conexion') 
@@ -926,6 +926,7 @@ def Editar_proveedor(request):
 
     return render(request, 'proveedores/editar_proveedor.html', context)
 
+#********************************Empleados************************************************
 
 def Listar_empleados(request):
     empleados = Cargo.objects.get(descripcion="Empleado")
@@ -1146,8 +1147,7 @@ def Cambiar_estado_empleado(id_empleado):
         user.is_active = True
         user.save()
 
-# *******************************************ORDENES********************************************************
-# **********************************************************************************************************
+# *********************************Pedidos************************************************
 @csrf_exempt
 def Crear_pedido(request, id = None):
     proveedor = Proveedor.objects.filter(proveedorid=id)
@@ -1176,6 +1176,8 @@ def Crear_pedido(request, id = None):
                         else:
                             print("not found")
                             listaProductos.append({'id':idProduct, 'value':value})
+                            break
+
             except Producto.DoesNotExist:
                 if key == "fecha_vencimiento" and len(value) == 0:
                     fecha = "1000-10-10"
@@ -1202,7 +1204,6 @@ def Crear_pedido(request, id = None):
                 cantidad = products['value'],
                 ordenid = last_orden_compra
             )
-            detallePedido.save()
 
         messages.warning(request, 'Orden de pedido realizada con exito')
         return redirect('listar_pedidos')
@@ -1223,7 +1224,6 @@ def filtro_proveedor(request):
     return render(request, 'pedidos/crear_pedido_proveedores.html', context)
 
 
-#--------------------------------------------------------------
 def cambiar_estado_pedido(id_pedido):
     orden_compra = Ordencompra.objects.get(ordenid=int(id_pedido))
 
@@ -1232,7 +1232,8 @@ def cambiar_estado_pedido(id_pedido):
     if orden_compra.estadoordenid.estadoordenid == 1:
         orden_compra.estadoordenid = estado_eliminado
         orden_compra.save()
-#--------------------------------------------------------------
+
+
 def Listar_pedidos(request):
     ordenes = Ordencompra.objects.all()
 
@@ -1256,6 +1257,7 @@ def Listar_pedidos(request):
 
     return render(request, 'pedidos/listar_pedidos.html', context)
 
+
 def Ver_pedidos(request):
     old_post = request.session.get('_old_post')
     print(old_post['VerPedido'])
@@ -1268,5 +1270,103 @@ def Ver_pedidos(request):
     return render(request, 'pedidos/ver_pedido.html', context)
 
 
+# ***************************Recepcionar pedidos*******************************************
+
+def RecepcionPedido(request, id = None):
+
+    # usuario = request.user
+    # usuario = User.objects.get(username=usuario)
+
+    # seguimientoPag = SEGUIMIENTO_PAGINA.objects.create(
+    #     pagina_visitada = "Recepcion de pedidos",
+    #     usuario = usuario
+    # )
+    # seguimientoPag.save()
+
+    # form = FormProveedor(request.POST or None, instance=proveedor)
+
+    if id:
+        ordenPedido = Ordencompra.objects.filter(ordenid=id)
+        detalleOrden = Detalleorden.objects.filter(ordenid=id)
+        productos = Producto.objects.all()
+   
+    if request.method == 'POST':
+        print(request.__dict__)
+        cantidad = request.POST.get('cantidad')
+        print(cantidad)
+        # orden_confirmada = Ordencompra.objects.get(id=id)
 
 
+        # fecharecepcion = datetime.now().date()
+        # cantidad =cantidad
+        # ordenid = orden_confirmada
+        # proveedorid = orden_confirmada.proveedorid
+        # productoid = orden_confirmada
+
+        # ordenPedido3.estado_recepcion = 1
+        # ordenPedido3.save()
+        # ordenPedido3.fecha_recepcion = fecha
+        # ordenPedido3.save()
+        # ordenPedido3.hora_recepcion = hora
+        # ordenPedido3.save()
+
+        # return redirect('listar_pedidos')
+
+    context= {
+        'ordenPedido':ordenPedido,
+        'productos':productos,
+        'detalleOrden':detalleOrden,
+    }
+
+    return render(request, 'recepcion_pedido.html',context)
+
+
+
+
+    usuario = request.user
+    usuario = User.objects.get(username=usuario)
+
+    seguimientoPag = SEGUIMIENTO_PAGINA.objects.create(
+        pagina_visitada = "Recepcion de pedidos",
+        usuario = usuario
+    )
+    seguimientoPag.save()
+
+    ordenPedido = ORDEN_PEDIDO.objects.all()
+    detalleOrden = DETALLE_ORDEN.objects.all()
+    productos = ""
+
+    ordenPedido2 = ""
+    detalleOrden2 = ""
+    if id:
+        ordenPedido2 = ORDEN_PEDIDO.objects.filter(id=id)
+        detalleOrden2 = DETALLE_ORDEN.objects.filter(orden_pedido=id)
+        productos = PRODUCTO.objects.all()
+
+    if request.method == 'POST':
+
+        ordenPedido3 = ORDEN_PEDIDO.objects.get(id=id)
+        validado = request.POST.get('validado')
+        fecha = datetime.now().date()
+        hora = datetime.now().time()
+        print(fecha)
+        print(hora)
+
+        ordenPedido3.estado_recepcion = 1
+        ordenPedido3.save()
+        ordenPedido3.fecha_recepcion = fecha
+        ordenPedido3.save()
+        ordenPedido3.hora_recepcion = hora
+        ordenPedido3.save()
+
+        return redirect('RecepcionPedido')
+
+    context= {
+        'ordenPedido':ordenPedido,
+        'productos':productos,
+        'detalleOrden':detalleOrden,
+        'ordenPedido2':ordenPedido2,
+        'detalleOrden2':detalleOrden2
+    }
+
+    return render(request, 'recepcion_pedido.html',context)

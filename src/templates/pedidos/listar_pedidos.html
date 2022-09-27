@@ -38,6 +38,7 @@
                                         <button type="submit" id="" name="CambiarEstado" value="{{orden.ordenid}}" class="btn btn_aceptar border border-secondary" >Eliminar Pedido</button>
                                     {% else %}
                                     {% endif %}
+                                    <a href="/recepcionar_pedido/{{orden.ordenid}}" style="text-decoration:none; align-items: center;" class="btn btn_aceptar border border-secondary">Recepcionar Pedido</a>
                                 </div>
                             </form>
                         </td>
