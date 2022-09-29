@@ -1,4 +1,4 @@
-/* .input {
+.input {
     width: 120%;
     height: 10%;
     margin-top: 20px;
@@ -17,7 +17,7 @@
     margin-top: 5%!important;
     margin-bottom: 6%!important;
     background-color: #D9D9D9;
-} */
+}
 
 .divPadre{
     justify-content: center;

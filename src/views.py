@@ -1273,27 +1273,32 @@ def Ver_pedidos(request):
 # ***************************Recepcionar pedidos*******************************************
 
 def RecepcionPedido(request, id = None):
-
-    # usuario = request.user
-    # usuario = User.objects.get(username=usuario)
-
-    # seguimientoPag = SEGUIMIENTO_PAGINA.objects.create(
-    #     pagina_visitada = "Recepcion de pedidos",
-    #     usuario = usuario
-    # )
-    # seguimientoPag.save()
-
-    # form = FormProveedor(request.POST or None, instance=proveedor)
-
     if id:
         ordenPedido = Ordencompra.objects.filter(ordenid=id)
+        print(ordenPedido)
         detalleOrden = Detalleorden.objects.filter(ordenid=id)
+        print(detalleOrden)
         productos = Producto.objects.all()
-   
-    if request.method == 'POST':
-        print(request.__dict__)
-        cantidad = request.POST.get('cantidad')
-        print(cantidad)
+
+        
+
+    elif request.method == 'POST':
+        for key,value in request.POST.items():
+            # ordenPedido = Ordencompra.objects.get(ordenid=id)
+            # detalleOrden = Detalleorden.objects.filter(ordenid=ordenPedido)
+            if key == "csrfmiddlewaretoken":
+                pass
+            else:
+                try:
+                    nomProduct = Producto.objects.get(nombre=key)
+                    idProduct = nomProduct.productoid
+                    print(f"key: {key}  value  {value}")
+
+                except Producto.DoesNotExist:
+                    print(key)
+
+
+        
         # orden_confirmada = Ordencompra.objects.get(id=id)
 
 
