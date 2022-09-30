@@ -1275,14 +1275,11 @@ def Ver_pedidos(request):
 def RecepcionPedido(request, id = None):
     if id:
         ordenPedido = Ordencompra.objects.filter(ordenid=id)
-        print(ordenPedido)
         detalleOrden = Detalleorden.objects.filter(ordenid=id)
-        print(detalleOrden)
         productos = Producto.objects.all()
 
-        
 
-    elif request.method == 'POST':
+    if request.method == 'POST':
         for key,value in request.POST.items():
             # ordenPedido = Ordencompra.objects.get(ordenid=id)
             # detalleOrden = Detalleorden.objects.filter(ordenid=ordenPedido)
@@ -1290,8 +1287,6 @@ def RecepcionPedido(request, id = None):
                 pass
             else:
                 try:
-                    nomProduct = Producto.objects.get(nombre=key)
-                    idProduct = nomProduct.productoid
                     print(f"key: {key}  value  {value}")
 
                 except Producto.DoesNotExist:
