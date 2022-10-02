@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from .models import Producto, Persona, Direccion, Proveedor, Usuario, Cliente,  Empleado
+from .models import Producto, Persona, Direccion, Proveedor, Usuario, Cliente, Empleado, Empresa
 
 class FormRegistroUsuario(UserCreationForm):
 
@@ -27,6 +27,12 @@ class FormClienteNormal3(forms.ModelForm):
         model = Usuario
         fields = ("email","password", "nombreusuario")
 
+class FormClienteEmpresa(forms.ModelForm):
+    
+    class Meta:
+        model = Empresa
+        fields = ("razonsocial","rutcuerpo","dv","fono")
+
 class FormEditarCliente(forms.ModelForm):
     # def __init__(self, *args, **kwargs):
     #     super().__init__(*args, **kwargs) 
@@ -37,7 +43,7 @@ class FormEditarCliente(forms.ModelForm):
 
     class Meta:
         model = Cliente
-        fields = ("direccionid","personaid","empresaid")
+        fields = ("personaid","empresaid")
 
 class addproductsForm(forms.ModelForm):
     class Meta:
