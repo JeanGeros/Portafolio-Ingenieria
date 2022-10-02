@@ -12,10 +12,6 @@ import sweetify
 import datetime 
 from django.contrib.auth.decorators import login_required
 
-
-import qrcode 
-
-
 from django.contrib import messages
 from src.forms import (
     FormClienteNormal1, FormClienteNormal2, FormClienteNormal3, addproductsForm, FormVendedorPersona,
@@ -516,10 +512,6 @@ def Registro_clientes(request):
         tipo_usuario = tipo_usuario.rolid.descripcion
     else: 
         tipo_usuario = None
-    
-
-#*********************************Clientes*************************************************
-def Registro_clientes(request):
 
     form1 = FormClienteNormal1()
     form2 = FormClienteNormal2()
@@ -1062,10 +1054,6 @@ def Listar_vendedores(request):
         tipo_usuario = tipo_usuario.rolid.descripcion
     else: 
         tipo_usuario = None
-
-
-#********************************Vendedores************************************************
-def Listar_vendedores(request):
 
     vendedores = Cargo.objects.get(descripcion="Vendedor")
     vendedores = Empleado.objects.filter(cargoid=vendedores)
