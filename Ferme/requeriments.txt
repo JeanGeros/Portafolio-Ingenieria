@@ -1,1 +1,2 @@
 # Carga de librerias
+qrcode-7.3.1.

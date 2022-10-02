@@ -147,6 +147,9 @@ class Detalleorden(models.Model):
     cantidad = models.BigIntegerField()
     productoid = models.ForeignKey('Producto', models.DO_NOTHING, db_column='productoid')
     ordenid = models.ForeignKey('Ordencompra', models.DO_NOTHING, db_column='ordenid')
+    
+    def __str__(self):
+        return f"{self.detalleid} {self.productoid}"
 
     class Meta:
         managed = False
@@ -248,7 +251,7 @@ class Estado(models.Model):
     descripcion = models.CharField(max_length=10)
 
     def __str__(self):
-            return self.descripcion
+        return self.descripcion
 
     class Meta:
         managed = False
@@ -258,6 +261,9 @@ class Estado(models.Model):
 class Estadoorden(models.Model):
     estadoordenid = models.BigIntegerField(primary_key=True)
     descripcion = models.CharField(max_length=30)
+
+    def __str__(self):
+        return self.descripcion
 
     class Meta:
         managed = False
@@ -326,6 +332,9 @@ class Ordencompra(models.Model):
     proveedorid = models.ForeignKey('Proveedor', models.DO_NOTHING, db_column='proveedorid')
     estadoordenid = models.ForeignKey(Estadoorden, models.DO_NOTHING, db_column='estadoordenid')
 
+    def __str__(self):
+        return str(self.ordenid)
+
     class Meta:
         managed = False
         db_table = 'ordencompra'
@@ -364,11 +373,12 @@ class Producto(models.Model):
     estadoid = models.ForeignKey(Estado, models.DO_NOTHING, db_column='estadoid')
 
     def __str__(self):
-        return self.nombre
+        return f"{self.nombre}"
 
     class Meta:
         managed = False
         db_table = 'producto'
+
 
 class Proveedor(models.Model):
     proveedorid = models.BigIntegerField(primary_key=True)
