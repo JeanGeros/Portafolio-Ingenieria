@@ -19,6 +19,15 @@
     background-color: #D9D9D9;
 }
 
+.divPadre{
+    justify-content: center;
+
+}
+.divHijo{
+    width: 45% !important; 
+    margin-inline: 2rem;
+}
+ 
 .textos {
     width: 20%;
 }
@@ -57,5 +66,5 @@
 
 #id_imagen {
     width: 120%;
-}
+} 
 
