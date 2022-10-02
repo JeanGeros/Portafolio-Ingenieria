@@ -1,48 +1,3 @@
-<<<<<<< HEAD
-{% extends 'layout.html' %}
-{% load widget_tweaks %}
-{% load static %}
-
-{% block content %}
-
-    <link rel="stylesheet" href="{% static 'css/modulo_productos.css' %}">
-    <div class="container text-end caja rounded mt-5">
-        <h1 class="text-center" >Detalles del Producto</h1>
-
-        <table class="table table-striped table-hover" style="background-color: white; margin-bottom: 35px;">
-            <thead class="table-dark" style="text-align:center">
-                <tr>
-                    <th>Nombre</th>
-                    <th>Precio</th>
-                    <th>Stock</th>
-                    <th>Stock Critico</th>
-                    <th>Fecha de Vencimiento</th>
-                    <th>Imagen del producto</th>
-               
-                </tr>
-            </thead>
-            <tbody style="text-align:center">
-                <tr>
-                    <td class="border border-secondary" >{{ producto.nombre}}</td>
-                    <td class="border border-secondary" >${{ producto.precio}}</td>
-                    <td class="border border-secondary" >{{ producto.stock }}</td>
-                    <td class="border border-secondary" >{{ producto.stockcritico }}</td>
-                    {% if producto.fechavencimiento != None %}
-                        <td class="border border-secondary" >{{ producto.fechavencimiento }}</td>
-                    {% else %}
-                        <td class="border border-secondary" >--</td>
-                    {% endif %}
-                    <td class="border border-secondary" > <img src="/static/images/{{producto.imagen}}" alt="imagen producto" style="width:100px;height:100px;"> </td>
-                </tr>
-            </tbody>
-        </table>
-    
-
-        <a href="{% url 'listar_productos' %}" type="submit" class="btn">Volver</a>
-
-    </div>
-    
-=======
 {% extends 'layout.html' %}
 {% load widget_tweaks %}
 {% load static %}
@@ -106,5 +61,4 @@
 
     </div>
     
->>>>>>> 6a77eec3b49303453afba2c056aa5b9f6975b4b1
 {% endblock %}
