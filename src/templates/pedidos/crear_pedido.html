@@ -1,0 +1,178 @@
+{% extends 'layout.html' %}
+{% load widget_tweaks %}
+{% load static %}
+{% block content %}
+
+    <link rel="stylesheet" href="{% static 'css/modulo_proveedores.css' %}">
+
+    <div class="p-3">
+        <div class="container registro pt-3">
+            <h1 class="text-center p-2">Crear pedido</h1>
+            {% if messages %}
+                <ul class="messages list-group mb-3">
+                {% for message in messages %}
+                    <li{% if message.tags %} class="{{ message.tags }} list-group-item list-group-item-primary"{% endif %}>{{ message }}</li>
+                {% endfor %}
+                </ul>
+            {% endif %}
+            <div class="row">
+                <div class="col-md-6 border border-secondary rounded p-5">
+                    <h3 class="text-center pb-3">Selecciones proveedor para ver sus productos</h3>
+
+                    {% for prov in proveedor %}
+                        <a href="crear_pedido/{{prov.proveedorid}}" style="text-decoration:none;" class="btn btn-primary text-white pb-2 mb-2" onclick="ActivarCampoOtroTema()" onclick="GetProveedor('{{prov.proveedorid}}')">{{prov.razonsocial}}</a>
+                    {% endfor %}
+                </div>
+                <div id="ListaProductos" class="col-md-6 border border-secondary rounded p-5">
+                    <h3 class="text-center pb-3">Seleccione producto para el pedido</h3>
+                    <form>
+                        Buscar producto <input id="searchTerm" type="text" onkeyup="doSearch()" />
+                    </form>
+                    <p>
+                        <table id="datos">
+                            <tr>
+                                <th>Nombre</th><th>Cantidad</th><th class="text-center">Accion</th>
+                            </tr>
+                            {% for value in listaProds %}
+                                <tr class="border border-secondary rounded-3 p-2">
+                                    <td id="{{value}}">{{value}}</td>
+                                    <td><input id="{{value}}.cantidad" type="number" name="numero" value="1" min="1" max="50" step="1" /></td>
+                                    <td><input class="btn btn-secondary btn-sm" type="button" title="Agregar Producto" Value="Agregar" onclick="agregar2('{{value}}','{{value}}.cantidad')"></td>
+                                </tr>
+                            {% endfor %}
+                            <tr class='noSearch hide'>
+                                <td colspan="5"></td>
+                            </tr>
+                        </table>
+                    </p>
+                </div>
+            </div>
+
+            <form method="post" action="" class="p-3" name="formCrearPedido" id="formCrearPedido">
+                <div class="row border border-secondary rounded"> 
+                    <div class="col-md-6 p-3">
+                        <!-- Contenedor -->
+                            <!-- Productos -->
+                            <div class="form-group border rounded p-2"> 
+                                <div class="p-0 m-0" id="proveedorId" style="visibility: hidden;">
+                                    <label for="state_id" class="control-label" >Proveedor:</label>
+                                </div>
+                                <div class="container pt-3">
+                                    <label for="state_id" class="control-label" style="padding-right: 200px;">Producto</label>
+                                    <label for="state_id" class="control-label" style="padding-right: 50px;">Cantidad</label>
+                                </div>
+                                <!-- Div donde se añadiran los Selects -->
+                                <div id="plazos" class="row" style="padding-left: 20px;">
+                                </div>
+                                <br>  
+                            </div>
+                    </div>
+                    <div class="col-md-6 p-3">
+                        <div class="form-group pb-3">
+                            <label for="fecha_vencimiento" class="txt_negrita p-2">Seleccione fecha de llegada:(opcional)</label>
+                            <input class="form-control dateinput" type="text" name="fecha_vencimiento" readonly placeholder="Click aqui" style="width:110px"/>
+                        </div>
+                    </div>
+                    
+                </div>
+                
+                <div class="p-3">
+                    <button type="button" id="boton_aceptar" class="btn btn-primary" onclick="validarPedido()">Aceptar</button>
+                    <!-- <a href="{{t.id}}"></a> -->
+                    <a href="/pedidos" class="btn btn-primary">Cancelar</a> 
+                </div>
+                
+            </form>
+        </div>
+    </div>
+
+<script>
+    function GetProveedor(id){
+        localStorage.setItem("proveedor", JSON.stringify(id));
+        //document = proveedorid;
+    }
+    
+    local = localStorage.getItem("proveedor");
+    local = local.replace(/['"]+/g, '');
+    //bloque = document.getElementById('proveedorId');
+        
+    //Creando el input que irá dentro del Div "plazos"
+    prov = document.createElement('input');
+    prov.setAttribute("name", `${local}` );
+    prov.id = 'inputProveedor';
+    prov.setAttribute("readonly", "" );
+    prov.setAttribute("style", "width:40px" );
+    //bloque.appendChild(prov);
+    //document.getElementById(prov.id).value = local;
+
+    var incremento = 0;
+    function agregar2(producto, cantidadProd)
+    {
+        let coincidencia = document.getElementById(producto).textContent;
+        let cantidad = document.getElementById(cantidadProd).value;
+        console.log(coincidencia)
+        console.log(cantidad)
+        incremento++;
+        
+        //Obteniendo el Div "plazos"
+        bloque = document.getElementById('plazos');
+        
+        //Creando el input que irá dentro del Div "plazos"
+        elemento = document.createElement('input');
+        elemento.setAttribute("class", "form-control col-sm-3 mb-2" );
+        elemento.setAttribute("style", "width:300px" );
+        elemento.setAttribute("name", `${coincidencia}` );
+        elemento.id = 'input1.'+incremento;
+        elemento.setAttribute("readonly", "" );
+        bloque.appendChild(elemento);
+
+        elemento2 = document.createElement('input');
+        elemento2.setAttribute("class", "form-control col-md-3 mb-2" );
+        elemento2.setAttribute("style", "width:50px" );
+        elemento2.setAttribute("name", `${coincidencia}` );
+        elemento2.id = 'input2.'+incremento;
+        elemento2.setAttribute("readonly", "" );
+        bloque.appendChild(elemento2);
+        
+        eliminar = document.createElement('input');
+        eliminar.setAttribute("class", `btn btn-secondary btn-sm mb-2`);
+        eliminar.setAttribute("onclick", `borrar(${incremento})`);
+        eliminar.setAttribute("value", "-");
+        eliminar.setAttribute("style", "width:30px");
+        eliminar.id = 'borrar'+incremento;
+        bloque.appendChild(eliminar);
+
+        document.getElementById(elemento.id).value = coincidencia;
+        document.getElementById(elemento2.id).value = cantidad;
+
+        br = document.createElement('br');
+        br.id = 'br'+incremento;
+        bloque.appendChild(br);
+    }
+
+    //Lo que se hará cuando se presione el boton de Borrar
+    function borrar(obj) {
+        document.getElementById(`input1.${obj}`).remove();
+        document.getElementById(`input2.${obj}`).remove();
+        document.getElementById(`borrar${obj}`).remove();
+        document.getElementById(`br${obj}`).remove();
+        
+    }
+    function validarPedido(){
+        bloque = document.getElementById('plazos').innerHTML;
+        localStorage.setItem("producto", JSON.stringify(bloque));
+        local = localStorage.getItem("producto");
+        local = local.length;
+        if (local <= 36){
+            Swal.fire({
+                icon: 'error',
+                title: 'No hay productos en el pedido',
+                showConfirmButton: true,
+            })
+        }else{
+            document.formCrearPedido.submit();
+        }
+    }
+</script>
+
+{% endblock %}

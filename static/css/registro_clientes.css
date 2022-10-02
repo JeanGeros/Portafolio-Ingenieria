@@ -1,0 +1,56 @@
+.input {
+    width: 120%;
+    height: 10%;
+}
+
+.label {
+    padding: 14px;
+}
+
+.input {
+    margin-top: 18px;
+    margin-bottom: 17px;
+}
+
+.caja {
+    padding-top: 2%;
+    padding-bottom: 3%;
+    padding-left: 4%;
+    padding-right: 4%;
+    margin-top: 5%!important;
+    margin-bottom: 6%!important;
+    background-color: #D9D9D9;
+}
+
+.textos {
+    width: 15%;
+}
+
+.btn {
+    background-color: #FF9550!important;
+}
+
+.input-dv {
+    width: 25%;
+}
+
+.input-run {
+    width: 100%;
+}
+
+.run {
+    margin-top: 17px;
+    margin-bottom: 17px;
+    display: flex;
+    height: 10%;
+    width: 120%;
+}
+
+.guion {
+    padding-left: 5%;
+    padding-right: 5%;
+}
+
+.swal2-cancel {
+    height: 86%;
+}

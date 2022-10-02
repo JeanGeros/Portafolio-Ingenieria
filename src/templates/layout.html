@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 {% load static %}
 
 <!DOCTYPE HTML>
@@ -111,4 +112,218 @@
         {% load sweetify %}
         {% sweetify %}
     </body>
+=======
+{% load static %}
+
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Ferme</title>
+        <!-- CSS proyecto -->
+        <link rel="stylesheet" href="{% static 'css/layout.css' %}">
+        <!-- CSS only -->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-gH2yIJqKdNHPEq0n4Mqa/HGKIhSkIHeL5AyhkYV8i59U5AR6csBvApHHNl/vI1Bx" crossorigin="anonymous">
+        <!-- JavaScript Bundle with Popper -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa" crossorigin="anonymous"></script>
+        <!-- JavaScript Fontawesome -->
+        <script src="https://kit.fontawesome.com/07b4c2553d.js" crossorigin="anonymous"></script>
+
+        <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+        <link href="{% static 'js/jquery-ui-1.12.1/jquery-ui.min.css' %}" rel="stylesheet">
+        <link href="{% static 'js/jquery-ui-1.12.1/jquery-ui.structure.min.css' %}" rel="stylesheet">
+        <link href="{% static 'js/jquery-ui-1.12.1/jquery-ui.theme.min.css' %}" rel="stylesheet">
+        <link href="{% static 'js/jquery-ui-1.12.1/external/jquery/jquery.js' %}" rel="stylesheet">
+
+        <link href="{% static 'js/jquery-timepicker-1.3.5/jquery.timepicker.min.css' %}" rel="stylesheet">
+        <link href="{% static 'js/jquery-timepicker-1.3.5/jquery.timepicker.min.js' %}" rel="stylesheet">
+        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/timepicker/1.3.5/jquery.timepicker.min.css">
+        {% load pwa %}
+        {% progressive_web_app_meta %}
+    </head>
+
+    <body>
+        <nav class="navbar navbar-expand-lg w-100">
+            <div class="container-fluid">
+                
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <img class="logo-navbar" src="{% static 'images/Ferme-nav.png' %}" alt="">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link fw-bolder text-black">Ventas</a>
+                        </li>
+                        {% if user.is_superuser and tipo_usuario != None and tipo_usuario == 'Administrador Sistema' %}
+                            <li class="nav-item">
+                                <a class="nav-link fw-bolder text-black" href="/productos">Administración <br> de productos</a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a href="/vendedores" class="nav-link fw-bolder text-black">Administración <br> de vendedores</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="/empleados" class="nav-link fw-bolder text-black">Administración <br> de empleados</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="/clientes" class="nav-link fw-bolder text-black">Administración <br> de clientes</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="/proveedores" class="nav-link fw-bolder text-black">Proveedores</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link fw-bolder text-black">Mis ordenes</a>
+                            </li>
+
+
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle fw-bolder text-black" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Facturación
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item fw-bolder text-black" href="#">Dato 1</a></li>
+                                    <li><a class="dropdown-item fw-bolder text-black" href="#">Dato 2</a></li>
+                                    <li><hr class="dropdown-divider fw-bolder text-black"></li>
+                                    <li><a class="dropdown-item fw-bolder text-black" href="#">Ejemplo</a></li>
+                                </ul>
+                            </li>
+                        {% endif %}  
+                        {% if tipo_usuario == 'Vendedor' and tipo_usuario != None %}
+                            <li class="nav-item">
+                                <a class="nav-link fw-bolder text-black" href="/productos">Administración <br> de productos</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{% url 'listar_clientes_vendedor' %}" class="nav-link fw-bolder text-black">Administración <br> de clientes</a>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle fw-bolder text-black" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Facturación
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item fw-bolder text-black" href="#">Dato 1</a></li>
+                                    <li><a class="dropdown-item fw-bolder text-black" href="#">Dato 2</a></li>
+                                    <li><hr class="dropdown-divider fw-bolder text-black"></li>
+                                    <li><a class="dropdown-item fw-bolder text-black" href="#">Ejemplo</a></li>
+                                </ul>
+                            </li>  
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle fw-bolder text-black" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Boleta
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item fw-bolder text-black" href="#">Dato 1</a></li>
+                                    <li><a class="dropdown-item fw-bolder text-black" href="#">Dato 2</a></li>
+                                    <li><hr class="dropdown-divider fw-bolder text-black"></li>
+                                    <li><a class="dropdown-item fw-bolder text-black" href="#">Ejemplo</a></li>
+                                </ul>
+                            </li>  
+                        {% endif %}
+                        {% if tipo_usuario == 'Empleado' and tipo_usuario != None %}
+                            <li class="nav-item">
+                                <a class="nav-link fw-bolder text-black" href="/productos">Ordenes <br> de compras</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="/productos" class="nav-link fw-bolder text-black">Administración <br> de productos</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="#" class="nav-link fw-bolder text-black">Administración <br> de proveedor</a>
+                            </li>
+                        {% endif %}
+                        {% if tipo_usuario == 'Cliente' and tipo_usuario != None %}
+                            <li class="nav-item">
+                                <a href="#" class="nav-link fw-bolder text-black">Productos</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link fw-bolder text-black" href="#">Facturacion</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="#" class="nav-link fw-bolder text-black">Boleta</a>
+                            </li>
+                        {% endif %}
+                        {% if tipo_usuario == 'Proveedor' and tipo_usuario != None %}
+                            
+                            <li class="nav-item">
+                                <a href="#" class="nav-link fw-bolder text-black">Ordenes de compras</a>
+                            </li>
+                        {% endif %}
+
+                        <li class="nav-item">
+                            <a href="/vendedores" class="nav-link fw-bolder text-black">Administración <br> de vendedores</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/empleados" class="nav-link fw-bolder text-black">Administración <br> de empleados</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/clientes" class="nav-link fw-bolder text-black">Administración <br> de clientes</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/proveedores" class="nav-link fw-bolder text-black">Proveedores</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/pedidos" class="nav-link fw-bolder text-black">Mis ordenes</a>
+                        </li>
+
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle fw-bolder text-black" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Facturación
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item fw-bolder text-black" href="#">Dato 1</a></li>
+                                <li><a class="dropdown-item fw-bolder text-black" href="#">Dato 2</a></li>
+                                <li><hr class="dropdown-divider fw-bolder text-black"></li>
+                                <li><a class="dropdown-item fw-bolder text-black" href="#">Ejemplo</a></li>
+                            </ul>
+                        </li>
+
+                    </ul>
+                    
+                    {% if user.is_authenticated %}
+                        <li class="nav-item dropdown icono_usuario rounded">
+                            <a class="nav-link dropdown-toggle fw-bolder icono_persona" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fa-solid fa-user fa-2x" ></i>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <form action="" method="post">
+                                    {% csrf_token %}
+                                    <li><button  id="" name="VerPerfil" value="{{request.user}}" class="dropdown-item fw-bolder text-black">Mi Perfil</button></li>
+                                </form>
+                                <li><hr class="dropdown-divider fw-bolder text-black"></li>
+                                <li><a href="{% url 'logout'%}?next={{request.path}}" class="dropdown-item fw-bolder text-black">Cerrar Sesion</a></li>
+                            </ul>
+                        </li>
+                    
+                    {% else %}
+                        <a href="{% url 'ingreso' %}" type="button" class="btn ingresar fw-bolder m-1">Ingresar</a>
+                    {% endif %}
+                
+                    <a href="{% url 'seleccion_registro' %}" type="button" class="btn registrarme fw-bolder m-1">Registrarme</a>
+                    <i class="fa-solid fa-cart-arrow-down text-black fa-2x p-2"></i>
+                
+                </div>
+            </div>
+        </nav>
+        <div id="content" class="pt-5">
+            {% block content %}
+                <!--codigo que viene de templates-->
+            {% endblock %}
+        </div>
+        <script src="{% static 'js/jquery-3.6.0.min.js' %}"></script>
+        <script src="{% static 'js/jquery-ui-1.12.1/jquery-ui.js' %}"></script>
+        <script src="{% static 'js/custom.js' %}"></script>
+        <script src="{% static 'js/jquery-timepicker-1.3.5/jquery.timepicker.min.js' %}"></script>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/timepicker/1.3.5/jquery.timepicker.min.js"></script>
+        <footer class="footer text-center text-black p-1 fw-bolder">
+            Copyright &copy; 2022
+        </footer>
+        <script src="{% static 'js/jquery-3.6.0.min.js' %}"></script>
+        <script src="{% static 'js/jquery-ui-1.12.1/jquery-ui.js' %}"></script>
+        <script src="{% static 'js/custom.js' %}"></script>
+        <script src="{% static 'js/jquery-timepicker-1.3.5/jquery.timepicker.min.js' %}"></script>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/timepicker/1.3.5/jquery.timepicker.min.js"></script>
+        {% load sweetify %}
+        {% sweetify %}
+    </body>
+>>>>>>> 6a77eec3b49303453afba2c056aa5b9f6975b4b1
 </html>

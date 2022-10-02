@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 {% extends 'layout.html' %}
 {% load widget_tweaks %}
 {% load static %}
@@ -52,4 +53,60 @@
   
     </div>
 
+=======
+{% extends 'layout.html' %}
+{% load widget_tweaks %}
+{% load static %}
+
+{% block content %}
+    <link rel="stylesheet" href="{% static 'css/registro_clientes.css' %}">
+    <div class="container text-end caja rounded mt-5">
+        <h1 class="text-center pt-4">Administración de Clientes</h1>
+
+        <table class="table table-striped table-hover" style="background-color: white">
+            <h3 class="titulo-cliente text-center p-2 mb-0">Clientes</h3>
+            <thead class="table-dark" style="text-align:center">
+                <tr>
+                    <th>Run</th>
+                    <th>Nombres</th>
+                    <th>Apellido Paterno</th>
+                    <th>Apellido Materno</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody style="text-align:center">
+          
+                {% for cliente in clientes %}
+                    <tr>
+                        <td>{{ cliente.personaid.runcuerpo }} - {{ cliente.personaid.dv }}</td>
+                        <td>{{ cliente.personaid.nombres }}</td>
+                        <td>{{ cliente.personaid.apellidopaterno }}</td>
+                        <td>{{ cliente.personaid.apellidopaterno }}</td>
+                        <td>
+                            <form method="POST" action="">
+                                {% csrf_token %}
+                                <div class="btn-group">
+                                    <button  id="" name="VerCliente" value="{{cliente.clienteid}}" class="btn btn_aceptar border border-secondary">Ver</button>
+                                    <button  id="" name="EditarCliente" value="{{cliente.clienteid}}" class="btn btn_aceptar border border-secondary">Editar</button>
+                                    <!-- <a href="#" title="Editar" type="button" class="btn btn-primary">Editar </a> -->
+                                    {% if cliente.estadoid.descripcion == 'Activo' %}
+                                        <button type="submit" id="" name="CambiarEstado" value="{{cliente.clienteid}}" class="btn btn_aceptar border border-secondary">Desactivar Cliente</button>
+                                    {% else %}
+                                        <button type="submit" id="" name="CambiarEstado" value="{{cliente.clienteid}}" class="btn btn_aceptar border border-secondary">Activar Cliente</button>
+                                    {% endif %}
+                                </div>
+                            </form>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+  
+        <div align="left" class="btn_crear mb-5">
+          <a href="{% url 'agregar_cliente' %}" type="button" class="btn btn_aceptar border border-secondary text-black">Crear</a>
+        </div>
+  
+    </div>
+
+>>>>>>> 6a77eec3b49303453afba2c056aa5b9f6975b4b1
 {% endblock %}

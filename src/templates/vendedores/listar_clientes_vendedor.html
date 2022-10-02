@@ -1,0 +1,54 @@
+{% extends 'layout.html' %}
+{% load widget_tweaks %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/registro_clientes.css' %}">
+    <div class="container text-end caja rounded mt-5">
+        <h1 class="text-center pt-3">Clientes</h1>
+        
+        <div class="p-3">
+
+            <form>
+                Buscar cliente <input id="searchTerm" type="text" onkeyup="doSearch()" /><br><br>
+            </form>
+            
+            <table id="datos" class="table table-striped table-hover" style="background-color: white">
+                <thead class="table-dark" style="text-align:center">
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Run</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody style="text-align:center">
+                    {% for cliente in clientes %}
+                        <tr class="border border-secondary rounded-3 p-2">
+
+                            <td id="{{value}}">{{cliente.personaid.nombres}} {{ cliente.personaid.apellidopaterno }} {{ cliente.personaid.apellidopaterno }}</td>
+                            <td id="{{value}}">{{ cliente.personaid.runcuerpo }} - {{ cliente.personaid.dv }}</td>
+                            <td>
+                                <form method="POST" action="">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="run" value="{{cliente.personaid.runcuerpo}}">
+                                    <input type="hidden" name="dv" value="{{cliente.personaid.dv}}">
+                                    <button  id="" name="VerCliente" class="btn btn_aceptar border border-secondary">Ver cliente</button>
+                                </form>
+                            </td>
+                        </tr>
+                        
+                    {% endfor %}
+                    <tr class='noSearch hide'>
+                        <td colspan="5"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div align="left" class="btn_crear mb-5">
+            <a href="{% url 'agregar_cliente_vendedor' %}" type="button" class="btn btn_aceptar border border-secondary text-black">Crear cliente</a>
+        </div>
+    </div>
+
+    <script src="{% static 'js/buscador_tabla.js' %}"></script>
+
+{% endblock %}
