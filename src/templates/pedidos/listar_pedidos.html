@@ -1,0 +1,57 @@
+{% extends 'layout.html' %}
+{% load widget_tweaks %}
+{% load static %}
+{% block content %}
+{% load l10n %}
+{% localize on %}
+{% load humanize %}
+
+    <link rel="stylesheet" href="{% static 'css/modulo_productos.css' %}">
+    <div class="container text-end caja rounded mt-5">
+    <h1 class="text-center">Administración de Pedidos</h1>
+    
+        <table class="table table-striped table-hover " style="background-color: white">
+            <thead  class="table-dark" style="text-align:center">
+                <tr>
+                    <th>id Orden</th>
+                    <th>Fecha de Solicitud</th>
+                    <th>Proveedor</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody style="text-align:center">
+                {% for orden in ordenes %}
+                    <tr>
+                        <td>{{ orden.ordenid }}</td>
+                        <td>{{ orden.fechapedido }}</td>
+                        <td>{{ orden.proveedorid }}</td>
+                        <td>{{ orden.estadoordenid }}</td>
+                        <td>
+                            <form method="POST" action="">
+                                {% csrf_token %}
+                                <div class="btn-group">
+                                    <button  id="" name="VerPedido" value="{{orden.ordenid}}" class="btn btn_aceptar border border-secondary">Ver</button>
+                                    <!-- <button  id="" name="EditarProducto" value="{{producto.productoid}}" class="btn btn_aceptar border border-secondary">Editar</button> -->
+                                    
+                                    {% if orden.estadoordenid.descripcion == 'Solicitado' or  orden.estadoordenid.descripcion == 'Pendiente'  %}
+                                        <button type="submit" id="" name="CambiarEstado" value="{{orden.ordenid}}" class="btn btn_aceptar border border-secondary" >Eliminar Pedido</button>
+                                    {% else %}
+                                    {% endif %}
+                                    <a href="/recepcionar_pedido/{{orden.ordenid}}" style="text-decoration:none; align-items: center;" class="btn btn_aceptar border border-secondary">Recepcionar Pedido</a>
+                                </div>
+                            </form>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+            <div align="left" class="btn_crear mb-5">
+                <a href="{% url 'crear_pedido_proveedores' %}" type="button" class="btn btn-primary">Crear</a>
+            </div>
+
+    </div>
+    {% endlocalize %}
+    {% endblock %}
+

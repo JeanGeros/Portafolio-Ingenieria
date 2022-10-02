@@ -1,0 +1,32 @@
+{% extends 'layout.html' %}
+{% load widget_tweaks %}
+{% load static %}
+{% block content %}
+
+    <link rel="stylesheet" href="{% static 'css/modulo_proveedores.css' %}">
+
+    <div class="p-3">
+        <div class="container registro pt-5">
+            <h1 class="text-center p-2">Crear pedido</h1>
+            {% if messages %}
+                <ul class="messages list-group mb-3">
+                {% for message in messages %}
+                    <li{% if message.tags %} class="{{ message.tags }} list-group-item list-group-item-primary"{% endif %}>{{ message }}</li>
+                {% endfor %}
+                </ul>
+            {% endif %}
+            <div class="row">
+                <div class="border border-secondary rounded p-5" style=" text-align: center;">
+                    <h3 class="text-center pb-3">Selecciones proveedor para ver sus productos</h3>
+                    {% for prov in proveedores %}
+                        <a href="crear_pedido/{{prov.proveedorid}}" style="text-decoration:none; align-items: center;" class="btn btn-primary text-white pb-2 mb-2">{{prov.razonsocial}}</a>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="p-3"  style=" text-align: center;">
+                <a href="/pedidos" class="btn btn-primary">Volver</a> 
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
