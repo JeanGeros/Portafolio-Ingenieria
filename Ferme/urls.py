@@ -23,7 +23,7 @@ from django.conf import settings
 urlpatterns = [
     path('accounts/', include('django.contrib.auth.urls')),
     path('admin/', admin.site.urls),
-    path('index/', views.Index, name="index"),
+    path('', views.Index, name="index"),
     path('ingreso_usuarios/', views.Ingreso, name="ingreso"),
 
     path('registro_cliente/', views.Registro_clientes, name="registro_clientes"),
