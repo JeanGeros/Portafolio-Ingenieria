@@ -1,4 +1,4 @@
-Django==3.1.7
+Django==3.2.0
 bootstrap-py==1.0.2
 charset-normalizer==2.1.1
 cx-Oracle==8.3.0
