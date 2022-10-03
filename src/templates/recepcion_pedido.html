@@ -18,21 +18,24 @@
                 <strong>Fecha de Creacion: </strong>{{orden.fechapedido}}<br>
                 <strong>Proveedor: </strong>{{orden.proveedorid}}
                 <br>
+
+                <br>
+                <h4>Productos:</h4>
+                <table>
+                    <tr>
+                        <th>Nombre</th><th class="text-center">Cantidad</th>
+                    </tr>
+                    {% for detalle in detalleOrden %}
+                        <tr class=" border-secondary rounded-3 p-2">
+                        <td style="padding-right: 1rem"> <label  class="detallePedidoP" id="detallePedidoP"> {{detalle.productoid | capfirst }}</label></td>
+                    
+                    {% endfor %}
+                </table>
             {% endfor %}
-            <br>
-            <h4>Productos:</h4>
+
         </div>
             
-            <table>
-                <tr>
-                    <th>Nombre</th><th class="text-center">Cantidad</th>
-                </tr>
-                {% for detalle in detalleOrden %}
-                    <tr class=" border-secondary rounded-3 p-2">
-                    <td style="padding-right: 1rem"> <label  class="detallePedidoP" id="detallePedidoP"> {{detalle.productoid | capfirst }}</label></td>
-                  
-                {% endfor %}
-            </table>
+           
 
         <form method="post" action="" name="formulario" id="formulario">
             <div class="form-group border rounded p-2 border-dark mt-3"> 

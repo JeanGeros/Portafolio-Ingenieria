@@ -37,7 +37,7 @@ class FormEditarCliente(forms.ModelForm):
 
     class Meta:
         model = Cliente
-        fields = ("direccionid","personaid","empresaid")
+        fields = ("personaid","empresaid")
 
 class addproductsForm(forms.ModelForm):
     class Meta:
