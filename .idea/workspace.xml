@@ -3,13 +3,10 @@
   <component name="ChangeListManager">
     <list default="true" id="a04c0c56-868d-47ee-907f-609832e66b45" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/forms.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/forms.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/admin.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/models.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/static/css/agregar_productos.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/static/css/agregar_productos.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/templates/pedidos/listar_pedidos.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/templates/pedidos/listar_pedidos.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/templates/productos/agregar_productos.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/templates/productos/agregar_productos.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/templates/productos/editar_productos.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/templates/productos/editar_productos.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/templates/recepcion_pedido.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/templates/recepcion_pedido.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/templates/pedidos/crear_pedido.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/templates/pedidos/crear_pedido.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/templates/productos/ver_producto.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/templates/productos/ver_producto.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/views.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -96,22 +93,6 @@
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
-  </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/src/views.py</url>
-          <line>35</line>
-          <option name="timeStamp" value="1" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/src/views.py</url>
-          <line>123</line>
-          <option name="timeStamp" value="2" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

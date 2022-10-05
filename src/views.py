@@ -7,7 +7,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 import sweetify
-import datetime 
+import datetime
 import qrcode
 
 
@@ -77,18 +77,18 @@ def Agregar_productos(request):
         familiaproid = request.POST.get('familiaproid')
         estadoid = request.POST.get('estadoid')
 
-        proveedor = Proveedor.objects.get(proveedorid=proveedorid)
         tipo_producto = Tipoproducto.objects.get(tipoproductoid=tipoproductoid)
         familia_producto = Familiaproducto.objects.get(familiaproid=familiaproid)
         estado_producto = Estado.objects.get(estadoid=estadoid)
+        proveedor = Proveedor.objects.get(proveedorid=proveedorid)
 
-        if len(fechavencimiento) == 10:  
+        if len(fechavencimiento) == 10:
             fecha = fechavencimiento.split("/")
             fechavencimiento = f"{fecha[2]}-{fecha[1]}-{fecha[0]}"
             fechacodigo = f"{fecha[2]}{fecha[1]}{fecha[0]}"
         else:
             fechavencimiento = None
-            fechacodigo = "00000000"    
+            fechacodigo = "00000000"
 
         codigo = f"{proveedor.proveedorid}{familia_producto.familiaproid}{fechacodigo}{tipo_producto.tipoproductoid}"
         try:
@@ -100,13 +100,18 @@ def Agregar_productos(request):
                 fechavencimiento=fechavencimiento,
                 codigo=codigo,
                 imagen=imagen,
-                proveedorid=proveedor,
                 tipoproductoid=tipo_producto,
                 familiaproid=familia_producto,
                 estadoid=estado_producto
             )
+            ultimo_producto = Producto.objects.order_by('productoid').last()
+            prov_producto = Productoproveedor.objects.create(
+                ProId = 2,
+                productoid=ultimo_producto,
+                proveedorid=proveedor
+            )
 
-            if product is not None:
+            if product is not None and prov_producto is not None:
                 sweetify.success(request, 'Producto creado correctamente')
                 return redirect('listar_productos')
 
@@ -132,7 +137,7 @@ def Listar_productos(request):
             sweetify.success(request,
                              f'El producto {producto.nombre} ha quedado {producto.estadoid.descripcion} correctamente')
             return redirect('listar_productos')
-        
+
         if request.POST.get('VerProducto') is not None:
             request.session['_old_post'] = request.POST
             return HttpResponseRedirect('ver_producto')
@@ -140,7 +145,7 @@ def Listar_productos(request):
         if request.POST.get('EditarProducto') is not None:
             request.session['_old_post'] = request.POST
             return HttpResponseRedirect('editar_producto')
-    
+
     context = {
         'productos': productos
     }
@@ -154,7 +159,7 @@ def Cambiar_estado_producto(id_producto):
     if producto.estadoid.descripcion == 'Activo':
         producto.estadoid = Estado.objects.get(descripcion="Inactivo")
         producto.save()
-    else: 
+    else:
         producto.estadoid = Estado.objects.get(descripcion="Activo")
         producto.save()
 
@@ -162,9 +167,11 @@ def Cambiar_estado_producto(id_producto):
 def Ver_producto(request):
     old_post = request.session.get('_old_post')
     producto = Producto.objects.get(productoid=old_post['VerProducto'])
+    prov_producto = Productoproveedor.objects.get(productoid=old_post['VerProducto'])
 
     context = {
         'producto': producto,
+        'prov_producto': prov_producto
     }
 
     return render(request, 'productos/ver_producto.html', context)
@@ -195,7 +202,7 @@ def Editar_producto(request):
         Estado_producto = Estado.objects.get(estadoid=estadoid)
 
         fecha = fechavencimiento.split("/")
-        if len(fechavencimiento) == 10:  
+        if len(fechavencimiento) == 10:
             fechavencimiento = f"{fecha[2]}-{fecha[1]}-{fecha[0]}"
             fechacodigo = f"{fecha[2]}{fecha[1]}{fecha[0]}"
         else:
@@ -206,7 +213,7 @@ def Editar_producto(request):
 
         producto, created = Producto.objects.get_or_create(productoid=old_post['EditarProducto'])
         try:
-            producto.nombre = nombre 
+            producto.nombre = nombre
             producto.precio = precio
             producto.stock = stock
             producto.stockcritico = stockcritico
@@ -221,7 +228,7 @@ def Editar_producto(request):
 
             sweetify.success(request, 'Producto actualizado correctamente')
             return redirect('listar_productos')
-            
+
         except Exception as error:
             print(error)
             sweetify.error(request, error)
@@ -268,7 +275,7 @@ def Registro_clientes(request):
             sweetify.warning(request, "El correo ingresado ya existe")
         elif usuarioRegistro3 == True:
             sweetify.warning(request, "El usuario ingresado ya esta registrado")
-        else: 
+        else:
             user = User.objects.create_user(
                 username=nombre_usuario,
                 first_name=nombres,
@@ -279,8 +286,8 @@ def Registro_clientes(request):
             )
             user.set_password(contraseña)
             user.set_password(confirme_contraseña)
-            
-            # Estado activo = 1 e inactivo = 2 
+
+            # Estado activo = 1 e inactivo = 2
             Persona.objects.create(
                 runcuerpo=run_cuerpo,
                 dv=dv,
@@ -319,12 +326,12 @@ def Registro_clientes(request):
                 nombreusuario=nombre_usuario
             )
 
-            if (Persona is not None and 
+            if (Persona is not None and
                     Direccion is not None and
                     Usuario is not None and
-                Cliente is not None and 
+                Cliente is not None and
                 user is not None):
-                
+
                 user.save()
 
                 sweetify.success(request, "Se ha registrado correctamente")
@@ -347,7 +354,7 @@ def Agregar_cliente(request):
     form3 = FormClienteNormal3()
 
     if request.method == 'POST':
-        
+
         run_cuerpo = request.POST.get('runcuerpo')
         dv = request.POST.get('dv')
         nombres = request.POST.get('nombres')
@@ -375,7 +382,7 @@ def Agregar_cliente(request):
             sweetify.warning(request, "El correo ingresado ya existe")
         elif usuarioRegistro3 == True:
             sweetify.warning(request, "El cliente ya cuenta con un usuario")
-        else: 
+        else:
             user = User.objects.create_user(
                 username=nombre_usuario,
                 first_name=nombres,
@@ -386,8 +393,8 @@ def Agregar_cliente(request):
             )
             user.set_password(contraseña)
             user.set_password(confirme_contraseña)
-            
-            # Estado activo = 1 e inactivo = 2 
+
+            # Estado activo = 1 e inactivo = 2
             Persona.objects.create(
                 runcuerpo=run_cuerpo,
                 dv=dv,
@@ -426,14 +433,14 @@ def Agregar_cliente(request):
                 nombreusuario=nombre_usuario
             )
 
-            if (Persona is not None and 
-                Direccion is not None and 
-                Usuario is not None and 
+            if (Persona is not None and
+                Direccion is not None and
+                Usuario is not None and
                     Cliente is not None and
                 user is not None):
-                
+
                 user.save()
-                
+
                 sweetify.success(request, "Cliente creado correctamente")
                 return redirect('registro_clientes')
             else:
@@ -460,7 +467,7 @@ def Listar_clientes(request):
             sweetify.success(request,
                              f'El cliente {cliente.personaid.runcuerpo} - {cliente.personaid.dv} ha quedado {cliente.estadoid.descripcion} correctamente')
             return redirect('listar_clientes')
-        
+
         if request.POST.get('VerCliente') is not None:
             request.session['_old_post'] = request.POST
             return HttpResponseRedirect('ver_cliente')
@@ -487,7 +494,7 @@ def Cambiar_estado_cliente(id_cliente):
         cliente.save()
         user.is_active = False
         user.save()
-    else: 
+    else:
         cliente.estadoid = Estado.objects.get(descripcion="Activo")
         cliente.save()
         user.is_active = True
@@ -648,8 +655,8 @@ def Agregar_vendedor(request):
             )
             user.set_password(contraseña)
             user.set_password(confirme_contraseña)
-            
-            # Estado activo = 1 e inactivo = 2 
+
+            # Estado activo = 1 e inactivo = 2
             Persona.objects.create(
                 runcuerpo=run_cuerpo,
                 dv=dv,
@@ -733,7 +740,7 @@ def Editar_vendedor(request):
         fecha_ingreso = fecha_ingreso[6:10] + '-' + fecha_ingreso[3:5] + '-' + fecha_ingreso[0:2]
 
         empleado, created = Empleado.objects.get_or_create(empleadoid=old_post['EditarVendedor'])
-        empleado.fechaingreso = fecha_ingreso 
+        empleado.fechaingreso = fecha_ingreso
         empleado.personaid.runcuerpo = run_cuerpo
         empleado.personaid.dv = dv
         empleado.personaid.nombres = nombres
@@ -744,17 +751,17 @@ def Editar_vendedor(request):
 
         empleado_para_persona = Empleado.objects.filter(empleadoid=old_post['EditarVendedor']).values('personaid')
         usuario, created = Usuario.objects.get_or_create(personaid=empleado_para_persona[0]['personaid'])
-        usuario.nombreusuario = nombre_usuario 
+        usuario.nombreusuario = nombre_usuario
         usuario.email = email
-        usuario.save() 
+        usuario.save()
 
         persona, created = Persona.objects.get_or_create(personaid=empleado_para_persona[0]['personaid'])
-        persona.runcuerpo = run_cuerpo 
-        persona.dv = dv 
-        persona.apellidopaterno = apellido_paterno 
-        persona.apellidomaterno = apellido_materno 
-        persona.nombres = nombres 
-        persona.telefono = telefono 
+        persona.runcuerpo = run_cuerpo
+        persona.dv = dv
+        persona.apellidopaterno = apellido_paterno
+        persona.apellidomaterno = apellido_materno
+        persona.nombres = nombres
+        persona.telefono = telefono
         persona.save()
 
         user_django = User.objects.get(email=vendedor_usuario)
@@ -795,8 +802,8 @@ def Cambiar_estado_vendedor(id_vendedor):
 
 #********************************Vendedores************************************************
 def Agregar_proveedor(request):
-    old_post_ingreso = request.session.get('old_post_ingreso') 
-    old_post_conexion = request.session.get('old_post_conexion') 
+    old_post_ingreso = request.session.get('old_post_ingreso')
+    old_post_conexion = request.session.get('old_post_conexion')
 
     form = FormProveedor()
 
@@ -822,7 +829,7 @@ def Agregar_proveedor(request):
             estadoid=estado,
             rubroid=rubro,
         )
-        
+
         if proveedor is not None:
             messages.warning(request, 'Proveedor creado correctamente')
             return redirect('listar_proveedores')
@@ -841,7 +848,7 @@ def Cambiar_estado_proveedor(id_proveedor):
     if proveedor.estadoid.descripcion == 'Activo':
         proveedor.estadoid = Estado.objects.get(descripcion="Inactivo")
         proveedor.save()
-    else: 
+    else:
         proveedor.estadoid = Estado.objects.get(descripcion="Activo")
         proveedor.save()
 
@@ -857,7 +864,7 @@ def Listar_proveedores(request):
             messages.warning(request,
                              f'El producto {proveedor.razonsocial} ha quedado {proveedor.estadoid.descripcion} correctamente')
             return redirect('listar_proveedores')
-        
+
         if request.POST.get('VerProveedor') is not None:
             request.session['_old_post'] = request.POST
             return HttpResponseRedirect('ver_proveedor')
@@ -865,7 +872,7 @@ def Listar_proveedores(request):
         if request.POST.get('EditarProveedor') is not None:
             request.session['_old_post'] = request.POST
             return HttpResponseRedirect('editar_proveedor')
-    
+
     context = {
         'proveedor': proveedor
     }
@@ -885,8 +892,8 @@ def Ver_proveedor(request):
 
 
 def Editar_proveedor(request):
-    old_post_ingreso = request.session.get('_old_post_ingreso') 
-    old_post_conexion = request.session.get('_old_post_conexion') 
+    old_post_ingreso = request.session.get('_old_post_ingreso')
+    old_post_conexion = request.session.get('_old_post_conexion')
 
     old_post = request.session.get('_old_post')
 
@@ -908,7 +915,7 @@ def Editar_proveedor(request):
 
         proveedor, created = Proveedor.objects.get_or_create(proveedorid=old_post['EditarProveedor'])
         try:
-            proveedor.razonsocial = razonsocial 
+            proveedor.razonsocial = razonsocial
             proveedor.rutcuerpo = rutcuerpo
             proveedor.dv = dv
             proveedor.fono = fono
@@ -919,7 +926,7 @@ def Editar_proveedor(request):
 
             messages.warning(request, 'Proveedor actualizado correctamente')
             return redirect('listar_proveedores')
-            
+
         except Exception as error:
             print(error)
             messages.error(request, error)
@@ -967,7 +974,7 @@ def Agregar_empleado(request):
     form3 = FormEmpleadoEmpleado()
 
     if request.method == 'POST':
-        
+
         run_cuerpo = request.POST.get('runcuerpo')
         dv = request.POST.get('dv')
         nombres = request.POST.get('nombres')
@@ -1006,8 +1013,8 @@ def Agregar_empleado(request):
             )
             user.set_password(contraseña)
             user.set_password(confirme_contraseña)
-            
-            # Estado activo = 1 e inactivo = 2 
+
+            # Estado activo = 1 e inactivo = 2
             Persona.objects.create(
                 runcuerpo=run_cuerpo,
                 dv=dv,
@@ -1033,9 +1040,9 @@ def Agregar_empleado(request):
                 estadoid=Estado.objects.get(descripcion="Activo")
             )
 
-            if (Persona is not None and 
-                Usuario is not None and 
-                Empleado is not None and 
+            if (Persona is not None and
+                Usuario is not None and
+                Empleado is not None and
                 user is not None):
 
                 user.save()
@@ -1091,7 +1098,7 @@ def Editar_empleado(request):
         fecha_ingreso = fecha_ingreso[6:10] + '-' + fecha_ingreso[3:5] + '-' + fecha_ingreso[0:2]
 
         empleadoEm, created = Empleado.objects.get_or_create(empleadoid=old_post['EditarEmpleado'])
-        empleadoEm.fechaingreso = fecha_ingreso 
+        empleadoEm.fechaingreso = fecha_ingreso
         empleadoEm.personaid.runcuerpo = run_cuerpo
         empleadoEm.personaid.dv = dv
         empleadoEm.personaid.nombres = nombres
@@ -1102,17 +1109,17 @@ def Editar_empleado(request):
 
         empleado_para_persona = Empleado.objects.filter(empleadoid=old_post['EditarEmpleado']).values('personaid')
         usuario, created = Usuario.objects.get_or_create(personaid=empleado_para_persona[0]['personaid'])
-        usuario.nombreusuario = nombre_usuario 
+        usuario.nombreusuario = nombre_usuario
         usuario.email = email
-        usuario.save() 
+        usuario.save()
 
         persona, created = Persona.objects.get_or_create(personaid=empleado_para_persona[0]['personaid'])
-        persona.runcuerpo = run_cuerpo 
-        persona.dv = dv 
-        persona.apellidopaterno = apellido_paterno 
-        persona.apellidomaterno = apellido_materno 
-        persona.nombres = nombres 
-        persona.telefono = telefono 
+        persona.runcuerpo = run_cuerpo
+        persona.dv = dv
+        persona.apellidopaterno = apellido_paterno
+        persona.apellidomaterno = apellido_materno
+        persona.nombres = nombres
+        persona.telefono = telefono
         persona.save()
 
         user_django = User.objects.get(email=empleado_usuario)
@@ -1145,7 +1152,7 @@ def Cambiar_estado_empleado(id_empleado):
         empleado.save()
         user.is_active = False
         user.save()
-    else: 
+    else:
         empleado.estadoid = Estado.objects.get(descripcion="Activo")
         empleado.save()
         user.is_active = True
@@ -1155,10 +1162,13 @@ def Cambiar_estado_empleado(id_empleado):
 @csrf_exempt
 def Crear_pedido(request, id=None):
     proveedor = Proveedor.objects.filter(proveedorid=id)
+    prod_prov = []
     for prov in proveedor:
         productos = Productoproveedor.objects.filter(proveedorid=prov)
+        for p in productos:
+            prod_prov.append(p.productoid.productoid)
+        productos = Producto.objects.filter(productoid__in=prod_prov)
         print(productos)
-        productos = Producto.objects.filter(proveedorid=prov)
     listaProds = []
     for prod in productos:
         listaProds.append(prod.nombre)
@@ -1181,6 +1191,7 @@ def Crear_pedido(request, id=None):
                             break
                         else:
                             print("not found")
+
                             listaProductos.append({'id':idProduct, 'value':value})
                             break
 
@@ -1188,11 +1199,14 @@ def Crear_pedido(request, id=None):
                 if key == "fecha_vencimiento" and len(value) == 0:
                     fecha = "1000-10-10"
                 else:
-                    fecha = value
+                    print(value)
+                    partes = value.split("/")
+                    fecha = "-".join(reversed(partes))
+                    print(fecha)
 
         proveedorOrden = Proveedor.objects.get(proveedorid=int(id))
         estado_orden = Estadoorden.objects.get(estadoordenid=1)
-        
+
         ordenPedido = Ordencompra.objects.create(
             fechapedido = fecha,
             proveedorid = proveedorOrden,
@@ -1221,11 +1235,11 @@ def Crear_pedido(request, id=None):
 
 
 def filtro_proveedor(request):
-    proveedores = Proveedor.objects.all()   
+    proveedores = Proveedor.objects.all()
     context = {
         'proveedores':proveedores,
     }
-    
+
     return render(request, 'pedidos/crear_pedido_proveedores.html', context)
 
 
