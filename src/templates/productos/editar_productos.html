@@ -25,7 +25,7 @@
                         {% render_field form.precio class="form-control input border border-secondary" onkeypress="return soloNumeros(event)" %}
                         {% render_field form.stock class="form-control input border border-secondary" onkeypress="return soloNumeros(event)" %} 
                         {% render_field form.stockcritico class="form-control input border border-secondary" onkeypress="return soloNumeros(event)" %} 
-                        {% render_field form.fechavencimiento class="form-control dateinput border border-secondary" name="fecha_vencimiento" %}
+                        {% render_field form.fechavencimiento class="form-control dateinput border border-secondary" style="width:120%" name="fecha_vencimiento" %}
                     </div>
 
                     <div class="col-md-3 mt-1 p-0">
@@ -41,7 +41,7 @@
                         <div class="modificar-imagen">
                             {% render_field form.imagen class="form-control input border border-secondary" name="imagen" %}
                         </div>
-                        {% render_field form.proveedorid class="form-control input border border-secondary" name="proveedorid" %}
+                        {% render_field form2.proveedorid class="form-control input border border-secondary" name="proveedorid" %}
                         {% render_field form.tipoproductoid class="form-control input border border-secondary" name="tipoproductoid" %}
                         {% render_field form.familiaproid class="form-control input border border-secondary" name="familiaproid" %}
                         {% render_field form.estadoid class="form-control input border border-secondary" name="estadoid" %}

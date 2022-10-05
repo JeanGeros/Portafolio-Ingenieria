@@ -18,20 +18,20 @@
                 <strong>Fecha de Creacion: </strong>{{orden.fechapedido}}<br>
                 <strong>Proveedor: </strong>{{orden.proveedorid}}
                 <br>
+            {% endfor %}
 
                 <br>
-                <h4>Productos:</h4>
+                 <h4>Productos:</h4>
                 <table>
                     <tr>
                         <th>Nombre</th><th class="text-center">Cantidad</th>
                     </tr>
                     {% for detalle in detalleOrden %}
                         <tr class=" border-secondary rounded-3 p-2">
-                        <td style="padding-right: 1rem"> <label  class="detallePedidoP" id="detallePedidoP"> {{detalle.productoid | capfirst }}</label></td>
+                        <td style="padding-right: 1rem"> <label  > {{detalle.productoid | capfirst }}</label></td>
                     
                     {% endfor %}
-                </table>
-            {% endfor %}
+            </table>
 
         </div>
             
@@ -196,57 +196,13 @@
                 showConfirmButton: true,
             })
         }else{
-            productos = document.querySelectorAll('.detallePedidoP');
-            productosSeleccionados = document.querySelectorAll('.productoSeleccionado');
-            contador = 0
-            contador2 = 0
-            productos.forEach( function(valor) {
-                valor1 = valor.innerHTML;
-                contador2 = contador2 + 1
-                productosSeleccionados.forEach( function(valor) {
-                    valor2 = valor.value;
-                    console.log(`valor1: ${valor1} |  valor2: ${valor2}`)
-
-                    if(valor1 == valor2){
-                        contador = contador + 1
-                    }
-                });
-                
-            });
-            if(contador == contador2 ){
-                Swal.fire({
-                    icon: 'success',
-                    title: 'El pedido fue recepcionado correctamente',
-                    showConfirmButton: false,
-                    timer: 3000
-                })
-                setTimeout(function(){
-                    bloque = document.getElementById('formulario');
-                    elemento = document.createElement('input');
-                    elemento.setAttribute("class", "form-control col-sm-3 mb-2 bg-dark" );
-                    elemento.setAttribute("style", "width:5px" );
-                    elemento.setAttribute("name", `validado` );
-                    elemento.setAttribute("name", `validado` );
-                    elemento.id = 'validado';
-                    elemento.setAttribute("readonly", "" );
-                    bloque.appendChild(elemento);
-                    document.getElementById(elemento.id).value = "validado";
-
-                    document.formulario.submit();
-
-                }, 3000);
-            }   
-            else{
-                
-                
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Hay productos que no se pueden recepcionar ya que no coinciden con los productos del pedido seleccionado',
-                    showConfirmButton: true,
-                
-                })
-                
-            }
+            Swal.fire({
+                icon: 'success',
+                title: 'El pedido fue recepcionado correctamente',
+                showConfirmButton: false,
+                timer: 3000
+            })
+            document.formulario.submit();
         }
     }
 
