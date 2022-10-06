@@ -1307,9 +1307,8 @@ def RecepcionPedido(request, id = None):
             else:
                 try:
                     orden_pedido = Ordencompra.objects.get(ordenid=id)
-                    nombre_producto = Producto.objects.get(nombre=key)
-                    id_producto = nombre_producto.productoid
-
+                    producto_r = Producto.objects.get(nombre=value)
+                    id_producto = producto_r.productoid
                     detalle = Detalleorden.objects.get(ordenid=id, productoid=id_producto)
 
                     Recepcion.objects.create(
@@ -1323,8 +1322,13 @@ def RecepcionPedido(request, id = None):
                     detalle, created = Detalleorden.objects.get_or_create(ordenid=id, productoid=id_producto)
                     detalle.estadoid = Estado.objects.get(estadoid=2)
                     detalle.save()
+
+                    producto_recepcionar, created = Producto.objects.get_or_create(productoid=id_producto)
+                    producto_recepcionar.stock = producto_recepcionar.stock+detalle.cantidad
+                    producto_recepcionar.save()
                 except Exception as error:
-                    print(f"key: {key}  value  {id_producto}")
+                    sweetify.warning(request, "No es posible Recepcionar el producto en este momento")
+                    print(f"key: {key}  value  {value}")
                     print(error)
 
         verificar_detalle_orden = Detalleorden.objects.filter(ordenid=id, estadoid=1)

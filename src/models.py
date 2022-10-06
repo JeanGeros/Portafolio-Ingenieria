@@ -171,6 +171,9 @@ class Detalleorden(models.Model):
     productoid = models.ForeignKey('Producto', models.DO_NOTHING, db_column='productoid')
     estadoid = models.ForeignKey('Estado', models.DO_NOTHING, db_column='estadoid', blank=True, null=True)
 
+    def __str__(self):
+        return f"{self.detalleid}"
+
     class Meta:
         managed = False
         db_table = 'detalleorden'
@@ -367,6 +370,9 @@ class Ordencompra(models.Model):
     fechapedido = models.DateField()
     estadoordenid = models.ForeignKey(Estadoorden, models.DO_NOTHING, db_column='estadoordenid')
     proveedorid = models.ForeignKey('Proveedor', models.DO_NOTHING, db_column='proveedorid')
+
+    def __str__(self):
+        return f"id: {self.ordenid} estado: {self.estadoordenid.descripcion}"
 
     class Meta:
         managed = False

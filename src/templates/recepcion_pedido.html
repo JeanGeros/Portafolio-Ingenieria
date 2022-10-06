@@ -28,7 +28,8 @@
                     </tr>
                     {% for detalle in detalleOrden %}
                         <tr class=" border-secondary rounded-3 p-2">
-                        <td style="padding-right: 1rem"> <label  > {{detalle.productoid | capfirst }}</label></td>
+                        <td style="padding-right: 1rem"> <label  > {{detalle.productoid }}</label></td>
+                        <td style="padding-right: 1rem"> <label  > {{detalle.cantidad }}</label></td>
                     
                     {% endfor %}
             </table>
@@ -62,7 +63,7 @@
                 </tr>
                 {% for value in detalleOrden %}
                     <tr class="border border-secondary rounded-3 p-2">
-                        <td style="padding-right: 2rem;" id="{{value}}">{{value.productoid| capfirst }}</td>
+                        <td style="padding-right: 2rem;" id="{{value}}">{{value.productoid }}</td>
                         <td ><input class="btn btn-secondary btn-sm " type="button" title="Agregar Producto" Value="Confirmar" onclick="agregar2('{{value}}')"></td>
                     </tr>
                 {% endfor %}
@@ -197,8 +198,8 @@
             })
         }else{
             Swal.fire({
-                icon: 'success',
-                title: 'El pedido fue recepcionado correctamente',
+                icon: 'info',
+                title: 'Recepcionando pedido...',
                 showConfirmButton: false,
                 timer: 3000
             })
