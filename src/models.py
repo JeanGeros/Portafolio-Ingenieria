@@ -172,7 +172,7 @@ class Detalleorden(models.Model):
     estadoid = models.ForeignKey('Estado', models.DO_NOTHING, db_column='estadoid', blank=True, null=True)
 
     def __str__(self):
-        return f"{self.detalleid}"
+        return f"id: {self.detalleid} id_order: {self.ordenid}"
 
     class Meta:
         managed = False
@@ -422,6 +422,9 @@ class Productoproveedor(models.Model):
     ProId = models.BigIntegerField(primary_key=True)
     productoid = models.ForeignKey(Producto, models.DO_NOTHING, db_column='productoid')
     proveedorid = models.ForeignKey('Proveedor', models.DO_NOTHING, db_column='proveedorid')
+
+    def __str__(self):
+        return f"{self.productoid} {self.proveedorid}"
 
     class Meta:
         managed = False

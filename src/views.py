@@ -1,3 +1,4 @@
+from copyreg import constructor
 import email
 from django.shortcuts import render, redirect
 from django.http import HttpResponseRedirect
@@ -127,7 +128,7 @@ def Agregar_productos(request):
 
 
 def Listar_productos(request):
-    productos = Producto.objects.all()
+    productos = Productoproveedor.objects.all()
 
     if request.method == 'POST':
         if request.POST.get('CambiarEstado') is not None:
@@ -147,7 +148,7 @@ def Listar_productos(request):
             return HttpResponseRedirect('editar_producto')
 
     context = {
-        'productos': productos
+        'productos': productos,
     }
 
     return render(request, 'productos/listar_productos.html', context)
@@ -166,12 +167,10 @@ def Cambiar_estado_producto(id_producto):
 
 def Ver_producto(request):
     old_post = request.session.get('_old_post')
-    producto = Producto.objects.get(productoid=old_post['VerProducto'])
-    prov_producto = Productoproveedor.objects.get(productoid=old_post['VerProducto'])
+    producto = Productoproveedor.objects.get(productoid=old_post['VerProducto'])
 
     context = {
         'producto': producto,
-        'prov_producto': prov_producto
     }
 
     return render(request, 'productos/ver_producto.html', context)
@@ -181,9 +180,10 @@ def Editar_producto(request):
     old_post = request.session.get('_old_post')
 
     producto = Producto.objects.get(productoid=old_post['EditarProducto'])
+    product_prov = Productoproveedor.objects.get(productoid=old_post['EditarProducto'])
 
     form = addproductsForm(request.POST or None, instance=producto)
-    form_prov = FormProductoproveedor(request.POST, request.FILES)
+    form_prov = FormProductoproveedor(request.POST, request.FILES, instance=product_prov)
 
     if request.method == 'POST':
         nombre = request.POST.get('nombre')
@@ -211,27 +211,32 @@ def Editar_producto(request):
 
         codigo = f"{proveedor.proveedorid}{familia_producto.familiaproid}{fechacodigo}{tipo_producto.tipoproductoid}"
 
-        producto, created = Producto.objects.get_or_create(productoid=old_post['EditarProducto'])
         try:
+            producto, created = Producto.objects.get_or_create(productoid=old_post['EditarProducto'])
             producto.nombre = nombre
             producto.precio = precio
             producto.stock = stock
             producto.stockcritico = stockcritico
             producto.fechavencimiento = fechavencimiento
-            producto.proveedorid = proveedor
             producto.tipoproductoid = tipo_producto
             producto.familiaproid = familia_producto
             producto.estadoid = Estado_producto
             producto.codigo = codigo
-            producto.imagen = imagen
-            producto.save()
+            if imagen:
+                producto.imagen = imagen 
+            
+            producto_prove, created = Productoproveedor.objects.get_or_create(productoid=old_post['EditarProducto'], proveedorid=proveedor)
+            producto_prove.proveedorid = proveedor
 
+            producto_prove.save()
+            producto.save()
             sweetify.success(request, 'Producto actualizado correctamente')
             return redirect('listar_productos')
-
         except Exception as error:
             print(error)
             sweetify.error(request, error)
+
+            
 
     context = {
         'form': form,
@@ -1245,12 +1250,18 @@ def filtro_proveedor(request):
 
 def cambiar_estado_pedido(id_pedido):
     orden_compra = Ordencompra.objects.get(ordenid=int(id_pedido))
-
-    estado_eliminado = Estadoorden.objects.get(estadoordenid=25)
+    detalle_orden = Detalleorden.objects.filter(ordenid=int(id_pedido))
+    estado_eliminado = Estadoorden.objects.get(estadoordenid=23)
+    estado_eliminado_detale = Estado.objects.get(estadoid=2)
 
     if orden_compra.estadoordenid.estadoordenid == 1:
         orden_compra.estadoordenid = estado_eliminado
         orden_compra.save()
+    
+    for detalle in detalle_orden:
+        print(detalle)
+        detalle.estadoid = estado_eliminado_detale
+        detalle.save()
 
 
 def Listar_pedidos(request):
@@ -1279,9 +1290,7 @@ def Listar_pedidos(request):
 
 def Ver_pedidos(request):
     old_post = request.session.get('_old_post')
-    print(old_post['VerPedido'])
     detalle_orden = Detalleorden.objects.filter(ordenid=old_post['VerPedido'])
-    print(detalle_orden)
     context = {
         'detalle_orden': detalle_orden,
     }

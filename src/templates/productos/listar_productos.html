@@ -16,7 +16,7 @@
                     <th>Nombre</th>
                     <th>Precio</th>
                     <th>Stock</th>
-                    <th>Stock Critico</th>
+                    <th>Proveedor</th>
                     <th>Fecha de Vencimiento</th>
                     <th>Imagen del producto</th>
                     <th>Acciones</th>
@@ -25,27 +25,26 @@
             <tbody style="text-align:center">
                 {% for producto in productos %}
                     <tr>
-                        <td>{{ producto.nombre | capfirst}}</td>
-                        <td>${{ producto.precio|localize |intcomma}}</td>
-                        <td>{{ producto.stock }}</td>
-                        <td>{{ producto.stockcritico }}</td>
-                        <td>{{ producto.fechavencimiento|date:"SHORT_DATE_FORMAT" }}</td>
-                        <td> <img src="/static/images/{{producto.imagen}}" alt="imagen producto" style="width:100px;height:100px;"> </td>
+                        <td>{{ producto.productoid.nombre | capfirst}}</td>
+                        <td>${{ producto.productoid.precio|localize |intcomma}}</td>
+                        <td>{{ producto.productoid.stock }}</td>
+                        <td>{{ producto.proveedorid.razonsocial }}</td>
+                        <td>{{ producto.productoid.fechavencimiento|date:"SHORT_DATE_FORMAT" }}</td>
+                        <td> <img src="/static/images/{{producto.productoid.imagen}}" alt="imagen producto" style="width:100px;height:100px;"> </td>
 
 
                         <td>
                             <form method="POST" action="">
                                 {% csrf_token %}
                                 <div class="btn-group">
-                                    <button  id="" name="VerProducto" value="{{producto.productoid}}" class="btn btn_aceptar border border-secondary">Ver</button>
-                                    <button  id="" name="EditarProducto" value="{{producto.productoid}}" class="btn btn_aceptar border border-secondary">Editar</button>
+                                    <button  id="nose" name="VerProducto" value="{{producto.productoid.productoid}}" value1="{{producto.proveedorid.proveedorid}}"  class="btn btn_aceptar border border-secondary">Ver</button>
+                                    <button  id="" name="EditarProducto" value="{{producto.productoid.productoid}}" class="btn btn_aceptar border border-secondary">Editar</button>
                                     <!-- <a href="#" title="Editar" type="button" class="btn btn-primary">Editar </a> -->
-                                    {% if producto.estadoid.descripcion == 'Activo' %}
-                                        <button type="submit" id="" name="CambiarEstado" value="{{producto.productoid}}" class="btn btn_aceptar border border-secondary">Desactivar Producto</button>
+                                    {% if producto.productoid.estadoid.descripcion == 'Activo' %}
+                                        <button type="submit" id="" name="CambiarEstado" value="{{producto.productoid.productoid}}" class="btn btn_aceptar border border-secondary">Desactivar Producto</button>
                                     {% else %}
-                                        <button type="submit" id="" name="CambiarEstado" value="{{producto.productoid}}" class="btn btn_aceptar border border-secondary">Activar Producto</button>
+                                        <button type="submit" id="" name="CambiarEstado" value="{{producto.productoid.productoid}}" class="btn btn_aceptar border border-secondary">Activar Producto</button>
                                     {% endif %}
-                                    <button type="submit" id="" name="Recepcionar" value="{{producto.productoid}}" class="btn btn_aceptar border border-secondary">Activar Producto</button>
                                     
                                 </div>
                             </form>
