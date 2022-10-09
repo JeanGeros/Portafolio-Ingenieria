@@ -178,12 +178,12 @@ def Ver_producto(request):
 
 def Editar_producto(request):
     old_post = request.session.get('_old_post')
+    print(old_post['EditarProducto'])
 
-    producto = Producto.objects.get(productoid=old_post['EditarProducto'])
-    product_prov = Productoproveedor.objects.get(productoid=old_post['EditarProducto'])
+    # producto = Producto.objects.get(productoid=old_post['EditarProducto'])
+    producto = Productoproveedor.objects.get(productoid=old_post['EditarProducto'], proveedorid=old_post['proveedor'])
 
     form = addproductsForm(request.POST or None, instance=producto)
-    form_prov = FormProductoproveedor(request.POST, request.FILES, instance=product_prov)
 
     if request.method == 'POST':
         nombre = request.POST.get('nombre')
@@ -196,6 +196,7 @@ def Editar_producto(request):
         tipoproductoid = request.POST.get('tipoproductoid')
         familiaproid = request.POST.get('familiaproid')
         estadoid = request.POST.get('estadoid')
+        
         proveedor = Proveedor.objects.get(proveedorid=proveedorid)
         tipo_producto = Tipoproducto.objects.get(tipoproductoid=tipoproductoid)
         familia_producto = Familiaproducto.objects.get(familiaproid=familiaproid)
@@ -240,7 +241,6 @@ def Editar_producto(request):
 
     context = {
         'form': form,
-        'form2': form_prov,
 
     }
 
