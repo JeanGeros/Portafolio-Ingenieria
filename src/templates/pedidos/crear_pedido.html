@@ -19,8 +19,8 @@
                 <div class="col-md-6 border border-secondary rounded p-5">
                     <h3 class="text-center pb-3">Selecciones proveedor para ver sus productos</h3>
 
-                    {% for prov in proveedor %}
-                        <a href="crear_pedido/{{prov.proveedorid}}" style="text-decoration:none;" class="btn btn-primary text-white pb-2 mb-2" onclick="ActivarCampoOtroTema()" onclick="GetProveedor('{{prov.proveedorid}}')">{{prov.razonsocial}}</a>
+                    {% for prov in listaProds %}
+                        <a style="text-decoration:none;" class="btn btn-primary text-white pb-2 mb-2">{{prov.proveedorid.razonsocial}}</a>
                     {% endfor %}
                 </div>
                 <div id="ListaProductos" class="col-md-6 border border-secondary rounded p-5">
@@ -33,11 +33,12 @@
                             <tr>
                                 <th>Nombre</th><th>Cantidad</th><th class="text-center">Accion</th>
                             </tr>
-                            {% for value in listaProds %}
+                            {% for prod in listaProds %}
                                 <tr class="border border-secondary rounded-3 p-2">
-                                    <td id="{{value}}">{{value}}</td>
-                                    <td><input id="{{value}}.cantidad" type="number" name="numero" value="1" min="1" max="50" step="1" /></td>
-                                    <td><input class="btn btn-secondary btn-sm" type="button" title="Agregar Producto" Value="Agregar" onclick="agregar2('{{value}}','{{value}}.cantidad')"></td>
+                                    <td id="{{prod.productoid}}">{{prod.productoid}}</td>
+                                    <td style="visibility: hidden;" id="{{prod.productoid.productoid}}">{{prod.productoid.productoid}}</td>
+                                    <td><input id="{{prod.productoid}}.cantidad" type="number" name="numero" value="1" min="1" max="50" step="1" /></td>
+                                    <td><input class="btn btn-secondary btn-sm" type="button" title="Agregar Producto" Value="Agregar" onclick="agregar2('{{prod.productoid}}','{{prod.productoid.productoid}}','{{prod.productoid}}.cantidad')"></td>
                                 </tr>
                             {% endfor %}
                             <tr class='noSearch hide'>
@@ -61,7 +62,6 @@
                                     <label for="state_id" class="control-label" style="padding-right: 200px;">Producto</label>
                                     <label for="state_id" class="control-label" style="padding-right: 50px;">Cantidad</label>
                                 </div>
-                                <!-- Div donde se añadiran los Selects -->
                                 <div id="plazos" class="row" style="padding-left: 20px;">
                                 </div>
                                 <br>  
@@ -69,8 +69,8 @@
                     </div>
                     <div class="col-md-6 p-3">
                         <div class="form-group pb-3">
-                            <label for="fecha_vencimiento" class="txt_negrita p-2">Seleccione fecha de llegada:(opcional)</label>
-                            <input class="form-control dateinput" type="text" name="fecha_vencimiento" readonly placeholder="Click aqui" style="width:110px"/>
+                            <label for="fecha_llegada" class="txt_negrita p-2">Seleccione fecha de llegada:(opcional)</label>
+                            <input class="form-control dateinput" type="text" name="fecha_llegada" readonly placeholder="Click aqui" style="width:110px"/>
                         </div>
                     </div>
                     
@@ -106,11 +106,13 @@
     //document.getElementById(prov.id).value = local;
 
     var incremento = 0;
-    function agregar2(producto, cantidadProd)
+    function agregar2(producto, producto_id, cantidadProd)
     {
         let coincidencia = document.getElementById(producto).textContent;
+        let idcoincidencia = document.getElementById(producto_id).textContent;
         let cantidad = document.getElementById(cantidadProd).value;
         console.log(coincidencia)
+        console.log(idcoincidencia)
         console.log(cantidad)
         incremento++;
         
@@ -121,7 +123,7 @@
         elemento = document.createElement('input');
         elemento.setAttribute("class", "form-control col-sm-3 mb-2" );
         elemento.setAttribute("style", "width:300px" );
-        elemento.setAttribute("name", `${coincidencia}` );
+        elemento.setAttribute("name", `${idcoincidencia}` );
         elemento.id = 'input1.'+incremento;
         elemento.setAttribute("readonly", "" );
         bloque.appendChild(elemento);
@@ -129,7 +131,7 @@
         elemento2 = document.createElement('input');
         elemento2.setAttribute("class", "form-control col-md-3 mb-2" );
         elemento2.setAttribute("style", "width:50px" );
-        elemento2.setAttribute("name", `${coincidencia}` );
+        elemento2.setAttribute("name", `${idcoincidencia}` );
         elemento2.id = 'input2.'+incremento;
         elemento2.setAttribute("readonly", "" );
         bloque.appendChild(elemento2);
@@ -174,5 +176,4 @@
         }
     }
 </script>
-
 {% endblock %}

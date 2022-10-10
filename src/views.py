@@ -11,18 +11,17 @@ import sweetify
 import datetime
 import qrcode
 
-
 from django.contrib import messages
 from src.forms import (
     FormClienteNormal1, FormClienteNormal2, FormClienteNormal3, addproductsForm, FormVendedorPersona,
     FormVendedorUsuario, FormVendedorEmpleado, FormEmpleadoPersona, FormEmpleadoUsuario, FormEmpleadoEmpleado,
-    FormProveedor, FormProductoproveedor
+    FormProveedor, FormProductoproveedor, FormBodega
 )
 
 from .models import (
     Detalleorden, Estadoorden, Ordencompra, Persona, Direccion, Usuario, Cliente, Estado, Comuna, Tipobarrio,
     Tipovivienda, Rolusuario,
-    Proveedor, Tipoproducto, Producto, Familiaproducto, Empleado, Cargo, Tiporubro, Recepcion, Productoproveedor
+    Proveedor, Tipoproducto, Producto, Familiaproducto, Empleado, Cargo, Tiporubro, Recepcion, Productoproveedor, Bodega
 )
 
 
@@ -61,10 +60,18 @@ def Ingreso(request):
 
     return render(request, 'ingreso/ingreso_usuarios.html', context)
 
-#************************************Productos*********************************************
+
+# ************************************Productos*********************************************
 def Agregar_productos(request):
+    #
+    # lugares_ocupados = []
+    # producto_bodega = Producto.objects.all().exclude(BodegaId=None).values('BodegaId')
+    # for p in list(producto_bodega):
+    #     lugares_ocupados.append(p['BodegaId'])
+
     form = addproductsForm(request.POST, request.FILES)
     form_prov = FormProductoproveedor(request.POST, request.FILES)
+    form_bodega = FormBodega(request.POST, request.FILES)
 
     if request.method == 'POST':
         nombre = request.POST.get('nombre')
@@ -77,11 +84,13 @@ def Agregar_productos(request):
         tipoproductoid = request.POST.get('tipoproductoid')
         familiaproid = request.POST.get('familiaproid')
         estadoid = request.POST.get('estadoid')
+        bodega_id = request.POST.get('BodegaId')
 
         tipo_producto = Tipoproducto.objects.get(tipoproductoid=tipoproductoid)
         familia_producto = Familiaproducto.objects.get(familiaproid=familiaproid)
         estado_producto = Estado.objects.get(estadoid=estadoid)
         proveedor = Proveedor.objects.get(proveedorid=proveedorid)
+        bodega = Bodega.objects.get(BodegaId=bodega_id)
 
         if len(fechavencimiento) == 10:
             fecha = fechavencimiento.split("/")
@@ -103,11 +112,13 @@ def Agregar_productos(request):
                 imagen=imagen,
                 tipoproductoid=tipo_producto,
                 familiaproid=familia_producto,
-                estadoid=estado_producto
+                estadoid=estado_producto,
+                BodegaId=bodega
             )
+
             ultimo_producto = Producto.objects.order_by('productoid').last()
             prov_producto = Productoproveedor.objects.create(
-                ProId = 2,
+                ProId=2,
                 productoid=ultimo_producto,
                 proveedorid=proveedor
             )
@@ -122,6 +133,7 @@ def Agregar_productos(request):
     context = {
         'form': form,
         'form2': form_prov,
+        'form_bodega': form_bodega
     }
 
     return render(request, 'productos/agregar_productos.html', context)
@@ -168,9 +180,11 @@ def Cambiar_estado_producto(id_producto):
 def Ver_producto(request):
     old_post = request.session.get('_old_post')
     producto = Productoproveedor.objects.get(productoid=old_post['VerProducto'])
-
+    prov_producto = Productoproveedor.objects.get(productoid=old_post['VerProducto'],
+                                                  proveedorid=old_post['proveedor'])
     context = {
         'producto': producto,
+        'prov_producto': prov_producto
     }
 
     return render(request, 'productos/ver_producto.html', context)
@@ -178,11 +192,12 @@ def Ver_producto(request):
 
 def Editar_producto(request):
     old_post = request.session.get('_old_post')
-    print(old_post['EditarProducto'])
 
-    # producto = Producto.objects.get(productoid=old_post['EditarProducto'])
-    producto = Productoproveedor.objects.get(productoid=old_post['EditarProducto'], proveedorid=old_post['proveedor'])
+    producto = Producto.objects.get(productoid=old_post['EditarProducto'])
+    prov_producto = Productoproveedor.objects.get(productoid=old_post['EditarProducto'],
+                                                  proveedorid=old_post['proveedor'])
 
+    form2 = FormProductoproveedor(request.POST or None, instance=prov_producto)
     form = addproductsForm(request.POST or None, instance=producto)
 
     if request.method == 'POST':
@@ -196,11 +211,13 @@ def Editar_producto(request):
         tipoproductoid = request.POST.get('tipoproductoid')
         familiaproid = request.POST.get('familiaproid')
         estadoid = request.POST.get('estadoid')
-        
+        bodega_id = request.POST.get('BodegaId')
+
         proveedor = Proveedor.objects.get(proveedorid=proveedorid)
         tipo_producto = Tipoproducto.objects.get(tipoproductoid=tipoproductoid)
         familia_producto = Familiaproducto.objects.get(familiaproid=familiaproid)
         Estado_producto = Estado.objects.get(estadoid=estadoid)
+        bodega = Bodega.objects.get(BodegaId=bodega_id)
 
         fecha = fechavencimiento.split("/")
         if len(fechavencimiento) == 10:
@@ -223,10 +240,13 @@ def Editar_producto(request):
             producto.familiaproid = familia_producto
             producto.estadoid = Estado_producto
             producto.codigo = codigo
+            producto.BodegaId = bodega
+
             if imagen:
-                producto.imagen = imagen 
-            
-            producto_prove, created = Productoproveedor.objects.get_or_create(productoid=old_post['EditarProducto'], proveedorid=proveedor)
+                producto.imagen = imagen
+
+            producto_prove, created = Productoproveedor.objects.get_or_create(productoid=old_post['EditarProducto'],
+                                                                              proveedorid=old_post['proveedor'])
             producto_prove.proveedorid = proveedor
 
             producto_prove.save()
@@ -237,16 +257,15 @@ def Editar_producto(request):
             print(error)
             sweetify.error(request, error)
 
-            
-
     context = {
         'form': form,
-
+        'form2': form2
     }
 
     return render(request, 'productos/editar_productos.html', context)
 
-#*********************************Clientes*************************************************
+
+# *********************************Clientes*************************************************
 def Registro_clientes(request):
     form1 = FormClienteNormal1()
     form2 = FormClienteNormal2()
@@ -334,8 +353,8 @@ def Registro_clientes(request):
             if (Persona is not None and
                     Direccion is not None and
                     Usuario is not None and
-                Cliente is not None and
-                user is not None):
+                    Cliente is not None and
+                    user is not None):
 
                 user.save()
 
@@ -439,10 +458,10 @@ def Agregar_cliente(request):
             )
 
             if (Persona is not None and
-                Direccion is not None and
-                Usuario is not None and
+                    Direccion is not None and
+                    Usuario is not None and
                     Cliente is not None and
-                user is not None):
+                    user is not None):
 
                 user.save()
 
@@ -586,7 +605,8 @@ def Editar_cliente(request):
 
     return render(request, 'clientes/editar_cliente.html', context)
 
-#********************************Vendedores************************************************
+
+# ********************************Vendedores************************************************
 def Listar_vendedores(request):
     vendedores = Cargo.objects.get(descripcion="Vendedor")
     vendedores = Empleado.objects.filter(cargoid=vendedores)
@@ -805,7 +825,8 @@ def Cambiar_estado_vendedor(id_vendedor):
         user.is_active = True
         user.save()
 
-#********************************Vendedores************************************************
+
+# ********************************Vendedores************************************************
 def Agregar_proveedor(request):
     old_post_ingreso = request.session.get('old_post_ingreso')
     old_post_conexion = request.session.get('old_post_conexion')
@@ -942,7 +963,8 @@ def Editar_proveedor(request):
 
     return render(request, 'proveedores/editar_proveedor.html', context)
 
-#********************************Empleados************************************************
+
+# ********************************Empleados************************************************
 
 def Listar_empleados(request):
     empleados = Cargo.objects.get(descripcion="Empleado")
@@ -1046,9 +1068,9 @@ def Agregar_empleado(request):
             )
 
             if (Persona is not None and
-                Usuario is not None and
-                Empleado is not None and
-                user is not None):
+                    Usuario is not None and
+                    Empleado is not None and
+                    user is not None):
 
                 user.save()
                 sweetify.success(request, "Empleado creado correctamente")
@@ -1163,78 +1185,75 @@ def Cambiar_estado_empleado(id_empleado):
         user.is_active = True
         user.save()
 
+
 # *********************************Pedidos************************************************
 @csrf_exempt
 def Crear_pedido(request, id=None):
-    proveedor = Proveedor.objects.filter(proveedorid=id)
-    prod_prov = []
-    for prov in proveedor:
-        productos = Productoproveedor.objects.filter(proveedorid=prov)
-        for p in productos:
-            prod_prov.append(p.productoid.productoid)
-        productos = Producto.objects.filter(productoid__in=prod_prov)
-        print(productos)
-    listaProds = []
-    for prod in productos:
-        listaProds.append(prod.nombre)
+    proveedor = Proveedor.objects.get(proveedorid=id)
+    listaProds = Productoproveedor.objects.filter(proveedorid=proveedor)
+   
+    # proveedor = Proveedor.objects.filter(proveedorid=id)
+    # prod_prov = []
+    # for prov in proveedor:
+    #     productos = Productoproveedor.objects.filter(proveedorid=prov)
+    #     for p in productos:
+    #         prod_prov.append(p.productoid.productoid)
+    #     productos = Producto.objects.filter(productoid__in=prod_prov)
+    # listaProds = []
+    # for prod in productos:
+    #     listaProds.append(prod.nombre)
 
     if request.method == 'POST':
-        listaProductos = []
+        lista_productos = []
         for key, value in request.POST.items():
             print(f"key: {key}  value  {value}")
+
             try:
-                nomProduct = Producto.objects.get(nombre=key)
-                idProduct = nomProduct.productoid
-                if len(listaProductos) == 0:
-                    listaProductos.append({'id': idProduct, 'value': value})
+                Producto.objects.get(productoid=key)
+                if len(lista_productos) == 0:
+                    lista_productos.append({'id': key, 'value': value})
                 else:
-                    for product in listaProductos:
-                        if product['id'] == str(idProduct):
-                            print("found")
+                    for product in lista_productos:
+                        if product['id'] == key:
                             sum_value = int(product['value']) + int(value)
                             product.update({'value': sum_value})
-                            break
                         else:
-                            print("not found")
-
-                            listaProductos.append({'id':idProduct, 'value':value})
+                            lista_productos.append({'id': key, 'value': value})
                             break
 
-            except Producto.DoesNotExist:
-                if key == "fecha_vencimiento" and len(value) == 0:
+            except Exception as error:
+                if len(value) == 0:
                     fecha = "1000-10-10"
                 else:
-                    print(value)
                     partes = value.split("/")
                     fecha = "-".join(reversed(partes))
-                    print(fecha)
-
-        proveedorOrden = Proveedor.objects.get(proveedorid=int(id))
+        proveedor_orden = Proveedor.objects.get(proveedorid=int(id))
         estado_orden = Estadoorden.objects.get(estadoordenid=1)
 
         ordenPedido = Ordencompra.objects.create(
-            fechapedido = fecha,
-            proveedorid = proveedorOrden,
-            estadoordenid = estado_orden
+            fechapedido=fecha,
+            proveedorid=proveedor_orden,
+            estadoordenid=estado_orden
         )
 
         last_orden_compra = Ordencompra.objects.order_by('ordenid').last()
+        estado_detalle = Estado.objects.get(estadoid=1)
 
-        for products in listaProductos:
-            producto = Producto.objects.get(productoid= int(products['id']))
+        for products in lista_productos:
+            producto = Producto.objects.get(productoid=int(products['id']))
 
             detallePedido = Detalleorden.objects.create(
-                productoid = producto,
-                cantidad = products['value'],
-                ordenid = last_orden_compra
-            )
+                productoid=producto,
+                cantidad=products['value'],
+                ordenid=last_orden_compra,
+                estadoid=estado_detalle
 
-        messages.warning(request, 'Orden de pedido realizada con exito')
+            )
+        sweetify.success(request, "Orden de pedido realizada con exito")
         return redirect('listar_pedidos')
 
     context = {
-        'proveedor':proveedor,
-        'listaProds':listaProds
+        'listaProds': listaProds
     }
     return render(request, 'pedidos/crear_pedido.html', context)
 
@@ -1242,7 +1261,7 @@ def Crear_pedido(request, id=None):
 def filtro_proveedor(request):
     proveedores = Proveedor.objects.all()
     context = {
-        'proveedores':proveedores,
+        'proveedores': proveedores,
     }
 
     return render(request, 'pedidos/crear_pedido_proveedores.html', context)
@@ -1257,7 +1276,7 @@ def cambiar_estado_pedido(id_pedido):
     if orden_compra.estadoordenid.estadoordenid == 1:
         orden_compra.estadoordenid = estado_eliminado
         orden_compra.save()
-    
+
     for detalle in detalle_orden:
         print(detalle)
         detalle.estadoid = estado_eliminado_detale
@@ -1291,8 +1310,11 @@ def Listar_pedidos(request):
 def Ver_pedidos(request):
     old_post = request.session.get('_old_post')
     detalle_orden = Detalleorden.objects.filter(ordenid=old_post['VerPedido'])
+    recepcion_orden = Recepcion.objects.filter(ordenid=old_post['VerPedido'])
+
     context = {
         'detalle_orden': detalle_orden,
+        'recepcion_orden':recepcion_orden
     }
 
     return render(request, 'pedidos/ver_pedido.html', context)
@@ -1300,7 +1322,7 @@ def Ver_pedidos(request):
 
 # ***************************Recepcionar pedidos*******************************************
 
-def RecepcionPedido(request, id = None):
+def RecepcionPedido(request, id=None):
     if id:
         orden_pedido = Ordencompra.objects.filter(ordenid=id)
         detalle_orden = Detalleorden.objects.filter(ordenid=id, estadoid=1)
@@ -1308,6 +1330,7 @@ def RecepcionPedido(request, id = None):
 
     if request.method == 'POST':
         for key, value in request.POST.items():
+            print(f"key:{key} value:{value}")
             orden_pedido = Ordencompra.objects.get(ordenid=id)
             detalle_orden = Detalleorden.objects.filter(ordenid=orden_pedido)
 
@@ -1316,7 +1339,7 @@ def RecepcionPedido(request, id = None):
             else:
                 try:
                     orden_pedido = Ordencompra.objects.get(ordenid=id)
-                    producto_r = Producto.objects.get(nombre=value)
+                    producto_r = Producto.objects.get(productoid=key)
                     id_producto = producto_r.productoid
                     detalle = Detalleorden.objects.get(ordenid=id, productoid=id_producto)
 
@@ -1333,11 +1356,11 @@ def RecepcionPedido(request, id = None):
                     detalle.save()
 
                     producto_recepcionar, created = Producto.objects.get_or_create(productoid=id_producto)
-                    producto_recepcionar.stock = producto_recepcionar.stock+detalle.cantidad
+                    producto_recepcionar.stock = producto_recepcionar.stock + detalle.cantidad
                     producto_recepcionar.save()
+                    sweetify.success(request, "Productos recepcionados satisfactoriamente")
                 except Exception as error:
                     sweetify.warning(request, "No es posible Recepcionar el producto en este momento")
-                    print(f"key: {key}  value  {value}")
                     print(error)
 
         verificar_detalle_orden = Detalleorden.objects.filter(ordenid=id, estadoid=1)
@@ -1353,10 +1376,9 @@ def RecepcionPedido(request, id = None):
         return redirect('listar_pedidos')
 
     context = {
-        'ordenPedido':orden_pedido,
-        'productos':productos,
-        'detalleOrden':detalle_orden,
+        'ordenPedido': orden_pedido,
+        'productos': productos,
+        'detalleOrden': detalle_orden,
     }
 
-    return render(request, 'recepcion_pedido.html',context)
-
+    return render(request, 'recepcion_pedido.html', context)

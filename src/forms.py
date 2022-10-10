@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from .models import Producto, Persona, Direccion, Proveedor, Usuario, Cliente, Empleado, Productoproveedor
+from .models import Producto, Persona, Direccion, Proveedor, Usuario, Cliente, Empleado, Productoproveedor, Bodega
 
 
 class FormRegistroUsuario(UserCreationForm):
@@ -91,5 +91,12 @@ class FormProductoproveedor(forms.ModelForm):
     class Meta:
         model = Productoproveedor
         fields = '__all__'
+    
+
+class FormBodega(forms.ModelForm):
+    class Meta:
+        model = Bodega
+        fields = '__all__'
+
 
 

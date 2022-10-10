@@ -94,11 +94,13 @@ class AuthUserUserPermissions(models.Model):
 
 
 class Bodega(models.Model):
-    id = models.BigIntegerField(primary_key=True)
+    BodegaId = models.BigIntegerField(primary_key=True)
     pasillo = models.CharField(max_length=6)
     estante = models.CharField(max_length=6)
     casillero = models.CharField(max_length=6)
-    producto_productoid = models.ForeignKey('Producto', models.DO_NOTHING, db_column='producto_productoid')
+
+    def __str__(self):
+        return f"Pasillo:{self.pasillo} Estante:{self.estante} casillero:{self.casillero}"
 
     class Meta:
         managed = False
@@ -409,6 +411,10 @@ class Producto(models.Model):
     tipoproductoid = models.ForeignKey('Tipoproducto', models.DO_NOTHING, db_column='tipoproductoid')
     estadoid = models.ForeignKey(Estado, models.DO_NOTHING, db_column='estadoid')
     imagen = models.ImageField(blank=True, null=True, upload_to="productos")
+    BodegaId = models.ForeignKey(Bodega, models.DO_NOTHING, db_column='BodegaId')
+
+    
+
 
     def __str__(self):
         return self.nombre

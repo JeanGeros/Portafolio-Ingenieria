@@ -36,10 +36,10 @@
                                     
                                     {% if orden.estadoordenid.descripcion == 'Solicitado'  %}
                                         <button type="submit"  name="CambiarEstado" value="{{orden.ordenid}}" class="btn btn_aceptar border border-secondary" >Rechazar Pedido</button>
-                                    {% else %}
-                                        {% if orden.estadoordenid.descripcion == 'Productos Pendientes' or orden.estadoordenid.descripcion == 'Solicitado'  %}
                                         <a href="/recepcionar_pedido/{{orden.ordenid}}" style="text-decoration:none; align-items: center;" class="btn btn_aceptar border border-secondary">Recepcionar Pedido</a>
-                                        {% else %}
+                                    {% else %}
+                                        {% if orden.estadoordenid.descripcion == 'Productos Pendientes' %}
+                                        <a href="/recepcionar_pedido/{{orden.ordenid}}" style="text-decoration:none; align-items: center;" class="btn btn_aceptar border border-secondary">Recepcionar Pedido</a>
                                         {% endif %}
                                     {% endif %}
                                 </div>

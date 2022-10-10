@@ -43,7 +43,7 @@ INSTALLED_APPS = [
     'src',
     'widget_tweaks',
     'django.contrib.humanize',
-    'sweetify'
+    'sweetify',
 ]
 
 MIDDLEWARE = [
