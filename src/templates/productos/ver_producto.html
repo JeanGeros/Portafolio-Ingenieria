@@ -21,16 +21,16 @@
             </thead>
             <tbody style="text-align:center">
                 <tr>
-                    <td class="border border-secondary" >{{ producto.nombre}}</td>
-                    <td class="border border-secondary" >${{ producto.precio}}</td>
-                    <td class="border border-secondary" >{{ producto.stock }}</td>
-                    <td class="border border-secondary" >{{ producto.stockcritico }}</td>
-                    {% if producto.fechavencimiento != None %}
-                        <td class="border border-secondary" >{{ producto.fechavencimiento }}</td>
+                    <td class="border border-secondary" >{{ producto.productoid.nombre}}</td>
+                    <td class="border border-secondary" >${{ producto.productoid.precio}}</td>
+                    <td class="border border-secondary" >{{ producto.productoid.stock }}</td>
+                    <td class="border border-secondary" >{{ producto.productoid.stockcritico }}</td>
+                    {% if producto.productoid.fechavencimiento != None %}
+                        <td class="border border-secondary" >{{ producto.productoid.fechavencimiento }}</td>
                     {% else %}
                         <td class="border border-secondary" >--</td>
                     {% endif %}
-                    <td class="border border-secondary" > <img src="/static/images/{{producto.imagen}}" alt="imagen producto" style="width:100px;height:100px;"> </td>
+                    <td class="border border-secondary" > <img src="/static/images/{{producto.productoid.imagen}}" alt="imagen producto" style="width:100px;height:100px;"> </td>
                 </tr>
             </tbody>
         </table>
@@ -42,15 +42,17 @@
                 <th>Tipo de Producto</th>
                 <th>Familia del Producto</th>
                 <th>Estado</th>
+                <th>Lugar en Bodega</th>
             </tr>
             </thead>
             <tbody style="text-align:center">
             <tr>
-                <td class="border border-secondary" >{{ producto.codigo}}</td>
-                <td class="border border-secondary" >{{ producto.proveedorid}}</td>
-                <td class="border border-secondary" >{{ producto.tipoproductoid }}</td>
-                <td class="border border-secondary" >{{ producto.familiaproid }}</td>
-                <td class="border border-secondary" >{{ producto.estadoid }}</td>
+                <td class="border border-secondary" >{{ producto.productoid.codigo}}</td>
+                <td class="border border-secondary" >{{ prov_producto.proveedorid.razonsocial}}</td>
+                <td class="border border-secondary" >{{ producto.productoid.tipoproductoid }}</td>
+                <td class="border border-secondary" >{{ producto.productoid.familiaproid }}</td>
+                <td class="border border-secondary" >{{ producto.productoid.estadoid }}</td>
+                <td class="border border-secondary" >{{ producto.productoid.BodegaId }}</td>
             </tr>
             </tbody>
         </table>

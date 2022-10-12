@@ -14,7 +14,8 @@
 
         <form method="post" action="" enctype="multipart/form-data">
             {% csrf_token %}        
-                <div class="form-group row pb-3">
+                <div class="form-group row pb-4">
+
                     <div class="col-md-2 mt-1 textos p-0">
                         <label class="txt_negrita label">Nombre:</label><br>
                         <label class="txt_negrita label">Precio:</label><br>
@@ -22,7 +23,7 @@
                         <label class="txt_negrita label">Stock Critico:</label><br>
                         <label class="txt_negrita label">Fecha de Vencimiento:</label><br>
                     </div>
-                    <div class="col-md-2">
+                    <div class="col-md-2 input_box">
                         {% render_field form.nombre class="form-control input border border-secondary" minlenght="1" maxlength="50" onkeypress="return numerosCaracteres(event)" %}
                         {% render_field form.precio class="form-control input border border-secondary" type="text" minlenght="1" maxlength="7" onkeypress="return soloNumeros(event)" %}
                         {% render_field form.stock class="form-control input border border-secondary" type="text" minlenght="1" maxlength="7" onkeypress="return soloNumeros(event)" %} 
@@ -30,28 +31,32 @@
                         {% render_field form.fechavencimiento|attr:"readonly:True" class="form-control dateinput  border border-secondary"  name="fecha_vencimiento" %}
                     </div>
 
-                    <div class="col-md-2 mt-1 textos p-0">
+                    <div class="col-md-1 mt-1 textos p-0">
                         <label class="txt_negrita label">Imagen del Producto:</label><br>
                         <label class="txt_negrita label">Proveedor :</label><br>
                         <label class="txt_negrita label">Tipo de Producto :</label><br>
                         <label class="txt_negrita label">Familia del Producto:</label><br>
                         <label class="txt_negrita label">Estado Producto:</label><br>
                     </div>
-                        <div class="col-md-2" style="padding-top: 14px!important;">
-                            {% render_field form.imagen type="file" class="form-control border border-secondary" name="imagen" id="id_imagen"%}
-                            {% render_field form.proveedorid class="form-control input border border-secondary" name="proveedorid" %}
-                            {% render_field form.tipoproductoid class="form-control input border border-secondary" name="tipoproductoid" %}
-                            {% render_field form.familiaproid class="form-control input border border-secondary" name="familiaproid" %}
-                            {% render_field form.estadoid class="form-control input border border-secondary" name="estadoid" %}
-                        </div>
-                    
+                    <div class="col-md-2 input_box" style="padding-top: 14px!important;">
+                        {% render_field form.imagen type="file" class="form-control border border-secondary" name="imagen" id="id_imagen"%}
+                        {% render_field form2.proveedorid class="form-control input border border-secondary" name="proveedorid" %}
+                        {% render_field form.tipoproductoid class="form-control input border border-secondary" name="tipoproductoid" %}
+                        {% render_field form.familiaproid class="form-control input border border-secondary" name="familiaproid" %}
+                        {% render_field form.estadoid class="form-control input border border-secondary" name="estadoid" %}
+                    </div>
 
-                    <div class="row">
+                    <div class="col-md-1 mt-1 p-0" style="width: 12%;">
+                        <label class="txt_negrita label">Bodega:</label><br>
+                    </div>
+                    <div class="col-md-1 input_box">
+                        {% render_field form.BodegaId class="form-control input border border-secondary" name="BodegaId" %}
                         <div class="" style="display: flex; justify-content: center;">
                             <button type="submit" id="boton_aceptar" class="btn" style="margin-right: 30px;">Aceptar</button>
                             <a href="/productos" type="submit" class="btn">Cancelar</a> 
                         </div>
                     </div>
+
                 </div>
         </form>
     </div>
