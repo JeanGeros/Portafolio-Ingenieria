@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'django.contrib.humanize',
     'sweetify',
     'pwa'
+
 ]
 
 MIDDLEWARE = [

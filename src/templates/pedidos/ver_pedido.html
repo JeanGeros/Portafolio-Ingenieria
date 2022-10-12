@@ -5,19 +5,19 @@
 {% block content %}
     <link rel="stylesheet" href="{% static 'css/modulo_productos.css' %}">
     <div class="container text-end caja rounded mt-5">
-        <h1 class="text-center" >Detalles del Pedido</h1>
-
-        <table class="table table-striped table-hover" style="background-color: white; margin-bottom: 35px;">
-            <thead class="table-dark" style="text-align:center">
-                <tr>
-                    <th>Cantidad</th>
-                    <th>Producto</th>
-                    <th>Stock Actual</th>
-                    <th>Tipo de Producto</th>
-                    <th>Imagen</th>
-               
-                </tr>
-            </thead>
+    <h1 class="text-center" >Detalles del Pedido</h1>
+    <h3 class="text-center pt-1" >Productos Solicitados</h3>
+    <table class="table table-striped table-hover" style="background-color: white; margin-bottom: 35px;">
+        <thead class="table-dark" style="text-align:center">
+            <tr>
+                <th>Cantidad</th>
+                <th>Producto</th>
+                <th>Stock Actual</th>
+                <th>Tipo de Producto</th>
+                <th>Imagen</th>
+            
+            </tr>
+        </thead>
         <tbody style="text-align:center">
             {% for detalle in detalle_orden %}
                 <tr>
@@ -26,6 +26,31 @@
                     <td>{{ detalle.productoid.stock }}</td>
                     <td>{{ detalle.productoid.tipoproductoid }}</td>
                     <td> <img src="/static/images/{{detalle.productoid.imagen}}" alt="imagen producto" style="width:100px;height:100px;"> </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h3 class="text-center" >Productos Recepcionados</h3>
+    <table class="table table-striped table-hover" style="background-color: white; margin-bottom: 35px;">
+        <thead class="table-dark" style="text-align:center">
+            <tr>
+                <th>Cantidad</th>
+                <th>Producto</th>
+                <th>Stock Actual</th>
+                <th>Fecha de Recepcion</th>
+                <th>Imagen</th>
+            
+            </tr>
+        </thead>
+        <tbody style="text-align:center">
+            {% for recepcion in recepcion_orden %}
+                <tr>
+                    <td>{{ recepcion.cantidad }}</td>
+                    <td>{{ recepcion.productoid }}</td>
+                    <td>{{ recepcion.productoid.stock }}</td>
+                    <td>{{ recepcion.fecharecepcion }}</td>
+                    <td> <img src="/static/images/{{recepcion.productoid.imagen}}" alt="imagen producto" style="width:100px;height:100px;"> </td>
                 </tr>
             {% endfor %}
         </tbody>
