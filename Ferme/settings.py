@@ -157,3 +157,11 @@ PWA_APP_ICONS_APPLE = [
 ]
 
 PWA_SERVICE_WORKER_PATH = os.path.join(BASE_DIR, 'serviceworker.js')
+
+# Email
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIT_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'ferreteria.ferme.gen2022@gmail.com'
+EMAIL_HOST_PASSWORD = 'tijvgosrmracgnom'

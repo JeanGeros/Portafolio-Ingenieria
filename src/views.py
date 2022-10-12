@@ -1,16 +1,45 @@
 import email
 from multiprocessing.sharedctypes import Value
+from pprint import pprint
 from this import d
 from django.shortcuts import render, redirect
 from django.http import HttpResponseRedirect
 from django.contrib.auth import authenticate, login, logout
 from django.views.decorators.csrf import csrf_exempt
+from django.db import connection
+import cx_Oracle
 
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 import sweetify
 import datetime 
 from django.contrib.auth.decorators import login_required
+from django.db.models import Sum
+
+import openpyxl
+from tempfile import NamedTemporaryFile
+from datetime import datetime
+import numpy as np
+from django.http import HttpResponse
+from django.http import FileResponse
+import webbrowser
+import os
+from django.conf import settings
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import get_template
+from docx import Document
+from django.http import HttpResponse
+
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import A4, A2, A3
+from reportlab.lib.pagesizes import mm
+from reportlab.lib.pagesizes import letter
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.lib.enums import TA_JUSTIFY, TA_LEFT, TA_CENTER 
+from reportlab.lib import colors
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, NextPageTemplate
+from io import BytesIO
+import re
 
 from django.contrib import messages
 from src.forms import (
@@ -22,7 +51,7 @@ from src.forms import (
 from .models import (
     Detalleorden, Estadoorden, Ordencompra, Persona, Direccion, Usuario, Cliente, Estado, Comuna, Tipobarrio, Tipovivienda, Rolusuario,
     Proveedor, Tipoproducto, Producto, Familiaproducto, Empleado, Cargo, Tiporubro, Empresa,
-    Direccioncliente
+    Direccioncliente, Venta, Detalleventa
 )
 
 def Index(request):
@@ -261,19 +290,7 @@ def Editar_producto(request):
 
     return render(request, 'productos/editar_productos.html', context)
 
-##********************Clientes*******************************************************************
-
-def Seleccion_registro(request):
-
-    if request.POST.get('VerPerfil') is not None:
-        request.session['_ver_perfil'] = request.POST
-        return redirect('ver_perfil')
-    
-    context = {
-
-    }
-
-    return render(request, 'clientes/seleccion_registro.html', context)
+##********************Perfiles*******************************************************************
 
 @login_required(login_url="ingreso")
 def Ver_perfil(request):
@@ -298,15 +315,28 @@ def Ver_perfil(request):
     else:
         cliente = None
 
-    if Empleado.objects.filter(personaid=datos_usuario[0]['personaid']).exists():
-        empleado = Empleado.objects.get(personaid=datos_usuario[0]['personaid'])
-    else:
-        empleado = None
+    # if Empleado.objects.filter(personaid=datos_usuario[0]['personaid']).exists():
+    #     empleado = Empleado.objects.get(personaid=datos_usuario[0]['personaid'])
+    # else:
+    #     empleado = None
 
     if datos_usuario[0]['empresaid'] is not None:
         empresa = Empresa.objects.get(empresaid=datos_usuario[0]['empresaid'])
     else:
         empresa = None
+
+    if Direccioncliente.objects.filter(clienteid=cliente).exists():
+        # direccion = Direccioncliente.objects.filter(clienteid=cliente).values('direccionid')
+        # direccion = Direccion.objects.get(direccionid=direccion[0]['direccionid'])
+
+        cliente = Cliente.objects.get(personaid=datos_usuario[0]['personaid'])
+        direccion = Direccioncliente.objects.filter(clienteid=cliente).values('direccionid')
+        perfil_direccion = []
+        for x in direccion:
+            perfil_direccion.append(Direccion.objects.get(direccionid=x['direccionid']))
+        direccion = perfil_direccion
+    else:
+        direccion = None
 
     if request.method == 'POST':
 
@@ -328,10 +358,10 @@ def Ver_perfil(request):
         persona_in.estadoid = estadoid
         persona_in.save()
 
-        if Empleado.objects.filter(personaid=usuario_desactivar).exists():
-            empleado_in, created = Empleado.objects.get_or_create(personaid=usuario_desactivar)
-            empleado_in.estadoid = estadoid
-            empleado_in.save()
+        # if Empleado.objects.filter(personaid=usuario_desactivar).exists():
+        #     empleado_in, created = Empleado.objects.get_or_create(personaid=usuario_desactivar)
+        #     empleado_in.estadoid = estadoid
+        #     empleado_in.save()
         
         if Cliente.objects.filter(personaid=usuario_desactivar).exists():
             cliente_in, created = Cliente.objects.get_or_create(personaid=usuario_desactivar)
@@ -350,12 +380,13 @@ def Ver_perfil(request):
         'persona': persona,
         'empresa': empresa,
         'cliente': cliente,
-        'empleado':empleado,
+        'direccion': direccion,
         'tipo_usuario': tipo_usuario
     }
 
-    return render(request, 'clientes/ver_perfil.html', context)
+    return render(request, 'perfiles/ver_perfil.html', context)
 
+@login_required(login_url="ingreso")
 def Revisar_compras(request):
 
     if request.POST.get('VerPerfil') is not None:
@@ -368,11 +399,67 @@ def Revisar_compras(request):
     else: 
         tipo_usuario = None
 
+    cliente= request.session.get('_revisar_compras')
+    cliente = Persona.objects.filter(runcuerpo=cliente['run'], dv=cliente['dv']).values('personaid')
+    cliente = Cliente.objects.get(personaid=cliente[0]['personaid'])
+
+    lista = []
+    lista.append(["Nro Venta","Fecha","Cant. productos","Total","Documento"])    
+    val = Detalleventa.objects.filter(nroventa__clienteid=cliente).values('nroventa').annotate(suma=Sum('cantidad')).values_list('nroventa','nroventa__fechaventa','suma','nroventa__totalventa','nroventa__tipodocumentoid__descripcion')
+    correo =  Usuario.objects.filter(nombreusuario=request.user).values('email')
+
+    if request.method == 'POST':
+        EnviarCorreo = request.POST.get('EnviarCorreo')
+
+        if EnviarCorreo is not None:
+            template = get_template('compras.html')
+            content = template.render({'val':val})
+            email = EmailMultiAlternatives(
+                "asunto",
+                "cuerpo",
+                settings.EMAIL_HOST_USER,
+                [correo[0]['email']]
+            )
+
+            email.attach_alternative(content,'text/html')
+            email.send()
+        
+        tipoInforme = request.POST.get('informeCheck')
+        descargarInforme = request.POST.get('descargarInforme')
+        
+        if tipoInforme is not None and descargarInforme is not None:
+
+            for valores in val:
+
+                lista.append(list(valores))
+
+            if tipoInforme == "informeExcel":
+
+                nombre_archivo = "Compras"
+                tipo_doc = 'ms-excel'
+                extension = 'xlsx'
+                
+                return  creacion_excel(nombre_archivo, lista, tipo_doc, extension)
+
+            if tipoInforme == "informePdf":
+                
+                tipo_doc = 'pdf'
+                extension = 'pdf'
+                nombre = 'Compras'
+                
+                return creacion_pdf(lista,tipo_doc,A4,nombre,extension, valor=False)
+
+            if tipoInforme == "informeWord":
+
+                nombre_archivo = "Compras"
+                return  creacion_doc(lista, nombre_archivo)
+
     context = {
         'tipo_usuario': tipo_usuario,
+        'val': val
     }
 
-    return render(request, 'index.html', context)
+    return render(request, 'perfiles/revisar_compras.html', context)
 
 @login_required(login_url="ingreso")
 def Editar_perfil(request):
@@ -392,17 +479,17 @@ def Editar_perfil(request):
     persona = Persona.objects.filter(runcuerpo=editar_perfil['run'],dv=editar_perfil['dv']).values('personaid')
     usuario = Usuario.objects.filter(personaid=persona[0]['personaid']).values('empresaid','email')
     if Cliente.objects.filter(personaid=persona[0]['personaid']).exists():
-        cliente = Cliente.objects.filter(personaid=persona[0]['personaid']).values('direccionid')
+        cliente = Cliente.objects.get(personaid=persona[0]['personaid'])
+        direccion = Direccioncliente.objects.filter(clienteid=cliente).values('direccionid')
+        perfil_direccion = []
+        for x in direccion:
+            perfil_direccion.append(Direccion.objects.get(direccionid=x['direccionid']))
+        form2 = []
     else: 
-        cliente = None
+        perfil_direccion = None
 
     perfil_usuario = Usuario.objects.get(personaid=persona[0]['personaid'])
     perfil_persona = Persona.objects.get(personaid=persona[0]['personaid'])
-
-    if cliente is not None:
-        perfil_direccion = Direccion.objects.get(direccionid=cliente[0]['direccionid'])
-    else: 
-        perfil_direccion = None
 
     if Empresa.objects.filter(empresaid=usuario[0]['empresaid']).exists():
         perfil_empresa = Empresa.objects.get(empresaid=usuario[0]['empresaid'])
@@ -412,7 +499,8 @@ def Editar_perfil(request):
     form1 = FormClienteNormal1(request.POST or None, instance=perfil_persona)
 
     if perfil_direccion is not None:
-        form2 = FormClienteNormal2(request.POST or None, instance=perfil_direccion)
+        for x in perfil_direccion:
+            form2.append(FormClienteNormal2(request.POST or None, instance=x))
     else: 
         form2 = None
 
@@ -459,7 +547,7 @@ def Editar_perfil(request):
 
         if perfil_direccion is not None:
 
-            perfil_direccion, created = Direccion.objects.get_or_create(direccionid=cliente[0]['direccionid'])
+            perfil_direccion, created = Direccion.objects.get_or_create(direccionid=direccion[0]['direccionid'])
             perfil_direccion.calle = calle
             perfil_direccion.numero = numero
             perfil_direccion.comunaid = Comuna.objects.get(comunaid=comuna_id)
@@ -490,7 +578,7 @@ def Editar_perfil(request):
 
         sweetify.success(request,"Perfil actualizado correctamente")
         return redirect('ver_perfil')
-
+    
     context = {
         'form1': form1,
         'form2': form2,
@@ -499,7 +587,21 @@ def Editar_perfil(request):
         'tipo_usuario': tipo_usuario,
     }
 
-    return render(request, 'clientes/editar_perfil.html', context)
+    return render(request, 'perfiles/editar_perfil.html', context)
+
+##********************Clientes*******************************************************************
+
+def Seleccion_registro(request):
+
+    if request.POST.get('VerPerfil') is not None:
+        request.session['_ver_perfil'] = request.POST
+        return redirect('ver_perfil')
+    
+    context = {
+
+    }
+
+    return render(request, 'clientes/seleccion_registro.html', context)
 
 def Registro_clientes(request):
 
@@ -559,46 +661,65 @@ def Registro_clientes(request):
             
             # Estado activo = 1 e inactivo = 2 
             Persona.objects.create(
-                runcuerpo=run_cuerpo,
-                dv=dv,
-                apellidopaterno=apellido_paterno,
-                apellidomaterno=apellido_materno,
-                nombres=nombres,
-                telefono=telefono,
-                estadoid=Estado.objects.get(descripcion="Activo")
+                runcuerpo = run_cuerpo,
+                dv = dv,
+                apellidopaterno = apellido_paterno,
+                apellidomaterno = apellido_materno,
+                nombres = nombres,
+                telefono = telefono,
+                estadoid = Estado.objects.get(descripcion="Activo")
             )
-
-            ValidarDireccion = Direccion.objects.filter(calle=calle,
-                                                        numero=numero,
-                                                        tipoviviendaid=tipo_vivienda_id).exists()
+            
+            ValidarDireccion = Direccion.objects.filter(calle = calle, 
+                numero = numero, 
+                tipoviviendaid = tipo_vivienda_id).exists()
 
             if ValidarDireccion == False:
+
                 Direccion.objects.create(
-                    calle=calle,
-                    numero=numero,
-                    comunaid=Comuna.objects.get(comunaid=comuna_id),
-                    tipoviviendaid=Tipovivienda.objects.get(tipoviviendaid=tipo_vivienda_id),
-                    tipobarrioid=Tipobarrio.objects.get(tipobarrioid=tipo_barrio_id),
-                    nombresector=nombre_sector
+                    calle = calle,
+                    numero = numero,
+                    comunaid = Comuna.objects.get(comunaid=comuna_id),
+                    tipoviviendaid = Tipovivienda.objects.get(tipoviviendaid=tipo_vivienda_id),
+                    tipobarrioid = Tipobarrio.objects.get(tipobarrioid=tipo_barrio_id),
+                    nombresector = nombre_sector
+                )
+
+            direccion = Direccion.objects.get(
+                    calle = calle,
+                    numero = numero,
+                    comunaid = Comuna.objects.get(comunaid=comuna_id),
+                    tipoviviendaid = Tipovivienda.objects.get(tipoviviendaid=tipo_vivienda_id),
+                    tipobarrioid = Tipobarrio.objects.get(tipobarrioid=tipo_barrio_id),
+                    nombresector = nombre_sector
                 )
 
             Cliente.objects.create(
-                direccionid=Direccion.objects.get(calle=calle, numero=numero),
-                personaid=Persona.objects.get(runcuerpo=run_cuerpo, dv=dv),
-                estadoid=Estado.objects.get(descripcion="Activo")
+                personaid = Persona.objects.get(runcuerpo=run_cuerpo, dv=dv),
+                estadoid = Estado.objects.get(descripcion="Activo")
+            )
+
+            cliente = Cliente.objects.get(
+                personaid = Persona.objects.get(runcuerpo=run_cuerpo, dv=dv),
+                estadoid = Estado.objects.get(descripcion="Activo")
+            )
+
+            Direccioncliente.objects.create(
+                direccionid = direccion,
+                clienteid = cliente
             )
 
             Usuario.objects.create(
-                email=email,
-                password=contraseña,
-                personaid=Persona.objects.get(runcuerpo=run_cuerpo, dv=dv),
-                rolid=Rolusuario.objects.get(descripcion="Cliente"),
-                nombreusuario=nombre_usuario
+                email = email,
+                password = contraseña,
+                personaid = Persona.objects.get(runcuerpo=run_cuerpo, dv=dv),
+                rolid = Rolusuario.objects.get(descripcion="Cliente"),
+                nombreusuario = nombre_usuario
             )
 
             if (Persona is not None and 
-                    Direccion is not None and
-                    Usuario is not None and
+                Direccion is not None and
+                Usuario is not None and
                 Cliente is not None and 
                 user is not None):
                 
@@ -617,7 +738,6 @@ def Registro_clientes(request):
     }
 
     return render(request, 'clientes/registro_clientes.html', context)
-
 
 @login_required(login_url="ingreso")
 def Agregar_cliente(request):
@@ -666,6 +786,32 @@ def Agregar_cliente(request):
         elif usuarioRegistro3 == True:
             sweetify.warning(request, "El cliente ya cuenta con un usuario")
         else: 
+            rolusuario = Rolusuario.objects.filter(descripcion="Cliente").values('rolid')
+
+            django_cursor = connection.cursor()
+            cursor = django_cursor.connection.cursor()
+            procedimiento = cursor.callproc(
+                'SP_InsertClientePersona', 
+                [
+                    int(run_cuerpo), 
+                    dv, 
+                    apellido_paterno, 
+                    apellido_materno, 
+                    nombres, 
+                    int(telefono), 
+                    rolusuario[0]['rolid'], 
+                    calle,
+                    str(numero),
+                    nombre_sector,
+                    tipo_vivienda_id,
+                    tipo_barrio_id,
+                    comuna_id,
+                    email,
+                    nombre_usuario,
+                    contraseña
+                ]
+            )
+
             user = User.objects.create_user(
                 username=nombre_usuario,
                 first_name=nombres,
@@ -676,56 +822,14 @@ def Agregar_cliente(request):
             )
             user.set_password(contraseña)
             user.set_password(confirme_contraseña)
-            
-            # Estado activo = 1 e inactivo = 2 
-            Persona.objects.create(
-                runcuerpo=run_cuerpo,
-                dv=dv,
-                apellidopaterno=apellido_paterno,
-                apellidomaterno=apellido_materno,
-                nombres=nombres,
-                telefono=telefono,
-                estadoid=Estado.objects.get(descripcion="Activo")
-            )
 
-            ValidarDireccion = Direccion.objects.filter(calle=calle,
-                                                        numero=numero,
-                                                        tipoviviendaid=tipo_vivienda_id).exists()
-
-            if ValidarDireccion == False:
-                Direccion.objects.create(
-                    calle=calle,
-                    numero=numero,
-                    comunaid=Comuna.objects.get(comunaid=comuna_id),
-                    tipoviviendaid=Tipovivienda.objects.get(tipoviviendaid=tipo_vivienda_id),
-                    tipobarrioid=Tipobarrio.objects.get(tipobarrioid=tipo_barrio_id),
-                    nombresector=nombre_sector
-                )
-
-            Cliente.objects.create(
-                direccionid=Direccion.objects.get(calle=calle, numero=numero),
-                personaid=Persona.objects.get(runcuerpo=run_cuerpo, dv=dv),
-                estadoid=Estado.objects.get(descripcion="Activo")
-            )
-
-            Usuario.objects.create(
-                email=email,
-                password=contraseña,
-                personaid=Persona.objects.get(runcuerpo=run_cuerpo, dv=dv),
-                rolid=Rolusuario.objects.get(descripcion="Cliente"),
-                nombreusuario=nombre_usuario
-            )
-
-            if (Persona is not None and 
-                Direccion is not None and 
-                Usuario is not None and 
-                    Cliente is not None and
+            if (procedimiento is not None and 
                 user is not None):
                 
                 user.save()
                 
                 sweetify.success(request, "Cliente creado correctamente")
-                return redirect('registro_clientes')
+                return redirect('listar_clientes')
             else:
                 sweetify.error(request, "No es posible crear el cliente en este momento")
 
@@ -737,7 +841,6 @@ def Agregar_cliente(request):
     }
 
     return render(request, 'clientes/agregar_cliente.html', context)
-
 
 @login_required(login_url="ingreso")
 def Listar_clientes(request):
@@ -796,7 +899,6 @@ def Cambiar_estado_cliente(id_cliente):
         user.is_active = True
         user.save()
 
-
 @login_required(login_url="ingreso")
 def Ver_cliente(request):
 
@@ -811,11 +913,15 @@ def Ver_cliente(request):
         tipo_usuario = None
 
     old_post = request.session.get('_old_post')
+    ver_cliente_post = Cliente.objects.get(clienteid=old_post['VerCliente'])
+    direccion = Direccioncliente.objects.filter(clienteid=ver_cliente_post).values('direccionid')
+    direccion = Direccion.objects.get(direccionid=direccion[0]['direccionid'])
     cliente = Cliente.objects.get(clienteid=old_post['VerCliente'])
 
     context = {
         'tipo_usuario': tipo_usuario,
-        'cliente':cliente
+        'cliente': cliente,
+        'direccion': direccion
     }
 
     return render(request, 'clientes/ver_cliente.html', context)
@@ -835,16 +941,18 @@ def Editar_cliente(request):
 
     old_post = request.session.get('_old_post')
 
-    cliente = Cliente.objects.filter(clienteid=old_post['EditarCliente']).values('personaid', 'direccionid')
-    cliente_usuario = Usuario.objects.get(personaid=cliente[0]['personaid'])
+    cliente = Cliente.objects.filter(clienteid=old_post['EditarCliente']).values('personaid')
     cliente_persona = Persona.objects.get(personaid=cliente[0]['personaid'])
-    cliente_direccion = Direccion.objects.get(direccionid=cliente[0]['direccionid'])
+    cliente_usuario = Usuario.objects.get(personaid=cliente[0]['personaid'])
+    direccion1 = Direccioncliente.objects.filter(clienteid=old_post['EditarCliente']).values('direccionid')
+    direccion = Direccion.objects.get(direccionid=direccion1[0]['direccionid'])
 
     form1 = FormClienteNormal1(request.POST or None, instance=cliente_persona)
-    form2 = FormClienteNormal2(request.POST or None, instance=cliente_direccion)
+    form2 = FormClienteNormal2(request.POST or None, instance=direccion)
     form3 = FormClienteNormal3(request.POST or None, instance=cliente_usuario)
 
     if request.method == 'POST':
+
         run_cuerpo = request.POST.get('runcuerpo')
         dv = request.POST.get('dv')
         nombres = request.POST.get('nombres')
@@ -869,7 +977,7 @@ def Editar_cliente(request):
         cliente_persona.telefono = telefono
         cliente_persona.save()
 
-        cliente_direccion, created = Direccion.objects.get_or_create(direccionid=cliente[0]['direccionid'])
+        cliente_direccion, created = Direccion.objects.get_or_create(direccionid=direccion1[0]['direccionid'])
         cliente_direccion.calle = calle
         cliente_direccion.numero = numero
         cliente_direccion.comunaid = Comuna.objects.get(comunaid=comuna_id)
@@ -913,21 +1021,14 @@ def Registro_clientes_empresa(request):
     else: 
         tipo_usuario = None
     
-    form1 = FormClienteNormal1()
     form2 = FormClienteNormal2()
     form3 = FormClienteNormal3()
     form4 = FormClienteEmpresa()
 
     if request.method == 'POST':
         
-        run_cuerpo = request.POST.get('runcuerpo')
         dv = request.POST.get('dv')
         rut_cuerpo = request.POST.get('rutcuerpo')
-        dv_emp = request.POST.get('dv')
-        nombres = request.POST.get('nombres')
-        apellido_paterno = request.POST.get('apellidopaterno')
-        apellido_materno = request.POST.get('apellidomaterno')
-        telefono = request.POST.get('telefono')
         nombre_usuario = request.POST.get('nombreusuario')
         email = request.POST.get('email')
         calle = request.POST.get('calle')
@@ -941,24 +1042,43 @@ def Registro_clientes_empresa(request):
         razon_social = request.POST.get('razonsocial')
         fono = request.POST.get('fono')
 
-        personaRegistro = Persona.objects.filter(runcuerpo=run_cuerpo, dv=dv).exists()
         usuarioRegistro = Usuario.objects.filter(email = email).exists()
         usuarioRegistro3 = Usuario.objects.filter(nombreusuario = nombre_usuario).exists()
         usuarioRegistroEmp = Empresa.objects.filter(razonsocial = razon_social).exists()
 
-        if personaRegistro == True:
-            sweetify.warning(request,"El run ingresado ya existe")
-        elif usuarioRegistro == True:
+        if usuarioRegistro == True:
             sweetify.warning(request,"El correo ingresado ya existe")
         elif usuarioRegistro3 == True:
             sweetify.warning(request,"El usuario ingresado ya esta registrado")
         elif usuarioRegistroEmp == True:
             sweetify.warning(request,"La razón social ingresada ya existe")
         else: 
+            rolusuario = Rolusuario.objects.filter(descripcion="Cliente").values('rolid')
+
+            django_cursor = connection.cursor()
+            cursor = django_cursor.connection.cursor()
+            procedimiento = cursor.callproc(
+                'SP_InsertClienteEmpresa', 
+                [
+                    razon_social,
+                    int(rut_cuerpo), 
+                    dv, 
+                    fono,
+                    rolusuario[0]['rolid'], 
+                    calle,
+                    str(numero),
+                    nombre_sector,
+                    tipo_vivienda_id,
+                    tipo_barrio_id,
+                    comuna_id,
+                    email,
+                    nombre_usuario,
+                    contraseña
+                ]
+            )
+
             user = User.objects.create_user(
                 username = nombre_usuario,
-                first_name = nombres,
-                last_name = apellido_paterno,
                 email = email,
                 is_superuser = False,
                 is_active = True
@@ -966,59 +1086,7 @@ def Registro_clientes_empresa(request):
             user.set_password(contraseña)
             user.set_password(confirme_contraseña)
             
-            # Estado activo = 1 e inactivo = 2 
-            Persona.objects.create(
-                runcuerpo = run_cuerpo,
-                dv = dv,
-                apellidopaterno = apellido_paterno,
-                apellidomaterno = apellido_materno,
-                nombres = nombres,
-                telefono = telefono,
-                estadoid = Estado.objects.get(descripcion="Activo")
-            )
-            
-            ValidarDireccion = Direccion.objects.filter(calle = calle, 
-                numero = numero, 
-                tipoviviendaid = tipo_vivienda_id).exists()
-
-            if ValidarDireccion == False:
-
-                Direccion.objects.create(
-                    calle = calle,
-                    numero = numero,
-                    comunaid = Comuna.objects.get(comunaid=comuna_id),
-                    tipoviviendaid = Tipovivienda.objects.get(tipoviviendaid=tipo_vivienda_id),
-                    tipobarrioid = Tipobarrio.objects.get(tipobarrioid=tipo_barrio_id),
-                    nombresector = nombre_sector
-                )
-
-            Empresa.objects.create(
-                razonsocial = razon_social,
-                rutcuerpo = rut_cuerpo,
-                dv = dv_emp,
-                fono = fono,
-                estado = Estado.objects.get(descripcion="Activo")
-            )
-
-            Cliente.objects.create(
-                direccionid = Direccion.objects.get(calle=calle, numero=numero),
-                personaid = Persona.objects.get(runcuerpo=run_cuerpo, dv=dv),
-                empresaid = Empresa.objects.get(rutcuerpo=rut_cuerpo, dv=dv_emp),
-                estadoid = Estado.objects.get(descripcion="Activo")
-            )
-
-            Usuario.objects.create(
-                email = email,
-                password = contraseña,
-                personaid = Persona.objects.get(runcuerpo=run_cuerpo, dv=dv),
-                rolid = Rolusuario.objects.get(descripcion="Cliente"),
-                nombreusuario = nombre_usuario
-            )
-
-            if (Persona is not None and 
-                Direccion is not None and 
-                Usuario is not None and 
-                Cliente is not None and 
+            if (procedimiento is not None and 
                 user is not None):
                 
                 user.save()
@@ -1029,7 +1097,6 @@ def Registro_clientes_empresa(request):
                 sweetify.error(request,"No es posible registrarse en este momento")
 
     context = {
-        'form1': form1,
         'form2': form2,
         'form3': form3,
         'form4': form4,
@@ -1291,7 +1358,6 @@ def Editar_vendedor(request):
 
     return render(request, 'vendedores/editar_vendedor.html', context)
 
-
 def Cambiar_estado_vendedor(id_vendedor):
     vendedor = Empleado.objects.get(empleadoid=id_vendedor)
     persona_id = Empleado.objects.filter(empleadoid=id_vendedor).values('personaid')
@@ -1352,8 +1418,8 @@ def Ver_cliente_vendedor(request):
 
     ver_cliente = Persona.objects.filter(runcuerpo=ver_cliente_post['run'], dv=ver_cliente_post['dv']).values('personaid')
     cliente_id = Cliente.objects.filter(personaid=ver_cliente[0]['personaid']).values('clienteid')
-    direccion = Direccioncliente.objects.filter(cliente_clienteid=cliente_id[0]['clienteid']).values('direccion_direccionid')
-    direccion = Direccion.objects.get(direccionid=direccion[0]['direccion_direccionid'])
+    direccion = Direccioncliente.objects.filter(clienteid=cliente_id[0]['clienteid']).values('direccionid')
+    direccion = Direccion.objects.get(direccionid=direccion[0]['direccionid'])
     cliente = Cliente.objects.get(personaid=ver_cliente[0]['personaid'])
 
     if request.method == 'POST':
@@ -1474,9 +1540,8 @@ def Agregar_cliente_vendedor(request):
             )
 
             Direccioncliente.objects.create(
-                iddircliente = 2,
-                direccion_direccionid = direccion,
-                cliente_clienteid = cliente
+                direccionid = direccion,
+                clienteid = cliente
             )
 
             Usuario.objects.create(
@@ -1526,8 +1591,8 @@ def Editar_cliente_vendedor(request):
     cliente = Cliente.objects.filter(clienteid=editar_cliente['EditarCliente']).values('personaid')
     cliente_persona = Persona.objects.get(personaid=cliente[0]['personaid'])
     cliente_usuario = Usuario.objects.get(personaid=cliente[0]['personaid'])
-    direccion1 = Direccioncliente.objects.filter(cliente_clienteid=editar_cliente['EditarCliente']).values('direccion_direccionid')
-    direccion = Direccion.objects.get(direccionid=direccion1[0]['direccion_direccionid'])
+    direccion1 = Direccioncliente.objects.filter(clienteid=editar_cliente['EditarCliente']).values('direccionid')
+    direccion = Direccion.objects.get(direccionid=direccion1[0]['direccionid'])
 
     form1 = FormClienteNormal1(request.POST or None, instance=cliente_persona)
     form2 = FormClienteNormal2(request.POST or None, instance=direccion)
@@ -1559,7 +1624,7 @@ def Editar_cliente_vendedor(request):
         cliente_persona.telefono = telefono
         cliente_persona.save()
 
-        cliente_direccion, created = Direccion.objects.get_or_create(direccionid=direccion1[0]['direccion_direccionid'])
+        cliente_direccion, created = Direccion.objects.get_or_create(direccionid=direccion1[0]['direccionid'])
         cliente_direccion.calle = calle
         cliente_direccion.numero = numero
         cliente_direccion.comunaid = Comuna.objects.get(comunaid=comuna_id)
@@ -1590,6 +1655,7 @@ def Editar_cliente_vendedor(request):
     }
 
     return render(request, 'vendedores/editar_cliente_vendedor.html', context)
+
 ##********************Proveedores*******************************************************************
 
 @login_required(login_url="ingreso")
@@ -1861,6 +1927,29 @@ def Agregar_empleado(request):
             sweetify.error(request, "El empleado ya cuenta con un usuario")
 
         else:
+            cargo = Cargo.objects.filter(descripcion="Empleado").values('cargoid')
+            rolusuario = Rolusuario.objects.filter(descripcion="Empleado").values('rolid')
+
+            django_cursor = connection.cursor()
+            cursor = django_cursor.connection.cursor()
+            procedimiento = cursor.callproc(
+                'SP_Insertempleado', 
+                [
+                    int(run_cuerpo), 
+                    dv, 
+                    apellido_paterno, 
+                    apellido_materno, 
+                    nombres, 
+                    int(telefono), 
+                    fecha_ingreso, 
+                    int(cargo[0]['cargoid']), 
+                    email, 
+                    nombre_usuario, 
+                    contraseña, 
+                    rolusuario[0]['rolid']
+                ]
+            )
+
             user = User.objects.create_user(
                 username=nombre_usuario,
                 first_name=nombres,
@@ -1871,41 +1960,12 @@ def Agregar_empleado(request):
             )
             user.set_password(contraseña)
             user.set_password(confirme_contraseña)
-            
-            # Estado activo = 1 e inactivo = 2 
-            Persona.objects.create(
-                runcuerpo=run_cuerpo,
-                dv=dv,
-                apellidopaterno=apellido_paterno,
-                apellidomaterno=apellido_materno,
-                nombres=nombres,
-                telefono=telefono,
-                estadoid=Estado.objects.get(descripcion="Activo")
-            )
 
-            Usuario.objects.create(
-                email=email,
-                password=contraseña,
-                personaid=Persona.objects.get(runcuerpo=run_cuerpo, dv=dv),
-                rolid=Rolusuario.objects.get(descripcion="Empleado"),
-                nombreusuario=nombre_usuario
-            )
-
-            Empleado.objects.create(
-                fechaingreso=fecha_ingreso,
-                personaid=Persona.objects.get(runcuerpo=run_cuerpo, dv=dv),
-                cargoid=Cargo.objects.get(descripcion="Empleado"),
-                estadoid=Estado.objects.get(descripcion="Activo")
-            )
-
-            if (Persona is not None and 
-                Usuario is not None and 
-                Empleado is not None and 
+            if (procedimiento is not None and 
                 user is not None):
 
                 user.save()
                 sweetify.success(request, "Empleado creado correctamente")
-
                 return redirect('listar_empleados')
             else:
                 sweetify.warning(request, "No es posible crear el empleado en este momento")
@@ -2265,3 +2325,112 @@ def RecepcionPedido(request, id = None):
 
     # return render(request, 'recepcion_pedido.html',context)
 
+
+def creacion_excel(nombre_archivo, lista, tipo_doc, extension):
+    book = openpyxl.Workbook()  # Se crea un libro
+    sheet = book.active  # Se activa la primera hojar
+    sheet.title = f"{nombre_archivo}"
+    cont = 0
+    cont2 = 0
+
+    for i in lista:
+        cont += 1
+        for j in i:
+            
+            cont2 += 1
+            val = sheet.cell(row=cont, column=cont2)
+            val.value = j
+        cont2 = 0    
+
+    cont = 0
+    cont2 = 0
+    
+    response = HttpResponse(content_type=f"application/{tipo_doc}")
+    contenido = "attachment; filename = {0}.{1}".format(nombre_archivo, extension)
+    response["Content-Disposition"] = contenido
+    book.save(response)
+
+    return response
+
+def creacion_pdf(lista,tipo_doc,tamaño_pagina, nombre, extension, valor = None):
+    response = HttpResponse(content_type=f'application/{tipo_doc}')  
+
+    buff = BytesIO()  
+
+    doc = SimpleDocTemplate(buff,  
+        pagesize=tamaño_pagina,  
+        rightMargin=40,  
+        leftMargin=40,  
+        topMargin=60,  
+        bottomMargin=18,  
+    ) 
+    
+    data = []  
+    styles = getSampleStyleSheet()  
+    styles = styles['Heading1']
+    styles.alignment = TA_CENTER 
+
+    header = Paragraph(f"{nombre}", styles)  
+    
+    data.append(header)  
+
+    t = Table(lista)  
+
+    t.setStyle(TableStyle(  
+        [  
+        ('GRID', (0, 0), (12, -1), 1, colors.dodgerblue),  
+        ('LINEBELOW', (0, 0), (-1, 0), 3, colors.darkblue),  
+        ('BACKGROUND', (0, 0), (-1, 0), colors.dodgerblue)  
+        ]  
+    ))  
+    
+    data.append(t)
+
+    doc.build(data)  
+    response.write(buff.getvalue())   
+
+    buff.seek(0)
+
+    respuesta = FileResponse(buff, as_attachment=valor, filename=f'{nombre}.{extension}')
+
+    return respuesta
+
+def creacion_doc(lista, nombre_archivo):
+    document = Document()
+    document.add_heading('Document Title', 0)
+
+    filas = 0
+    for x in lista:
+        columnas = len(x)
+        filas += 1
+
+    # add grid table
+    table = document.add_table(rows=filas, cols=columnas, style="Table Grid")
+
+    # access first row's cells
+    heading_row = table.rows[0].cells
+
+    # add headings
+    cont = 0
+    for value in lista[0]:
+        heading_row[cont].text = value
+        cont += 1
+
+    lista.pop(0)
+    cont = 0
+    cont2 = 0
+
+    for value in lista:
+        cont += 1
+        data_row = table.rows[cont].cells
+
+        for x in value:
+            data_row[cont2].text = f'{x}'
+            cont2 += 1
+        cont2 = 0     
+
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document')
+    response['Content-Disposition'] = f'attachment; filename={nombre_archivo}.docx'
+    document.save(response)
+
+    return response
