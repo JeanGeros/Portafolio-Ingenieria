@@ -44,6 +44,8 @@ INSTALLED_APPS = [
     'widget_tweaks',
     'django.contrib.humanize',
     'sweetify',
+    'pwa'
+
 ]
 
 MIDDLEWARE = [
@@ -135,3 +137,24 @@ STATIC_ROOT = os.path.join(BASE_DIR, "static")
 # configuracion de sweetalert
 SWEETIFY_SWEETALERT_LIBRARY = 'sweetalert2'
 sweetify.DEFAULT_OPTS = { "timer": 3000}
+
+PWA_APP_NAME = "Ferme"
+PWA_APP_DESCRIPTION = "La Ferreteria familiar"
+PWA_APP_THEME_COLOR = "#909090"
+PWA_APP_BACKGROUND_COLOR = "#FF9550"
+
+PWA_APP_ICONS = [
+    {
+        "src": "/static/images/Ferme-logo.png",
+        "sizes": "160x160"
+    }
+]
+
+PWA_APP_ICONS_APPLE = [
+    {
+        "src": "/static/images/Ferme-logo.png",
+        "sizes": "160x160"
+    }
+]
+
+PWA_SERVICE_WORKER_PATH = os.path.join(BASE_DIR, 'serviceworker.js')

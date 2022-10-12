@@ -39,7 +39,3 @@ admin.site.register(Tipovivienda)
 admin.site.register(Usuario)
 admin.site.register(Venta)
 
-
-
-
-
