@@ -1,0 +1,95 @@
+{% extends 'layout.html' %}
+{% load widget_tweaks %}
+{% load static %}
+
+{% block content %}
+    <link rel="stylesheet" href="{% static 'css/editar_perfil.css' %}">
+
+    <div class="container text-end caja rounded">
+        
+        <h1 class="text-center pb-2">Editar perfil</h1>
+        
+        <form method="post" action="" class="">
+            {% csrf_token %}        
+
+            <div class="row pb-3">
+                <div class="col-md-3 mt-1 textos p-0">
+                    <label for="run" class="txt_negrita label">Run:</label><br>
+                    <label for="run" class="txt_negrita label">Nombres:</label><br>
+                    <label for="run" class="txt_negrita label">Apellido paterno:</label><br>
+                    <label for="run" class="txt_negrita label">Apellido materno:</label><br>
+                    <label for="run" class="txt_negrita label">Telefono:</label><br>
+                    <label for="comuna" class="txt_negrita label">Correo:</label><br>
+                </div>
+                <div class="col-md-6">
+                    <div class="run">
+                        {% render_field form1.runcuerpo|append_attr:"readonly:readonly" class="form-control border border-secondary input-run" type="text" placeholder="12345678" minlength="7" maxlength="8" onkeypress="return SoloNumeros(event)" %}
+                        <label for="run" class="txt_negrita guion">-</label>
+                        {% render_field form1.dv|attr:"readonly:True" class="form-control input-dv border border-secondary" onkeypress="return ValidacionDv(event)" %}
+                    </div>
+                    
+                    {% render_field form1.nombres|attr:"readonly:True" class="form-control input border border-secondary" onkeypress="return SoloLetras(event)" %}
+                    {% render_field form1.apellidopaterno|attr:"readonly:True" class="form-control input border border-secondary" onkeypress="return SoloLetras(event)" %}
+                    {% render_field form1.apellidomaterno|attr:"readonly:True" class="form-control input border border-secondary" onkeypress="return SoloLetras(event)" %}
+                    {% render_field form1.telefono class="form-control input border border-secondary" type="text" placeholder="+56999999999 223456789" onkeypress="return ValidacionTelefono(event)" %}
+                    {% render_field form3.email type="email" class="form-control input border border-secondary" placeholder="nombre@ejemplo.com" %}
+                </div>
+            </div>
+            
+            <hr class="fw-bolder text-black">
+            <h2 class="text-center">Direcciones</h2>
+            {% if form2 is not None %}
+
+                {% for f in form2 %}
+                    <div class="row pb-3">
+                        <div class="col-md-3 mt-2 p-0">
+                            <label for="comuna" class="txt_negrita label">Calle:</label><br>
+                            <label for="comuna" class="txt_negrita label">Numero:</label><br>
+                            <label for="comuna" class="txt_negrita label">Comuna:</label><br>
+                            <label for="comuna" class="txt_negrita label">Tipo de vivienda:</label><br>
+                            <label for="comuna" class="txt_negrita label">Tipo de barrio:</label><br>
+                            <label for="comuna" class="txt_negrita label">Nombre de sector:</label><br>
+                        </div>
+                        <div class="col-md-6" name="calle+1">
+                            {% render_field f.calle class="form-control input2 border border-secondary"%}
+                            {% render_field f.numero class="form-control input2 border border-secondary" minlength="1" onkeypress="return SoloNumeros(event)" %}
+                            {% render_field f.comunaid class="form-control input2 border border-secondary" %}
+                            {% render_field f.tipoviviendaid|attr:"readonly:True" class="form-control input border border-secondary" %}
+                            {% render_field f.tipobarrioid|attr:"readonly:True" class="form-control input border border-secondary" %}
+                            {% render_field f.nombresector|attr:"readonly:True" class="form-control input border border-secondary" %}
+                        </div>
+                    </div>
+                {% endfor %}
+                
+            {% endif %}
+            
+            
+            {% if form4 is not None %}
+                <div class="row pb-3">
+                    <div class="col-md-6 mt-1 p-0">
+                        <label for="comuna" class="txt_negrita label">Razon social:</label><br>
+                        <label for="comuna" class="txt_negrita label">Rut:</label><br>
+                        <label for="comuna" class="txt_negrita label">Telefono:</label><br>
+                    </div>
+                    <div class="col-md-6">
+                        {% render_field form4.razonsocial class="form-control input border border-secondary" onkeypress="return SoloLetras(event)" %}
+                        <div class="run">
+                            {% render_field form4.rutcuerpo class="form-control border border-secondary input-run" type="text" placeholder="12345678" minlength="7" maxlength="8" onkeypress="return SoloNumeros(event)" %}
+                            <label for="run" class="txt_negrita guion">-</label>
+                            {% render_field form4.dv class="form-control input-dv border border-secondary" onkeypress="return ValidacionDv(event)" %}
+                        </div>
+                        {% render_field form4.fono class="form-control input border border-secondary" type="text" placeholder="+56999999999 223456789" onkeypress="return ValidacionTelefono(event)" %}
+                        
+                    </div>
+                </div>
+            {% endif %}
+                
+            
+
+            <button type="submit" id="boton_aceptar" class="btn btn_aceptar border border-secondary text-black">Aceptar</button>
+            <a href="{% url 'ver_perfil' %}" type="submit" class="btn">Cancelar</a>
+        </form>
+    </div>
+
+    <script src="{% static 'js/editar_cliente.js' %}"></script>
+{% endblock %}
