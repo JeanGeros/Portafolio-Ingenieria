@@ -2,7 +2,8 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from .models import Producto, Persona, Direccion, Proveedor, Usuario, Cliente, Empleado, Empresa
+
+from .models import Producto, Persona, Direccion, Proveedor, Usuario, Cliente, Empleado, Productoproveedor, Bodega, Empresa
 
 class FormRegistroUsuario(UserCreationForm):
 
@@ -11,19 +12,19 @@ class FormRegistroUsuario(UserCreationForm):
         fields = ("email", "username","password1","password2")
 
 class FormClienteNormal1(forms.ModelForm):
-    
+
     class Meta:
         model = Persona
         fields = ("runcuerpo", "dv", "apellidopaterno", "apellidomaterno", "nombres", "telefono")
 
 class FormClienteNormal2(forms.ModelForm):
-    
+
     class Meta:
         model = Direccion
         fields = ("calle", "numero", "comunaid", "tipoviviendaid", "tipobarrioid","nombresector")
 
 class FormClienteNormal3(forms.ModelForm):
-    
+
     class Meta:
         model = Usuario
         fields = ("email","password", "nombreusuario")
@@ -36,11 +37,11 @@ class FormClienteEmpresa(forms.ModelForm):
 
 class FormEditarCliente(forms.ModelForm):
     # def __init__(self, *args, **kwargs):
-    #     super().__init__(*args, **kwargs) 
-    #     for field in iter(self.fields):  
-    #         self.fields[field].widget.attrs.update({  
-    #             'class': 'confirmar_contraseña'  
-    #         })  
+    #     super().__init__(*args, **kwargs)
+    #     for field in iter(self.fields):
+    #         self.fields[field].widget.attrs.update({
+    #             'class': 'confirmar_contraseña'
+    #         })
 
     class Meta:
         model = Cliente
@@ -56,38 +57,53 @@ class FormProveedor(forms.ModelForm):
         model = Proveedor
         fields = '__all__'
 class FormVendedorPersona(forms.ModelForm):
-    
+
     class Meta:
         model = Persona
         fields = ("runcuerpo", "dv", "apellidopaterno", "apellidomaterno", "nombres", "telefono")
 
 class FormVendedorUsuario(forms.ModelForm):
-    
+
     class Meta:
         model = Usuario
         fields = ("email", "nombreusuario","password")
 
 class FormVendedorEmpleado(forms.ModelForm):
-    
+
     class Meta:
         model = Empleado
         fields = ("fechaingreso",)
 
 class FormEmpleadoPersona(forms.ModelForm):
-    
+
     class Meta:
         model = Persona
         fields = ("runcuerpo", "dv", "apellidopaterno", "apellidomaterno", "nombres", "telefono")
 
 class FormEmpleadoUsuario(forms.ModelForm):
-    
+
     class Meta:
         model = Usuario
         fields = ("email", "nombreusuario","password")
 
 class FormEmpleadoEmpleado(forms.ModelForm):
-    
+
     class Meta:
         model = Empleado
         fields = ("fechaingreso",)
+
+
+class FormProductoproveedor(forms.ModelForm):
+
+    class Meta:
+        model = Productoproveedor
+        fields = '__all__'
+    
+
+class FormBodega(forms.ModelForm):
+    class Meta:
+        model = Bodega
+        fields = '__all__'
+
+
 
