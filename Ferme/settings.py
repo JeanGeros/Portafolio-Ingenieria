@@ -28,7 +28,11 @@ SECRET_KEY = 'r^ebil-*r=hc&n7@q&q7=nw^6cd@z7&&&n2-(c$+jyd8ai^b!i'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+<<<<<<< HEAD
 ALLOWED_HOSTS = ['54.144.234.66','www.ferme.cl']
+=======
+ALLOWED_HOSTS = ['34.232.138.67', 'www.ferme.cl']
+>>>>>>> eec4f47b67546a42763ab2d8ff6137398eb15b1d
 
 
 # Application definition
@@ -45,6 +49,7 @@ INSTALLED_APPS = [
     'django.contrib.humanize',
     'sweetify',
     'pwa'
+
 ]
 
 MIDDLEWARE = [
@@ -157,3 +162,11 @@ PWA_APP_ICONS_APPLE = [
 ]
 
 PWA_SERVICE_WORKER_PATH = os.path.join(BASE_DIR, 'serviceworker.js')
+
+# Email
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIT_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'ferreteria.ferme.gen2022@gmail.com'
+EMAIL_HOST_PASSWORD = 'tijvgosrmracgnom'
