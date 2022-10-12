@@ -30,7 +30,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['34.232.138.67', 'www.ferme.cl']
 
-
 # Application definition
 
 INSTALLED_APPS = [
