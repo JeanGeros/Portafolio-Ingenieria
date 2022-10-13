@@ -25,15 +25,6 @@ class Auditoria(models.Model):
         managed = False
         db_table = 'auditoria'
 
-class Auditoria(models.Model):
-    id = models.BigIntegerField(primary_key=True)
-    menu = models.CharField(max_length=200)
-    accion = models.CharField(max_length=250)
-    usuario = models.BigIntegerField()
-
-    class Meta:
-        managed = False
-        db_table = 'auditoria'
 
 class AuthGroup(models.Model):
     name = models.CharField(unique=True, max_length=150, blank=True, null=True)
@@ -98,19 +89,6 @@ class AuthUserUserPermissions(models.Model):
         managed = False
         db_table = 'auth_user_user_permissions'
         unique_together = (('user', 'permission'),)
-
-
-class Bodega(models.Model):
-    bodegaid = models.BigIntegerField(primary_key=True)
-    pasillo = models.CharField(max_length=6)
-    estante = models.CharField(max_length=6)
-    casillero = models.CharField(max_length=6)
-    producto_productoid = models.ForeignKey('Producto', models.DO_NOTHING, db_column='producto_productoid')
-
-    class Meta:
-        managed = False
-        db_table = 'bodega'
-
 
 class Bodega(models.Model):
     BodegaId = models.BigIntegerField(primary_key=True)
@@ -237,17 +215,6 @@ class Direccioncliente(models.Model):
         managed = False
         db_table = 'direccioncliente'
 
-
-class Direccioncliente(models.Model):
-    id = models.BigIntegerField(primary_key=True)
-    direccion_direccionid = models.ForeignKey(Direccion, models.DO_NOTHING, db_column='direccion_direccionid')
-    cliente_clienteid = models.ForeignKey(Cliente, models.DO_NOTHING, db_column='cliente_clienteid')
-
-    class Meta:
-        managed = False
-        db_table = 'direccioncliente'
-
-
 class DjangoAdminLog(models.Model):
     action_time = models.DateTimeField()
     object_id = models.TextField(blank=True, null=True)
@@ -319,16 +286,6 @@ class Empresa(models.Model):
     class Meta:
         managed = False
         db_table = 'empresa'
-
-
-class Error(models.Model):
-    id = models.BigIntegerField(primary_key=True)
-    rutina = models.CharField(max_length=150)
-    mensaje = models.CharField(max_length=250)
-
-    class Meta:
-        managed = False
-        db_table = 'error'
 
 
 class Error(models.Model):
@@ -473,15 +430,6 @@ class Producto(models.Model):
 
 class Productoproveedor(models.Model):
     proid = models.BigIntegerField(primary_key=True)
-    productoid = models.ForeignKey(Producto, models.DO_NOTHING, db_column='productoid')
-    proveedorid = models.ForeignKey('Proveedor', models.DO_NOTHING, db_column='proveedorid')
-
-    class Meta:
-        managed = False
-        db_table = 'productoproveedor'
-
-class Productoproveedor(models.Model):
-    ProId = models.BigIntegerField(primary_key=True)
     productoid = models.ForeignKey(Producto, models.DO_NOTHING, db_column='productoid')
     proveedorid = models.ForeignKey('Proveedor', models.DO_NOTHING, db_column='proveedorid')
 
