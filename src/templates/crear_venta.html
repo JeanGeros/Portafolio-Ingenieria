@@ -1,0 +1,416 @@
+{% extends 'layout.html' %}
+{% load static %}
+{% load widget_tweaks %}
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/crear_venta.css' %}">
+<div class="container caja rounded mt-5 p-0">
+    <h1 class="text-center pt-5 ">Crear Venta</h1>
+    <div class="row p-4 ">
+        <div class="container">
+            {% if messages %}
+                <ul class="messages list-group mb-3">
+                {% for message in messages %}
+                    <li{% if message.tags %} class="{{ message.tags }} list-group-item list-group-item-primary"{% endif %}>{{ message }}</li>
+                {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+        
+        <div class="border border-secondary rounded p-2 divVenta">
+            <div class="container contenedorCrearUsuario"> 
+                <!-- Contenedor -->
+                <form method="post" action="" name="formulario" id="formulario">
+                    {% csrf_token %}
+                    <!-- Productos -->
+                    <div class="form-group border rounded p-2"> 
+                        <label for="state_id" class="control-label">Carrito</label>
+                        
+                        <!-- Div donde se añadiran los Selects -->
+                        <div id="plazos" class="row" style="padding-left: 30px;">
+                        </div>
+
+                        <br>  
+                        <label for="state_id" class="control-label">Total:$</label>
+                        <label for="state_id" name="total_precios" class="control-label" id="total_precios"></label>
+                        
+                    </div>
+                </form>
+
+                <div class="text-center pt-3">
+                    <button id="boton_aceptar" class="btn btn-primary" onclick="CrearVenta()">Crear Venta</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="border border-secondary rounded divProducto">
+            <div>
+                <h1 class="text-center p-0 ">Lista de Productos</h1>
+                <form style="justify-content: center;display: flex; padding: 10px; "> 
+                    <input style="width: 80%; text-align: center;" id="searchTerm"  placeholder="Buscar Producto" type="text" onkeyup="doSearch()" />
+                </form>
+            </div>
+
+            <table id="datos" class="table table-striped table-hover" style="padding-top: 10px; padding: 0px !important;">
+                <thead  class="table-dark" style="text-align:center">
+                    <tr>
+                        <th>Nombre del Producto </th>
+                        <th>Proveedor </th>
+                        <th>Precio</th>
+                        <th>Cantidad</th>
+                        <th> Accion</th>
+                    </tr>
+                </thead>
+                <tbody style="text-align:center">
+                    {% for prod in productos %} 
+                    <tr>
+                        <td id="{{prod.productoid.productoid}}">{{prod.productoid.nombre}}</td>
+                        <td id="{{prod.productoid.productoid}}">{{prod.proveedorid.razonsocial}}</td>
+                        <td id="{{prod.productoid.productoid}}.{{prod.productoid.precio}}">${{prod.productoid.precio}}</td>
+                        <td><input id="{{prod.productoid.productoid}}.cantidad" type="number" name="numero" value="1" min="1" max="50" step="1" /></td>
+                        <td><input class="btn btn-secondary btn-sm agregar" type="button" title="Agregar Producto" id="agregar{{prod.productoid.productoid}}" Value="Agregar" onclick="agregar2('{{prod.productoid.productoid}}','{{prod.productoid.productoid}}.{{prod.productoid.precio}}', '{{prod.productoid.productoid}}.cantidad', this)"></td>
+                    </tr>
+                    {% endfor %}
+                    <tr class='noSearch hide'>
+                        <td colspan="5"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Autorizacion de administrador</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Para crear venta con cliente seleccionado, lo debe autorizar la Señora Juanita</p>
+                <label for="state_id" class="control-label">Usuario:</label>
+                <input type="text" class="form-control" id="usuario">
+                <label for="state_id" class="control-label">Constraseña:</label>
+                <input type="password" class="form-control" id="contrasena">
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary close" data-bs-dismiss="modal" onclick="Habilitar()">Cancelar</button>
+                <button type="button" class="btn btn-primary" onclick="CrearVenta()">Aceptar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function Habilitar(){
+        location.reload();
+    }
+
+    // function ValidarFiado(){
+    //     bloque = document.getElementById('plazos').innerHTML;
+    //     localStorage.setItem("producto", JSON.stringify(bloque));
+    //     local = localStorage.getItem("producto");
+    //     local = local.length;
+    //     if (local <= 36){
+    //         Swal.fire({
+    //             icon: 'error',
+    //             title: 'No hay productos seleccionados',
+    //             showConfirmButton: true,
+    //         })
+    //     }else{
+    //         productos = document.querySelectorAll('.detallePedidoP');
+    //         productosSeleccionados = document.querySelectorAll('.productoSeleccionado');
+    //         console.log(productosSeleccionados)
+    //         contador = 0
+    //         contador2 = 0
+    //         productos.forEach( function(valor) {
+    //             valor1 = valor.innerHTML;
+    //             contador2 = contador2 + 1
+    //             productosSeleccionados.forEach( function(valor) {
+    //                 valor2 = valor.value;
+    //                 if(valor1 == valor2){
+    //                     contador = contador + 1
+    //                 }
+    //             });
+                
+    //         });
+    //         if(contador == contador2 ){
+                
+    //             let combo = document.getElementById("id_cliente");
+    //             let selected = combo.options[combo.selectedIndex].text;
+
+    //             if (selected == '---------'){
+
+    //                 let total = document.getElementById('total_precios').innerText;
+        
+    //                 bloque = document.getElementById('formulario');
+    //                 elemento2 = document.createElement('input');
+    //                 elemento2.setAttribute("class", "form-control col-sm-3 mb-2 bg-dark" );
+    //                 elemento2.setAttribute("style", "width:200px" );
+    //                 elemento2.setAttribute("name", `total` );
+    //                 elemento2.id = 'total';
+    //                 elemento2.setAttribute("readonly", "" );
+    //                 bloque.appendChild(elemento2);
+    //                 document.getElementById(elemento2.id).value = total;
+
+    //                 Swal.fire({
+    //                     icon: 'success',
+    //                     title: 'Venta creada con exito',
+    //                     showConfirmButton: false,
+    //                     timer: 3000
+    //                 })
+    //                 setTimeout(function(){
+                        
+    //                     document.formulario.submit();
+
+    //                 }, 3000);
+
+    //             }else{
+    //                 elemento = document.getElementById('boton_aceptar');
+    //                 elemento.setAttribute("data-bs-toggle", "modal" );
+    //                 elemento.setAttribute("data-bs-target", "#exampleModal" );
+    //                 elemento.setAttribute("class", "modal" );
+    //                 if (document.getElementsByClassName("modal")){
+    //                     elemento.click();
+    //                 }
+    //             }
+
+    //         }   
+    //         else{
+                
+    //             Swal.fire({
+    //                 icon: 'error',
+    //                 title: 'Hay productos que no se pueden recepcionar ya que no coinciden con los productos del pedido seleccionado',
+    //                 showConfirmButton: true,
+                
+    //             })
+    //         }
+    //     }
+    // }
+
+    function CrearVenta(){
+        usuario = document.getElementById('usuario').value;
+        contrasena = document.getElementById('contrasena').value;
+        bloque = document.getElementById('formulario');
+        elemento = document.createElement('input');
+        elemento.setAttribute("class", "form-control col-sm-3 mb-2 bg-dark" );
+        elemento.setAttribute("style", "width:200px" );
+        elemento.setAttribute("name", `usuario` );
+        elemento.id = 'usuario';
+        elemento.setAttribute("readonly", "" );
+        bloque.appendChild(elemento);
+        
+        document.getElementById(elemento.id).value = usuario;
+
+        bloque = document.getElementById('formulario');
+        elemento1 = document.createElement('input');
+        elemento1.setAttribute("class", "form-control col-sm-3 mb-2 bg-dark" );
+        elemento1.setAttribute("style", "width:200px" );
+        elemento1.setAttribute("name", `contrasena` );
+        elemento1.id = 'contrasena';
+        elemento1.setAttribute("readonly", "" );
+        bloque.appendChild(elemento1);
+        
+        document.getElementById(elemento1.id).value = contrasena;
+
+        let total = document.getElementById('total_precios').innerText;
+        bloque = document.getElementById('formulario');
+        elemento2 = document.createElement('input');
+        elemento2.setAttribute("class", "form-control col-sm-3 mb-2 bg-dark" );
+        elemento2.setAttribute("style", "width:200px" );
+        elemento2.setAttribute("name", `total` );
+        elemento2.id = 'total';
+        elemento2.setAttribute("readonly", "" );
+        bloque.appendChild(elemento2);
+        document.getElementById(elemento2.id).value = total;
+
+        Swal.fire({
+            icon: 'success',
+            title: 'Venta creada con exito',
+            showConfirmButton: false,
+            timer: 3000
+        })
+        setTimeout(function(){
+            
+            document.formulario.submit();
+
+        }, 3000);
+            elemento = document.getElementById('boton_aceptar');
+            elemento.setAttribute("data-bs-toggle", "modal" );
+            elemento.setAttribute("data-bs-target", "#exampleModal" );
+            elemento.setAttribute("class", "modal" );
+            if (document.getElementsByClassName("modal")){
+                elemento.click();
+            }
+        }
+</script>
+
+<script language="JavaScript">
+    var incremento = 0;
+    function TotalPrecios()
+    {
+        let suma = 0;
+        let precios = document.querySelectorAll('input.precio');
+        let cantidad = document.querySelectorAll('input.cantidad');
+
+        let cont1 = 0;
+        let cont2 = 0;
+        let multi = 0;
+        precios.forEach( function(valor) {
+            console.log(valor.value)
+            cont1++;
+            valores = parseInt(valor.value.replace("$", ""));
+            
+            cantidad.forEach( function(cantidad) {
+                cont2++;
+                cantidades = parseInt(cantidad.value);
+                if (cont1 == cont2){
+                    multi = cantidades * valores;
+                }
+            });
+            cont2 = 0;
+            suma += multi;
+        });
+
+
+        document.getElementById("total_precios").innerHTML = suma;
+        console.log(suma)
+    }
+    
+    valor = "";
+    function agregar2(idProd, precioProd, cantidadProd, boton)
+    {
+        boton.setAttribute("disabled",true);
+        let coincidencia = document.getElementById(idProd).textContent;
+        let precio = document.getElementById(precioProd).textContent;
+        let cantidad = document.getElementById(cantidadProd).value;
+        
+
+        incremento++;
+        //Obteniendo el Div "plazos"
+        bloque = document.getElementById('plazos');
+        
+        //Creando el input que irá dentro del Div "plazos"
+        elemento = document.createElement('input');
+        elemento.setAttribute("class", "form-control col-sm-3 mb-2 productoSeleccionado" );
+        elemento.setAttribute("style", "width:200px" );
+        elemento.setAttribute("name", `${coincidencia}` );
+        elemento.id = 'input1.'+coincidencia;
+        elemento.setAttribute("readonly", "" );
+        bloque.appendChild(elemento);
+
+        elemento2 = document.createElement('input');
+        elemento2.setAttribute("class", "form-control col-md-3 mb-2 cantidad" );
+        elemento2.setAttribute("style", "width:50px" );
+        elemento2.setAttribute("name", `${coincidencia}.cantidad` );
+        elemento2.id = 'input2.'+coincidencia;
+        elemento2.setAttribute("readonly", "" );
+        bloque.appendChild(elemento2);
+
+        elemento3 = document.createElement('input');
+        elemento3.setAttribute("class", "form-control col-md-3 mb-2 precio" );
+        elemento3.setAttribute("style", "width:80px" );
+        elemento3.setAttribute("name", `${coincidencia}.precio` );
+        elemento3.id = 'input3.'+coincidencia;
+        elemento3.setAttribute("readonly", "" );
+        bloque.appendChild(elemento3);
+        
+        eliminar = document.createElement('input');
+        eliminar.setAttribute("class", "btn btn-secondary btn-sm mb-2");
+        eliminar.setAttribute("onclick", `borrar("${coincidencia}", "${idProd}")`);
+        eliminar.setAttribute("value", "-");
+        eliminar.setAttribute("style", "width:30px");
+        eliminar.id = ''+coincidencia;
+        bloque.appendChild(eliminar);
+
+        document.getElementById(elemento.id).value = coincidencia;
+        document.getElementById(elemento2.id).value = cantidad;
+        document.getElementById(elemento3.id).value = precio;
+
+        br = document.createElement('br');
+        br.id = 'br'+coincidencia;
+        bloque.appendChild(br);
+        TotalPrecios();
+        valor = idProd;
+    }
+   
+    //Lo que se hará cuando se presione el boton de Borrar
+    function borrar(obj, valor) {
+
+        boton = document.getElementById(`agregar${valor}`);
+        boton.removeAttribute('disabled')
+
+        document.getElementById(`input1.${obj}`).remove();
+        document.getElementById(`input2.${obj}`).remove();
+        document.getElementById(`input3.${obj}`).remove();
+        document.getElementById(`${obj}`).remove();
+        document.getElementById(`br${obj}`).remove();
+        TotalPrecios()
+        
+        // document.getElementById(`agregar${valor}`).diabled = true;
+        // console.log(boton)
+        // boton.setAttribute("disabled",false);
+    }
+</script>
+
+<script> 
+    function doSearch()
+    {
+        const tableReg = document.getElementById('datos');
+        const searchText = document.getElementById('searchTerm').value.toLowerCase();
+        let total = 0;
+
+        // Recorremos todas las filas con contenido de la tabla
+        for (let i = 1; i < tableReg.rows.length; i++) {
+
+            // Si el td tiene la clase "noSearch" no se busca en su cntenido
+            if (tableReg.rows[i].classList.contains("noSearch")) {
+                continue;
+            }
+
+            let found = false;
+            const cellsOfRow = tableReg.rows[i].getElementsByTagName('td');
+
+            // Recorremos todas las celdas
+            for (let j = 0; j < cellsOfRow.length && !found; j++) {
+
+                const compareWith = cellsOfRow[j].innerHTML.toLowerCase();
+
+                // Buscamos el texto en el contenido de la celda
+                if (searchText.length == 0 || compareWith.indexOf(searchText) > -1) {
+                    found = true;
+                    total++;
+                }
+            }
+
+            if (found) {
+                tableReg.rows[i].style.display = '';
+            } 
+            else {
+                // si no ha encontrado ninguna coincidencia, esconde la
+                // fila de la tabla
+                tableReg.rows[i].style.display = 'none';
+            }
+        }
+
+        // mostramos las coincidencias
+        const lastTR=tableReg.rows[tableReg.rows.length-1];
+        const td=lastTR.querySelector("td");
+        lastTR.classList.remove("hide", "red");
+
+        if (searchText == "") {
+            lastTR.classList.add("hide");
+        } 
+        else if (total) {
+            td.innerHTML="Se ha encontrado "+total+" coincidencia"+((total>1)?"s":"");
+        } 
+        else {
+            lastTR.classList.add("red");
+            td.innerHTML="No se han encontrado coincidencias";
+        }
+    }
+</script>
+{% endblock %}

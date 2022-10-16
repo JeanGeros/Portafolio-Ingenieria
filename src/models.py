@@ -24,16 +24,6 @@ class Auditoria(models.Model):
         managed = False
         db_table = 'auditoria'
 
-class Auditoria(models.Model):
-    id = models.BigIntegerField(primary_key=True)
-    menu = models.CharField(max_length=200)
-    accion = models.CharField(max_length=250)
-    usuario = models.BigIntegerField()
-
-    class Meta:
-        managed = False
-        db_table = 'auditoria'
-
 
 class AuthGroup(models.Model):
     name = models.CharField(unique=True, max_length=150, blank=True, null=True)
@@ -94,17 +84,6 @@ class AuthUserUserPermissions(models.Model):
         managed = False
         db_table = 'auth_user_user_permissions'
         unique_together = (('user', 'permission'),)
-
-class Bodega(models.Model):
-    id = models.BigIntegerField(primary_key=True)
-    pasillo = models.CharField(max_length=6)
-    estante = models.CharField(max_length=6)
-    casillero = models.CharField(max_length=6)
-    producto_productoid = models.ForeignKey('Producto', models.DO_NOTHING, db_column='producto_productoid')
-
-    class Meta:
-        managed = False
-        db_table = 'bodega'
 
 class Bodega(models.Model):
     BodegaId = models.BigIntegerField(primary_key=True)
@@ -207,15 +186,6 @@ class Direccion(models.Model):
         db_table = 'direccion'
 
 class Direccioncliente(models.Model):
-    iddircliente = models.AutoField(primary_key=True)
-    direccion_direccionid = models.ForeignKey(Direccion, models.DO_NOTHING, db_column='direccion_direccionid')
-    cliente_clienteid = models.ForeignKey(Cliente, models.DO_NOTHING, db_column='cliente_clienteid')
-
-    class Meta:
-        managed = False
-        db_table = 'direccioncliente'
-
-class Direccioncliente(models.Model):
     id = models.BigIntegerField(primary_key=True)
     direccion_direccionid = models.ForeignKey(Direccion, models.DO_NOTHING, db_column='direccion_direccionid')
     cliente_clienteid = models.ForeignKey(Cliente, models.DO_NOTHING, db_column='cliente_clienteid')
@@ -291,15 +261,6 @@ class Empresa(models.Model):
     class Meta:
         managed = False
         db_table = 'empresa'
-
-class Error(models.Model):
-    id = models.BigIntegerField(primary_key=True)
-    rutina = models.CharField(max_length=150)
-    mensaje = models.CharField(max_length=250)
-
-    class Meta:
-        managed = False
-        db_table = 'error'
 
 class Error(models.Model):
     id = models.BigIntegerField(primary_key=True)
@@ -431,15 +392,6 @@ class Producto(models.Model):
     class Meta:
         managed = False
         db_table = 'producto'
-
-class Productoproveedor(models.Model):
-    id = models.BigIntegerField(primary_key=True)
-    producto_productoid = models.ForeignKey(Producto, models.DO_NOTHING, db_column='producto_productoid')
-    proveedor_proveedorid = models.ForeignKey('Proveedor', models.DO_NOTHING, db_column='proveedor_proveedorid')
-
-    class Meta:
-        managed = False
-        db_table = 'productoproveedor'
 
 class Productoproveedor(models.Model):
     ProId = models.BigIntegerField(primary_key=True)
@@ -578,17 +530,29 @@ class Usuario(models.Model):
 
 class Venta(models.Model):
     nroventa = models.BigIntegerField(primary_key=True)
-    cantidad = models.BigIntegerField()
     fechaventa = models.DateField()
     totalventa = models.BigIntegerField()
-    productoid = models.ForeignKey(Producto, models.DO_NOTHING, db_column='productoid')
     tipodocumentoid = models.ForeignKey(Tipodocumento, models.DO_NOTHING, db_column='tipodocumentoid')
     clienteid = models.ForeignKey(Cliente, models.DO_NOTHING, db_column='clienteid')
+    tipopagoid = models.BigIntegerField()
 
     class Meta:
         managed = False
         db_table = 'venta'
+    class Meta:
+        managed = False
+        db_table = 'venta'
 
+class Detalleventa(models.Model):
+    detalleventaid = models.BigIntegerField(primary_key=True)
+    cantidad = models.BigIntegerField()
+    subtotal = models.BigIntegerField()
+    productoid = models.ForeignKey('Producto', models.DO_NOTHING, db_column='productoid')
+    nroventa = models.ForeignKey('Venta', models.DO_NOTHING, db_column='nroventa')
+
+    class Meta:
+        managed = False
+        db_table = 'detalleventa'
 
 class Ventadiaria(models.Model):
     id = models.BigIntegerField(primary_key=True)

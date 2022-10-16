@@ -19,13 +19,13 @@ from django.contrib import messages
 from src.forms import (
     FormClienteNormal1, FormClienteNormal2, FormClienteNormal3, addproductsForm, FormVendedorPersona,
     FormVendedorUsuario, FormVendedorEmpleado, FormEmpleadoPersona, FormEmpleadoUsuario, FormEmpleadoEmpleado,
-    FormProveedor, FormProductoproveedor, FormBodega
+    FormProveedor, FormProductoproveedor, FormBodega, FormBoleta
 )
 
 from .models import (
     Detalleorden, Estadoorden, Ordencompra, Persona, Direccion, Usuario, Cliente, Estado, Comuna, Tipobarrio,
-    Tipovivienda, Rolusuario, Direccioncliente, Empresa,
-    Proveedor, Tipoproducto, Producto, Familiaproducto, Empleado, Cargo, Tiporubro, Recepcion, Productoproveedor, Bodega
+    Tipovivienda, Rolusuario, Direccioncliente, Empresa, Proveedor, Tipoproducto, Producto, Familiaproducto, 
+    Empleado, Cargo, Tiporubro, Recepcion, Productoproveedor, Bodega, Boleta
 )
 
 def Index(request):
@@ -1342,6 +1342,7 @@ def Cambiar_estado_vendedor(id_vendedor):
         user.is_active = True
         user.save()
 
+
 def Listar_clientes_vendedor(request):
 
     if request.POST.get('VerPerfil') is not None:
@@ -1368,6 +1369,7 @@ def Listar_clientes_vendedor(request):
     }
 
     return render(request, 'vendedores/listar_clientes_vendedor.html', context)
+
 
 def Ver_cliente_vendedor(request):
 
@@ -1542,6 +1544,7 @@ def Agregar_cliente_vendedor(request):
 
     return render(request, 'vendedores/agregar_cliente_vendedor.html', context)
 
+
 def Editar_cliente_vendedor(request):
 
     if request.POST.get('VerPerfil') is not None:
@@ -1676,6 +1679,7 @@ def Agregar_proveedor(request):
 
     return render(request, 'proveedores/agregar_proveedor.html', context)
 
+
 def Cambiar_estado_proveedor(id_proveedor):
     proveedor = Proveedor.objects.get(proveedorid=id_proveedor)
 
@@ -1685,6 +1689,7 @@ def Cambiar_estado_proveedor(id_proveedor):
     else:
         proveedor.estadoid = Estado.objects.get(descripcion="Activo")
         proveedor.save()
+
 
 @login_required(login_url="ingreso")
 def Listar_proveedores(request):
@@ -1725,6 +1730,7 @@ def Listar_proveedores(request):
 
     return render(request, 'proveedores/listar_proveedores.html', context)
 
+
 @login_required(login_url="ingreso")
 def Ver_proveedor(request):
 
@@ -1747,6 +1753,7 @@ def Ver_proveedor(request):
     }
 
     return render(request, 'proveedores/ver_proveedor.html', context)
+
 
 @login_required(login_url="ingreso")
 def Editar_proveedor(request):
@@ -1803,7 +1810,6 @@ def Editar_proveedor(request):
     }
 
     return render(request, 'proveedores/editar_proveedor.html', context)
-
 
 # ********************************Empleados************************************************
 
@@ -1953,7 +1959,6 @@ def Agregar_empleado(request):
 
     return render(request, 'empleados/agregar_empleado.html', context)
 
-
 @login_required(login_url="ingreso")
 def Ver_empleado(request):
 
@@ -2057,6 +2062,7 @@ def Editar_empleado(request):
     }
 
     return render(request, 'empleados/editar_empleado.html', context)
+
 
 def Cambiar_estado_empleado(id_empleado):
     empleado = Empleado.objects.get(empleadoid=id_empleado)
@@ -2272,3 +2278,160 @@ def RecepcionPedido(request, id=None):
     }
 
     return render(request, 'recepcion_pedido.html', context)
+
+
+def crear_venta(request):
+
+    usuario = request.user
+    print(usuario)
+    try:
+        usuario = User.objects.get(username=usuario)
+    except User.DoesNotExist:
+        return redirect('ingreso')
+
+    productos = Productoproveedor.objects.all()
+    form = FormBoleta()
+    admin = usuario.is_staff
+    # admin = User.objects.filter(username='Sra.Juanita')
+
+    total = 0
+    cliente = 0
+    listaProductos = []
+    cont = 0
+
+    if request.method == 'POST':
+        
+        usuario = request.POST.get('usuario')
+        contrasena = request.POST.get('contrasena')
+        queryCliente = request.POST.get('cliente')
+        fecha_pago = request.POST.get('fecha_pago')
+
+        print(usuario)
+        print(contrasena)
+        print(f"{queryCliente}")
+
+        if queryCliente != '':
+            print(queryCliente)
+            if admin:
+                contador = 0
+                for key,value in request.POST.items():
+                    contador = contador + 1
+
+                contador2 = 0
+                producto = []
+                for key,value in request.POST.items():
+                    print(f"key:{key} value:{value}")
+                    contador2 = contador2 + 1
+
+                    if contador2 == contador:
+                        total = value
+
+                    if contador2 > 1 and contador2 < contador - 2:
+                        if key == 'cliente':
+                            cliente = value
+                        if contador2 > 3:
+                            cont += 1
+                            producto.append(value)
+                            
+                            if cont == 3:
+                                listaProductos.append(producto)
+                                producto = []
+                                cont = 0
+
+                cliente = Cliente.objects.filter(id=cliente)
+                for client in cliente:
+                    cliente = client
+
+                boleta = Boleta.objects.create(
+                    total_a_pagar = total,
+                    usuario = usuarioBoleta,
+                    cliente = cliente,
+                    estado = 1
+                )
+                boleta.save()
+
+                bol = Boleta.objects.all().last()
+                bol = Boleta.objects.get(id = bol.id)
+                
+                for listaP in listaProductos:
+                    
+                    prod = Producto.objects.get(codigo_barra = listaP[0])
+                    
+                    # detalleBoleta = DETALLE_BOLETA.objects.create(
+                    #     boleta = bol,
+                    #     cantidad = listaP[1],
+                    #     monto_a_pagar = listaP[2],
+                    #     producto = prod
+                    # )
+                    # detalleBoleta.save()
+                
+                # fecha_pago = fecha_pago[6:10] + '-' + fecha_pago[3:5] + '-' + fecha_pago[0:2]
+                # pago_fiado = PAGO_FIADO.objects.create(
+                #     estado = 1,
+                #     monto = total,
+                #     fecha_final = fecha_pago,
+                #     cliente = Cliente.objects.get(id=queryCliente) 
+                # )
+                
+                messages.warning(request, 'Venta realizada con exito')
+                return redirect('venta')
+         
+            else:
+                messages.warning(request, 'Usuario ingresado no es administrador')
+
+        else:
+            if request.method == 'POST':
+                usuarioBoleta = request.user
+                usuarioBoleta = User.objects.get(username=usuarioBoleta)
+                contador = 0
+
+                for key,value in request.POST.items():
+                    contador = contador + 1
+
+                contador2 = 0
+                producto = []
+                for key,value in request.POST.items():
+                    
+                    contador2 = contador2 + 1
+
+                    if contador2 == contador:
+
+                        total = value
+
+                    if contador2 > 1 and contador2 < contador:
+                        
+                        if contador2 > 3:
+                            cont += 1
+                            
+                            producto.append(value)
+
+                            if cont == 3:
+                                listaProductos.append(producto)
+                                producto = []
+                                cont = 0
+
+                boleta = Boleta.objects.create(
+                    total_a_pagar = total,
+                    usuario = usuarioBoleta,
+                    estado = 1
+                )
+                boleta.save()
+
+                bol = Boleta.objects.all().last()
+                bol = Boleta.objects.get(id = bol.id)
+
+                for listaP in listaProductos:
+                    prod = Producto.objects.get(codigo_barra = listaP[0])
+                    
+                    # detalleBoleta = DETALLE_BOLETA.objects.create(
+                    #     boleta = bol,
+                    #     cantidad = listaP[1],
+                    #     monto_a_pagar = listaP[2],
+                    #     producto = prod
+                    # )
+                    # detalleBoleta.save()
+
+                messages.warning(request, 'Venta realizada con exito')
+                return redirect('venta')
+
+    return render(request, 'crear_venta.html',{'productos':productos, 'form':form})
