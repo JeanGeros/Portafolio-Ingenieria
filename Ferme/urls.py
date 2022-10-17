@@ -71,7 +71,9 @@ urlpatterns = [
     
     path('recepcionar_pedido/<int:id>', views.RecepcionPedido, name="recepcion_pedidos"),
 
-    path('venta/', views.crear_venta, name="crear_venta"),
+    path('ventas/', views.listar_ventas, name="listar_ventas"),
+    path('ventas/crear_venta', views.crear_venta, name="crear_venta"),
+    path('ventas/ver_venta', views.ver_venta, name="ver_venta"),
 
 
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

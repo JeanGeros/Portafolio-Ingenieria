@@ -389,6 +389,7 @@ def Ver_perfil(request):
 
     return render(request, 'clientes/ver_perfil.html', context)
 
+
 def Revisar_compras(request):
 
     if request.POST.get('VerPerfil') is not None:
@@ -533,6 +534,7 @@ def Editar_perfil(request):
     }
 
     return render(request, 'clientes/editar_perfil.html', context)
+
 
 def Registro_clientes(request):
 
@@ -2331,7 +2333,6 @@ def crear_venta(request):
                 productoid = producto[0],
                 nroventa = ultima_ventas
             )
-
             producto_modificar = producto[0]
             producto_vendido, created = Producto.objects.get_or_create(productoid=producto_modificar.productoid)
             producto_vendido.stock = producto_vendido.stock-int(producto[1])
@@ -2339,7 +2340,6 @@ def crear_venta(request):
 
     
         if documento_venta.tipodocumentoid in [2,4]:
-            print("factura creada")
             Factura.objects.create(
                 fechafactura = datetime.datetime.now().date(),
                 neto = int(total_venta)-(int(total_venta)*0.19),
@@ -2350,8 +2350,6 @@ def crear_venta(request):
             )
           
         elif documento_venta.tipodocumentoid in [1,3]:
-            print("boleta creada")
-
             Boleta.objects.create(
                 fechaboleta = datetime.datetime.now().date(),
                 totalboleta = total_venta,
@@ -2363,4 +2361,42 @@ def crear_venta(request):
         return redirect('crear_venta')
 
 
-    return render(request, 'crear_venta.html',{'productos':productos, 'form':form, 'form_doc':form_doc})
+    return render(request, 'ventas/crear_venta.html',{'productos':productos, 'form':form, 'form_doc':form_doc})
+
+
+def listar_ventas(request):
+    ventas = Venta.objects.all()
+
+    if request.method == 'POST':
+        # if request.POST.get('CambiarEstado') is not None:
+        #     id_pedido = request.POST.get('CambiarEstado')
+        #     print(id_pedido)
+        #     cambiar_estado_pedido(id_pedido)
+        #     orden_compra = Ordencompra.objects.get(ordenid=id_pedido)
+        #     sweetify.success(request,
+        #                      f'La Nro:{orden_compra.ordenid} se elimino correctamente')
+        #     return redirect('listar_pedidos')
+
+        if request.POST.get('VerVenta') is not None:
+            request.session['_old_post'] = request.POST
+            return HttpResponseRedirect('ver_venta')
+
+    context = {
+        'ventas': ventas
+    }
+
+    return render(request, 'ventas/listar_ventas.html', context)
+
+
+def ver_venta(request):
+    old_post = request.session.get('_old_post')
+    detalle_venta = Detalleventa.objects.filter(nroventa=old_post['VerVenta'])
+    ventas = Venta.objects.filter(nroventa=old_post['VerVenta'])
+
+    context = {
+        'detalle_venta': detalle_venta,
+        'ventas': ventas
+    }
+
+    return render(request, 'ventas/ver_venta.html', context)
+

@@ -1,0 +1,62 @@
+{% extends 'layout.html' %}
+{% load widget_tweaks %}
+{% load static %}
+{% block content %}
+{% load l10n %}
+{% localize on %}
+{% load humanize %}
+
+    <link rel="stylesheet" href="{% static 'css/modulo_productos.css' %}">
+    <div class="container text-end caja rounded mt-5">
+    <h1 class="text-center">Administración de Ventas</h1>
+    
+        <table class="table table-striped table-hover " style="background-color: white">
+            <thead  class="table-dark" style="text-align:center">
+                <tr>
+                    <th>Cliente</th>
+                    <th>Fecha de Venta</th>
+                    <th>Tipo documento</th>
+                    <th>Valor Total</th>
+                    <th>Tipo de Pago</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody style="text-align:center">
+                {% for venta in ventas %}
+                    <tr>
+                        <td>{{ venta.clienteid }}</td>
+                        <td>{{ venta.fechaventa }}</td>
+                        <td>{{ venta.tipodocumentoid }}</td>
+                        <td>${{ venta.totalventa |localize |intcomma }}</td>
+                        <td>{{ venta.tipopagoid.descripcion}}</td>
+
+                        <td>
+                            <form method="POST" action="">
+                                {% csrf_token %}
+                                <div class="btn-group">
+                                    <button  id="" name="VerVenta" value="{{venta.nroventa}}" class="btn btn_aceptar border border-secondary">Ver</button>
+                                    <button  id="" name="EditarVenta" value="{{venta.nroventa}}" class="btn btn_aceptar border border-secondary">Editar</button>
+                                    <!-- {% if producto.productoid.estadoid.descripcion == 'Activo' %}
+                                        <button type="submit" id="" name="CambiarEstado" value="{{producto.productoid.productoid}}" class="btn btn_aceptar border border-secondary">Desactivar Producto</button>
+                                    {% else %}
+                                        <button type="submit" id="" name="CambiarEstado" value="{{producto.productoid.productoid}}" class="btn btn_aceptar border border-secondary">Activar Producto</button>
+                                    {% endif %} -->
+                                    
+                                </div>
+                            </form>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+            <div align="left" class="btn_crear mb-5">
+                <a href="{% url 'crear_venta' %}" type="button" class="btn btn-primary">Crear</a>
+            </div>
+
+    </div>
+    <script>
+        console.log(image)
+    </script>
+    {% endlocalize %}
+    {% endblock %}

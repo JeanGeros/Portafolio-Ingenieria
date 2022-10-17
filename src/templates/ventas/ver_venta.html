@@ -1,0 +1,60 @@
+{% extends 'layout.html' %}
+{% load widget_tweaks %}
+{% load static %}
+{% block content %}
+{% load l10n %}
+{% localize on %}
+{% load humanize %}
+
+    <link rel="stylesheet" href="{% static 'css/modulo_productos.css' %}">
+    <div class="container text-end caja rounded mt-5">
+    <h1 class="text-center" >Detalles de la Venta</h1>
+    <table class="table table-striped table-hover" style="background-color: white; margin-bottom: 35px;">
+        <thead class="table-dark" style="text-align:center">
+            <tr>
+                <th>Cliente</th>
+                <th>Fecha de Venta</th>
+                <th>Tipo documento</th>
+                <th>Valor Total</th>
+                <th>Tipo de Pago</th>
+            </tr>
+        </thead>
+        <tbody style="text-align:center">
+            {% for venta in ventas %}
+                <tr>
+                    <td>{{ venta.clienteid }}</td>
+                    <td>{{ venta.fechaventa }}</td>
+                    <td>{{ venta.tipodocumentoid }}</td>
+                    <td>${{ venta.totalventa |localize |intcomma }}</td>
+                    <td>{{ venta.tipopagoid.descripcion}}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <table class="table table-striped table-hover" style="background-color: white; margin-bottom: 35px;">
+        <thead class="table-dark" style="text-align:center">
+            <tr>
+                <th>Nombre Producto</th>
+                <th>Cantidad</th>
+                <th>Sub Total</th>
+                <th>Imagen</th>
+            
+            </tr>
+        </thead>
+        <tbody style="text-align:center">
+            {% for detalle in detalle_venta %}
+                <tr>
+                    <td>{{ detalle.productoid.nombre }}</td>
+                    <td>{{ detalle.cantidad }}</td>
+                    <td>${{ detalle.subtotal |localize |intcomma }}</td>
+                    <td> <img src="/static/images/{{detalle.productoid.imagen}}" alt="imagen producto" style="width:100px;height:100px;"> </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <a href="{% url 'listar_ventas' %}" type="submit" class="btn">Volver</a>
+
+    </div>
+    {% endlocalize %}
+    {% endblock %}
