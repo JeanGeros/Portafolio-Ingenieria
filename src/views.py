@@ -19,13 +19,13 @@ from django.contrib import messages
 from src.forms import (
     FormClienteNormal1, FormClienteNormal2, FormClienteNormal3, addproductsForm, FormVendedorPersona,
     FormVendedorUsuario, FormVendedorEmpleado, FormEmpleadoPersona, FormEmpleadoUsuario, FormEmpleadoEmpleado,
-    FormProveedor, FormProductoproveedor, FormBodega, FormBoleta
+    FormProveedor, FormProductoproveedor, FormBodega, FormCliente, FormTipodocumento, FormVenta
 )
 
 from .models import (
     Detalleorden, Estadoorden, Ordencompra, Persona, Direccion, Usuario, Cliente, Estado, Comuna, Tipobarrio,
     Tipovivienda, Rolusuario, Direccioncliente, Empresa, Proveedor, Tipoproducto, Producto, Familiaproducto, 
-    Empleado, Cargo, Tiporubro, Recepcion, Productoproveedor, Bodega, Boleta
+    Empleado, Cargo, Tiporubro, Recepcion, Productoproveedor, Bodega, Boleta, Factura, Venta, Tipodocumento, Detalleventa
 )
 
 def Index(request):
@@ -2279,159 +2279,88 @@ def RecepcionPedido(request, id=None):
 
     return render(request, 'recepcion_pedido.html', context)
 
-
+@login_required(login_url="ingreso")
 def crear_venta(request):
-
-    usuario = request.user
-    print(usuario)
-    try:
-        usuario = User.objects.get(username=usuario)
-    except User.DoesNotExist:
-        return redirect('ingreso')
-
     productos = Productoproveedor.objects.all()
-    form = FormBoleta()
-    admin = usuario.is_staff
-    # admin = User.objects.filter(username='Sra.Juanita')
+    form = FormCliente()
+    form_doc = FormVenta()
 
     total = 0
-    cliente = 0
-    listaProductos = []
-    cont = 0
-
     if request.method == 'POST':
-        
-        usuario = request.POST.get('usuario')
-        contrasena = request.POST.get('contrasena')
-        queryCliente = request.POST.get('cliente')
-        fecha_pago = request.POST.get('fecha_pago')
-
-        print(usuario)
-        print(contrasena)
-        print(f"{queryCliente}")
-
-        if queryCliente != '':
-            print(queryCliente)
-            if admin:
-                contador = 0
-                for key,value in request.POST.items():
-                    contador = contador + 1
-
-                contador2 = 0
-                producto = []
-                for key,value in request.POST.items():
-                    print(f"key:{key} value:{value}")
-                    contador2 = contador2 + 1
-
-                    if contador2 == contador:
-                        total = value
-
-                    if contador2 > 1 and contador2 < contador - 2:
-                        if key == 'cliente':
-                            cliente = value
-                        if contador2 > 3:
-                            cont += 1
-                            producto.append(value)
-                            
-                            if cont == 3:
-                                listaProductos.append(producto)
-                                producto = []
-                                cont = 0
-
-                cliente = Cliente.objects.filter(id=cliente)
-                for client in cliente:
-                    cliente = client
-
-                boleta = Boleta.objects.create(
-                    total_a_pagar = total,
-                    usuario = usuarioBoleta,
-                    cliente = cliente,
-                    estado = 1
-                )
-                boleta.save()
-
-                bol = Boleta.objects.all().last()
-                bol = Boleta.objects.get(id = bol.id)
-                
-                for listaP in listaProductos:
-                    
-                    prod = Producto.objects.get(codigo_barra = listaP[0])
-                    
-                    # detalleBoleta = DETALLE_BOLETA.objects.create(
-                    #     boleta = bol,
-                    #     cantidad = listaP[1],
-                    #     monto_a_pagar = listaP[2],
-                    #     producto = prod
-                    # )
-                    # detalleBoleta.save()
-                
-                # fecha_pago = fecha_pago[6:10] + '-' + fecha_pago[3:5] + '-' + fecha_pago[0:2]
-                # pago_fiado = PAGO_FIADO.objects.create(
-                #     estado = 1,
-                #     monto = total,
-                #     fecha_final = fecha_pago,
-                #     cliente = Cliente.objects.get(id=queryCliente) 
-                # )
-                
-                messages.warning(request, 'Venta realizada con exito')
-                return redirect('venta')
-         
+        productos_venta = []
+        for key, value in request.POST.items():
+            print(f"key: {key}  value  {value}")
+            if key == "csrfmiddlewaretoken":
+                pass
+            elif key == "clienteid":
+                cliente_venta = Cliente.objects.get(clienteid=value)
+            elif key == "tipodocumentoid":
+                documento_venta = Tipodocumento.objects.get(tipodocumentoid=value)
             else:
-                messages.warning(request, 'Usuario ingresado no es administrador')
+                try:
+                    key = int(key)
+                    try:
+                        producto = Producto.objects.get(productoid=int(key))
+                    except Producto.DoesNotExist:
+                        sweetify.warning(request, "Ocurrio un Problema")
+                        print(error)
+                        return render(request, 'index.html')
+                except Exception as error:
+                    if "cantidad" in key:
+                        cantidad = value
 
-        else:
-            if request.method == 'POST':
-                usuarioBoleta = request.user
-                usuarioBoleta = User.objects.get(username=usuarioBoleta)
-                contador = 0
+                    elif key != "total" and "total" in key:
+                        total = value.replace("$", "")
+                        productos_venta.append([producto, cantidad, total])
+                    elif key == "total":
+                        total_venta = value
 
-                for key,value in request.POST.items():
-                    contador = contador + 1
+        Venta.objects.create(
+            fechaventa=datetime.datetime.now().date(),
+            totalventa=total_venta,
+            tipodocumentoid=documento_venta,
+            clienteid=cliente_venta,
+            tipopagoid=0
+        )
 
-                contador2 = 0
-                producto = []
-                for key,value in request.POST.items():
-                    
-                    contador2 = contador2 + 1
+        ultima_ventas = Venta.objects.order_by('nroventa').last()
+        for producto in productos_venta:
+            Detalleventa.objects.create(
+                cantidad = producto[1],
+                subtotal = int(producto[2]) * int(producto[1]),
+                productoid = producto[0],
+                nroventa = ultima_ventas
+            )
 
-                    if contador2 == contador:
+            producto_modificar = producto[0]
+            producto_vendido, created = Producto.objects.get_or_create(productoid=producto_modificar.productoid)
+            producto_vendido.stock = producto_vendido.stock-int(producto[1])
+            producto_vendido.save()
 
-                        total = value
+    
+        if documento_venta.tipodocumentoid in [2,4]:
+            print("factura creada")
+            Factura.objects.create(
+                fechafactura = datetime.datetime.now().date(),
+                neto = int(total_venta)-(int(total_venta)*0.19),
+                iva = int(total_venta)*0.19,
+                totalfactura = total_venta,
+                nroventa = ultima_ventas,
+                estadoid = Estado.objects.get(descripcion="Activo")
+            )
+          
+        elif documento_venta.tipodocumentoid in [1,3]:
+            print("boleta creada")
 
-                    if contador2 > 1 and contador2 < contador:
-                        
-                        if contador2 > 3:
-                            cont += 1
-                            
-                            producto.append(value)
+            Boleta.objects.create(
+                fechaboleta = datetime.datetime.now().date(),
+                totalboleta = total_venta,
+                nroventa = ultima_ventas,
+                estadoid = Estado.objects.get(descripcion="Activo")
+            )
 
-                            if cont == 3:
-                                listaProductos.append(producto)
-                                producto = []
-                                cont = 0
+        messages.warning(request, 'Venta realizada con exito')
+        return redirect('crear_venta')
 
-                boleta = Boleta.objects.create(
-                    total_a_pagar = total,
-                    usuario = usuarioBoleta,
-                    estado = 1
-                )
-                boleta.save()
 
-                bol = Boleta.objects.all().last()
-                bol = Boleta.objects.get(id = bol.id)
-
-                for listaP in listaProductos:
-                    prod = Producto.objects.get(codigo_barra = listaP[0])
-                    
-                    # detalleBoleta = DETALLE_BOLETA.objects.create(
-                    #     boleta = bol,
-                    #     cantidad = listaP[1],
-                    #     monto_a_pagar = listaP[2],
-                    #     producto = prod
-                    # )
-                    # detalleBoleta.save()
-
-                messages.warning(request, 'Venta realizada con exito')
-                return redirect('venta')
-
-    return render(request, 'crear_venta.html',{'productos':productos, 'form':form})
+    return render(request, 'crear_venta.html',{'productos':productos, 'form':form, 'form_doc':form_doc})

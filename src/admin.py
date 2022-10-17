@@ -4,7 +4,7 @@ from .models import (
     Accionpagina, Boleta, Cliente, Comuna, Despacho, Detalleorden, Tipoproducto, Tiporubro,
     Direccion, Empleado, Empresa, Factura, Familiaproducto, Guiadespacho, Notacredito,
     Persona, Producto, Proveedor, Recepcion, Region, Rolusuario, Tipobarrio, Tipodocumento,
-    Tipovivienda, Usuario, Venta, Estado, Estadoorden, Ordencompra, Productoproveedor, Bodega
+    Tipovivienda, Usuario, Venta, Estado, Estadoorden, Ordencompra, Productoproveedor, Bodega, Detalleventa
 )
 
 admin.site.register(Accionpagina)
@@ -38,4 +38,5 @@ admin.site.register(Tiporubro)
 admin.site.register(Tipovivienda)
 admin.site.register(Usuario)
 admin.site.register(Venta)
+admin.site.register(Detalleventa)
 
