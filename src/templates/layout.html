@@ -79,6 +79,13 @@
                                     <li><a class="dropdown-item fw-bolder text-black" href="#">Ejemplo</a></li>
                                 </ul>
                             </li>
+                            
+                            <form action="" method="post">
+                                {% csrf_token %}
+                                <button  id="" name="DescargarApp" value="DescargarApp" class="btn registrarme fw-bolder m-1">Descargar aplicacion</button>
+                            </form>
+                            <!-- <a href="https://drive.google.com/file/d/15iBWnDS3DXcGGSsxWqoyvhsxAhip6_hU/view?usp=sharing" type="button" class="btn ingresar fw-bolder m-1">Descarga la aplicacion movil</a> -->
+
                         {% endif %}  
                         {% if tipo_usuario == 'Vendedor' and tipo_usuario != None %}
                             <li class="nav-item">

@@ -56,12 +56,20 @@ from .models import (
     Proveedor, Tipoproducto, Producto, Familiaproducto, Empleado, Cargo, Tiporubro, Empresa, Recepcion, Productoproveedor, Bodega,
     Direccioncliente, Venta, Detalleventa
 )
-
+from django.utils.encoding import smart_str
 def Index(request):
     
     if request.POST.get('VerPerfil') is not None:
         request.session['_ver_perfil'] = request.POST
         return redirect('ver_perfil')
+    
+    if request.POST.get('DescargarApp') is not None:
+        
+
+        response = HttpResponse(content_type='application/force-download') # mimetype is replaced by content_type for django 1.7
+        response['Content-Disposition'] = 'attachment; filename=%s' % smart_str('app-debug.apk')
+        response['X-Sendfile'] = smart_str('/')
+        return response
 
     if Usuario.objects.filter(nombreusuario=request.user).exists():
         tipo_usuario = Usuario.objects.get(nombreusuario=request.user)
