@@ -83,6 +83,8 @@
             </table>
         </div>
     </div>
+    <a href="{% url 'listar_ventas' %}" type="submit" class="btn" style="margin-left: 1rem; margin-bottom: 1rem;">Volver</a>
+
 </div>
 
 <script>
@@ -226,6 +228,7 @@
         // boton.setAttribute("disabled",false);
     }
 </script>
+
 <script> 
     function doSearch()
     {
@@ -271,7 +274,7 @@
         const td=lastTR.querySelector("td");
         lastTR.classList.remove("hide", "red");
 
-        if (searchText == "") {
+        if (searchText == '') {
             lastTR.classList.add("hide");
         } 
         else if (total) {

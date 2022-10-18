@@ -594,7 +594,7 @@ class Venta(models.Model):
     totalventa = models.BigIntegerField()
     tipodocumentoid = models.ForeignKey(Tipodocumento, models.DO_NOTHING, db_column='tipodocumentoid')
     clienteid = models.ForeignKey(Cliente, models.DO_NOTHING, db_column='clienteid')
-    tipopagoid = models.BigIntegerField()
+    tipopagoid = models.ForeignKey(Tipopago, models.DO_NOTHING, db_column='tipopagoid')
 
     def __str__(self):
         return f"{self.nroventa}"

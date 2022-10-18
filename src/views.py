@@ -2326,6 +2326,7 @@ def crear_venta(request):
         )
 
         ultima_ventas = Venta.objects.order_by('nroventa').last()
+        
         for producto in productos_venta:
             Detalleventa.objects.create(
                 cantidad = producto[1],
