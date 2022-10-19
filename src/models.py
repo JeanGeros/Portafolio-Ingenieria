@@ -160,7 +160,8 @@ class Despacho(models.Model):
     despachoid = models.BigIntegerField(primary_key=True)
     fechasolicitud = models.DateField()
     fechadespacho = models.DateField(blank=True, null=True)
-    nroguia = models.ForeignKey('Guiadespacho', models.DO_NOTHING, db_column='nroguia')
+    nroventa = models.ForeignKey('Venta', models.DO_NOTHING, db_column='nroventa')
+    estadoid = models.ForeignKey('Estado', models.DO_NOTHING, db_column='estadoid')
 
     class Meta:
         managed = False
@@ -530,6 +531,9 @@ class Tipopago(models.Model):
     tipopagoid = models.BigIntegerField(primary_key=True)
     descripcion = models.CharField(max_length=25)
 
+    def __str__(self):
+        return self.descripcion
+        
     class Meta:
         managed = False
         db_table = 'tipopago'

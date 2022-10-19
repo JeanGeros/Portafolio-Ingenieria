@@ -39,7 +39,7 @@
                     <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                         <img class="logo-navbar" src="{% static 'images/Ferme-nav.png' %}" alt="">
                         <li class="nav-item">
-                            <a href="/venta" class="nav-link fw-bolder text-black">Ventas</a>
+                            <a href="/ventas" class="nav-link fw-bolder text-black">Ventas</a>
                         </li>
                         {% if user.is_superuser and tipo_usuario != None and tipo_usuario == 'Administrador Sistema' %}
                             <li class="nav-item">

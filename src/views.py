@@ -19,12 +19,12 @@ from django.contrib import messages
 from src.forms import (
     FormClienteNormal1, FormClienteNormal2, FormClienteNormal3, addproductsForm, FormVendedorPersona,
     FormVendedorUsuario, FormVendedorEmpleado, FormEmpleadoPersona, FormEmpleadoUsuario, FormEmpleadoEmpleado,
-    FormProveedor, FormProductoproveedor, FormBodega, FormCliente, FormTipodocumento, FormVenta
+    FormProveedor, FormProductoproveedor, FormBodega, FormCliente, FormTipodocumento, FormVenta, 
 )
 
 from .models import (
-    Detalleorden, Estadoorden, Ordencompra, Persona, Direccion, Usuario, Cliente, Estado, Comuna, Tipobarrio,
-    Tipovivienda, Rolusuario, Direccioncliente, Empresa, Proveedor, Tipoproducto, Producto, Familiaproducto, 
+    Detalleorden, Estadoorden, Ordencompra, Persona, Direccion, Usuario, Cliente, Estado, Comuna, Tipobarrio, Despacho,
+    Tipovivienda, Rolusuario, Direccioncliente, Empresa, Proveedor, Tipoproducto, Producto, Familiaproducto, Tipopago,
     Empleado, Cargo, Tiporubro, Recepcion, Productoproveedor, Bodega, Boleta, Factura, Venta, Tipodocumento, Detalleventa
 )
 
@@ -2298,6 +2298,8 @@ def crear_venta(request):
                 cliente_venta = Cliente.objects.get(clienteid=value)
             elif key == "tipodocumentoid":
                 documento_venta = Tipodocumento.objects.get(tipodocumentoid=value)
+            elif key == "tipopagoid":
+                tipopagoid = Tipopago.objects.get(tipopagoid=value)
             else:
                 try:
                     key = int(key)
@@ -2310,56 +2312,72 @@ def crear_venta(request):
                 except Exception as error:
                     if "cantidad" in key:
                         cantidad = value
-
                     elif key != "total" and "total" in key:
                         total = value.replace("$", "")
+                        print([producto, cantidad, total])
                         productos_venta.append([producto, cantidad, total])
                     elif key == "total":
                         total_venta = value
+                    elif key == "tipo_entrega":
+                        tipo_entrega = value
+                    
+       
+        if len(productos_venta) >0: 
+            Venta.objects.create(
+                fechaventa=datetime.datetime.now().date(),
+                totalventa=total_venta,
+                tipodocumentoid=documento_venta,
+                clienteid=cliente_venta,
+                tipopagoid=tipopagoid
+            )
 
-        Venta.objects.create(
-            fechaventa=datetime.datetime.now().date(),
-            totalventa=total_venta,
-            tipodocumentoid=documento_venta,
-            clienteid=cliente_venta,
-            tipopagoid=0
-        )
+            ultima_ventas = Venta.objects.order_by('nroventa').last()
+            
+            for producto in productos_venta:
+                Detalleventa.objects.create(
+                    cantidad = producto[1],
+                    subtotal = int(producto[2]) * int(producto[1]),
+                    productoid = producto[0],
+                    nroventa = ultima_ventas
+                )
+                producto_modificar = producto[0]
+                producto_vendido, created = Producto.objects.get_or_create(productoid=producto_modificar.productoid)
+                producto_vendido.stock = producto_vendido.stock-int(producto[1])
+                producto_vendido.save()
 
-        ultima_ventas = Venta.objects.order_by('nroventa').last()
         
-        for producto in productos_venta:
-            Detalleventa.objects.create(
-                cantidad = producto[1],
-                subtotal = int(producto[2]) * int(producto[1]),
-                productoid = producto[0],
-                nroventa = ultima_ventas
-            )
-            producto_modificar = producto[0]
-            producto_vendido, created = Producto.objects.get_or_create(productoid=producto_modificar.productoid)
-            producto_vendido.stock = producto_vendido.stock-int(producto[1])
-            producto_vendido.save()
+            if documento_venta.tipodocumentoid in [2,4]:
+                Factura.objects.create(
+                    fechafactura = datetime.datetime.now().date(),
+                    neto = int(total_venta)-(int(total_venta)*0.19),
+                    iva = int(total_venta)*0.19,
+                    totalfactura = total_venta,
+                    nroventa = ultima_ventas,
+                    estadoid = Estado.objects.get(descripcion="Activo")
+                )
+            
+            elif documento_venta.tipodocumentoid in [1,3]:
+                Boleta.objects.create(
+                    fechaboleta = datetime.datetime.now().date(),
+                    totalboleta = total_venta,
+                    nroventa = ultima_ventas,
+                    estadoid = Estado.objects.get(descripcion="Activo")
+                )
 
-    
-        if documento_venta.tipodocumentoid in [2,4]:
-            Factura.objects.create(
-                fechafactura = datetime.datetime.now().date(),
-                neto = int(total_venta)-(int(total_venta)*0.19),
-                iva = int(total_venta)*0.19,
-                totalfactura = total_venta,
-                nroventa = ultima_ventas,
-                estadoid = Estado.objects.get(descripcion="Activo")
-            )
-          
-        elif documento_venta.tipodocumentoid in [1,3]:
-            Boleta.objects.create(
-                fechaboleta = datetime.datetime.now().date(),
-                totalboleta = total_venta,
-                nroventa = ultima_ventas,
-                estadoid = Estado.objects.get(descripcion="Activo")
-            )
+            if tipo_entrega == 1:
+                print(datetime.datetime.now().date())
+                Despacho.objects.create(
+                    fechasolicitud = datetime.datetime.now().date(),
+                    fechadespacho =  datetime.datetime.now().date(),
+                    nroventa = ultima_ventas,
+                    estadoid = Estado.objects.get(descripcion="Activo")
+                )
 
-        messages.warning(request, 'Venta realizada con exito')
-        return redirect('crear_venta')
+            messages.warning(request, 'Venta realizada con exito')
+            return redirect('listar_ventas')
+        else:
+            messages.warning(request, 'Ocurrio un error en la venta')
+
 
 
     return render(request, 'ventas/crear_venta.html',{'productos':productos, 'form':form, 'form_doc':form_doc})

@@ -74,3 +74,6 @@
 
 .hide {display: none;}
 
+.inputFilter {
+    padding-inline: 25px;
+}

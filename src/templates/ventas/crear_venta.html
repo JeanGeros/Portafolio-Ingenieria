@@ -16,15 +16,37 @@
             {% endif %}
         </div>
         
+        <div class="w-100 pb-3">
+            <form class= "d-flex" method="post" action="" name="formulario" id="formulario">
+                {% csrf_token %}
+                <div class="w-25 inputFilter">
+                    <label for="buscar">Selecciona un cliente:</label>
+                    {{ form_doc.clienteid|add_class:"form-control" }}
+                </div>
+                <div class="w-25 inputFilter">
+                    <label for="buscar">Selecciona un documento :</label>
+                    {{ form_doc.tipodocumentoid|add_class:"form-control"}}
+                </div>
+                <div class="w-25 inputFilter">
+                    <label for="buscar">Selecciona el tipo de pago:</label>
+                    {{ form_doc.tipopagoid|add_class:"form-control"}}
+                </div>
+
+                <div class="w-25 inputFilter">
+                    <label for="buscar">Selecciona el tipo de entrega:</label>
+                    <select class="form-select" type="text" name="tipo_entrega" aria-label="Default select example">
+                        <option selected>----------</option>
+                        <option value="0">Retiro en tienda</option>
+                        <option value="1">Despacho a domicilio</option>
+                      </select>
+                </div>
+            </form>
+        </div>
         <div class="border border-secondary rounded p-2 divVenta">
             <div class="container contenedorCrearUsuario"> 
                 <!-- Contenedor -->
-                <form method="post" action="" name="formulario" id="formulario">
-                    {% csrf_token %}
-                    <label for="buscar">Seleccionar cliente para venta:</label>
-                        {{ form_doc.clienteid|add_class:"form-control" }}
-                    <label for="buscar">Selecciona el tipo de documento para la venta:</label>
-                        {{ form_doc.tipodocumentoid|add_class:"form-control"}}
+                <form class= "" method="post" action="" name="formulario" id="formulario">
+                {% csrf_token %}
 
                     <!-- Productos -->
                     <div class="form-group border rounded p-2"> 
@@ -33,7 +55,6 @@
                         <!-- Div donde se añadiran los Selects -->
                         <div id="plazos" class="row" style="padding-left: 30px;">
                         </div>
-
                         <br>  
                         <label for="state_id" class="control-label">Total:$</label>
                         <label for="state_id" name="total_precios" class="control-label" id="total_precios"></label>
@@ -70,7 +91,7 @@
                         <td id="{{prod.productoid.productoid}}">{{prod.productoid.nombre}}</td>
                         <td id="{{prod.productoid.productoid}}">{{prod.proveedorid.razonsocial}}</td>
                         <td id="{{prod.productoid.productoid}}.{{prod.productoid.precio}}">${{prod.productoid.precio}}</td>
-                        <td><input id="{{prod.productoid.productoid}}.cantidad" type="number" name="numero" value="0" min="0" max="{{prod.productoid.stock}}" step="1" /></td>
+                        <td><input id="{{prod.productoid.productoid}}.cantidad" type="number" name="numero" value="1" min="1" max="{{prod.productoid.stock}}" step="1" /></td>
                         <td><input class="btn btn-secondary btn-sm agregar" type="button" title="Agregar Producto" id="agregar{{prod.productoid.productoid}}" Value="Agregar" onclick="agregar2('{{prod.productoid.productoid}}','{{prod.productoid.productoid}}.{{prod.productoid.precio}}', '{{prod.productoid.productoid}}.cantidad',this,'{{prod.productoid.productoid}}.id')"></td>
                         <td style="visibility: hidden;" id="{{prod.productoid.productoid}}.id">{{prod.productoid.productoid}}</td>
 
@@ -105,12 +126,13 @@
         document.getElementById(elemento2.id).value = total;
 
         Swal.fire({
-            icon: 'success',
-            title: 'Venta creada con exito',
+            icon: 'info',
+            title: 'Creando Venta...',
             showConfirmButton: false,
             timer: 3000
         })
         setTimeout(function(){
+            document.formulario.submit();
             document.formulario.submit();
         }, 3000);
     }
