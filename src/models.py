@@ -163,6 +163,8 @@ class Despacho(models.Model):
     nroventa = models.ForeignKey('Venta', models.DO_NOTHING, db_column='nroventa')
     estadoid = models.ForeignKey('Estado', models.DO_NOTHING, db_column='estadoid')
 
+    def __str__(self):
+        return f"{self.despachoid}"
     class Meta:
         managed = False
         db_table = 'despacho'
@@ -363,6 +365,9 @@ class Guiadespacho(models.Model):
     fechaguia = models.DateField()
     nroventa = models.ForeignKey('Venta', models.DO_NOTHING, db_column='nroventa')
     estadoid = models.ForeignKey(Estado, models.DO_NOTHING, db_column='estadoid')
+
+    def __str__(self):
+        return f"{self.descripcion}"
 
     class Meta:
         managed = False

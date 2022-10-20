@@ -15,41 +15,42 @@
                 </ul>
             {% endif %}
         </div>
-        
-        <div class="w-100 pb-3">
-            <form class= "d-flex" method="post" action="" name="formulario" id="formulario">
-                {% csrf_token %}
-                <div class="w-25 inputFilter">
-                    <label for="buscar">Selecciona un cliente:</label>
-                    {{ form_doc.clienteid|add_class:"form-control" }}
-                </div>
-                <div class="w-25 inputFilter">
-                    <label for="buscar">Selecciona un documento :</label>
-                    {{ form_doc.tipodocumentoid|add_class:"form-control"}}
-                </div>
-                <div class="w-25 inputFilter">
-                    <label for="buscar">Selecciona el tipo de pago:</label>
-                    {{ form_doc.tipopagoid|add_class:"form-control"}}
-                </div>
 
-                <div class="w-25 inputFilter">
-                    <label for="buscar">Selecciona el tipo de entrega:</label>
-                    <select class="form-select" type="text" name="tipo_entrega" aria-label="Default select example">
-                        <option selected>----------</option>
-                        <option value="0">Retiro en tienda</option>
-                        <option value="1">Despacho a domicilio</option>
-                      </select>
-                </div>
-            </form>
-        </div>
         <div class="border border-secondary rounded p-2 divVenta">
             <div class="container contenedorCrearUsuario"> 
                 <!-- Contenedor -->
-                <form class= "" method="post" action="" name="formulario" id="formulario">
-                {% csrf_token %}
+                <form method="post" action="" name="formulario" id="formulario">
+                    {% csrf_token %}
+                    <div class= "d-flex" style="justify-content: space-around;" >
+                        <div class="inputFilter">
+                            <label for="buscar"> Cliente Comprador:</label>
+                            {{ form_doc.clienteid|add_class:"form-control" }}
+                        </div>
+                      
+                        <div class="inputFilter">
+                            <label for="buscar">Tipo documento :</label>
+                            {{ form_doc.tipodocumentoid|add_class:"form-control"}}
+                        </div>
+                    </div>
 
+                    <div class= "d-flex" style="justify-content: space-around;" >
+                        <div class="inputFilter">
+                            <label for="buscar">Tipo de pago:</label>
+                            {{ form_doc.tipopagoid|add_class:"form-control"}}
+                        </div>
+                        <div class="inputFilter">
+                            <label for="buscar">Tipo de entrega:</label>
+                            <select class="form-select" type="text" name="tipo_entrega" aria-label="Default select example">
+                                <option selected>----------</option>
+                                <option value="0">Retiro en tienda</option>
+                                <option value="1">Despacho a domicilio</option>
+                                </select>
+                        </div>
+                    </div>
+
+                    
                     <!-- Productos -->
-                    <div class="form-group border rounded p-2"> 
+                    <div class="form-group border rounded p-2 w-100"> 
                         <label for="state_id" class="control-label">Carrito</label>
                         
                         <!-- Div donde se añadiran los Selects -->
@@ -133,7 +134,7 @@
         })
         setTimeout(function(){
             document.formulario.submit();
-            document.formulario.submit();
+            document.formulario2.submit();
         }, 3000);
     }
 </script>

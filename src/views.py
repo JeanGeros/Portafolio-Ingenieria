@@ -2231,7 +2231,6 @@ def RecepcionPedido(request, id=None):
             print(f"key:{key} value:{value}")
             orden_pedido = Ordencompra.objects.get(ordenid=id)
             detalle_orden = Detalleorden.objects.filter(ordenid=orden_pedido)
-
             if key == "csrfmiddlewaretoken":
                 pass
             else:
@@ -2300,6 +2299,9 @@ def crear_venta(request):
                 documento_venta = Tipodocumento.objects.get(tipodocumentoid=value)
             elif key == "tipopagoid":
                 tipopagoid = Tipopago.objects.get(tipopagoid=value)
+            elif key == "tipo_entrega":
+                tipo_entrega = value
+
             else:
                 try:
                     key = int(key)
@@ -2314,14 +2316,11 @@ def crear_venta(request):
                         cantidad = value
                     elif key != "total" and "total" in key:
                         total = value.replace("$", "")
-                        print([producto, cantidad, total])
                         productos_venta.append([producto, cantidad, total])
                     elif key == "total":
                         total_venta = value
-                    elif key == "tipo_entrega":
-                        tipo_entrega = value
+
                     
-       
         if len(productos_venta) >0: 
             Venta.objects.create(
                 fechaventa=datetime.datetime.now().date(),
@@ -2364,8 +2363,7 @@ def crear_venta(request):
                     estadoid = Estado.objects.get(descripcion="Activo")
                 )
 
-            if tipo_entrega == 1:
-                print(datetime.datetime.now().date())
+            if int(tipo_entrega) == 1:
                 Despacho.objects.create(
                     fechasolicitud = datetime.datetime.now().date(),
                     fechadespacho =  datetime.datetime.now().date(),
@@ -2373,12 +2371,16 @@ def crear_venta(request):
                     estadoid = Estado.objects.get(descripcion="Activo")
                 )
 
+                Despacho.objects.create(
+                    fechaguia = datetime.datetime.now().date(),
+                    nroventa = ultima_ventas,
+                    estadoid = Estado.objects.get(descripcion="Activo")
+                )   
+
             messages.warning(request, 'Venta realizada con exito')
             return redirect('listar_ventas')
         else:
             messages.warning(request, 'Ocurrio un error en la venta')
-
-
 
     return render(request, 'ventas/crear_venta.html',{'productos':productos, 'form':form, 'form_doc':form_doc})
 

@@ -24,11 +24,11 @@
 }
 
 .divVenta {
-    width: 35% !important; 
+    width: 40% !important; 
 }
 
 .divProducto {
-    width: 60% !important; 
+    width: 55% !important; 
     margin-inline: 2rem;
 }
  
@@ -75,5 +75,7 @@
 .hide {display: none;}
 
 .inputFilter {
-    padding-inline: 25px;
+    width: 45% !important;
 }
+
+

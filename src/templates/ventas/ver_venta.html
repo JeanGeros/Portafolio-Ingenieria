@@ -25,8 +25,8 @@
                     <td>{{ venta.clienteid }}</td>
                     <td>{{ venta.fechaventa }}</td>
                     <td>{{ venta.tipodocumentoid }}</td>
-                    <td>${{ venta.totalventa |localize |intcomma }}</td>
-                    <td>{{ venta.tipopagoid.descripcion}}</td>
+                    <td>${{ venta.totalventa |localize |intcomma }} </td>
+                    <td>{{ venta.tipopagoid.descripcion }}</td>
                 </tr>
             {% endfor %}
         </tbody>
@@ -47,7 +47,7 @@
                 <tr>
                     <td>{{ detalle.productoid.nombre }}</td>
                     <td>{{ detalle.cantidad }}</td>
-                    <td>${{ detalle.subtotal |localize |intcomma }}</td>
+                    <td>${{detalle.subtotal |localize |intcomma }}</td>
                     <td> <img src="/static/images/{{detalle.productoid.imagen}}" alt="imagen producto" style="width:100px;height:100px;"> </td>
                 </tr>
             {% endfor %}
