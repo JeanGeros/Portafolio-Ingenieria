@@ -23,7 +23,7 @@ from src.forms import (
 )
 
 from .models import (
-    Detalleorden, Estadoorden, Ordencompra, Persona, Direccion, Usuario, Cliente, Estado, Comuna, Tipobarrio, Despacho,
+    Detalleorden, Estadoorden, Guiadespacho, Ordencompra, Persona, Direccion, Usuario, Cliente, Estado, Comuna, Tipobarrio, Despacho,
     Tipovivienda, Rolusuario, Direccioncliente, Empresa, Proveedor, Tipoproducto, Producto, Familiaproducto, Tipopago,
     Empleado, Cargo, Tiporubro, Recepcion, Productoproveedor, Bodega, Boleta, Factura, Venta, Tipodocumento, Detalleventa
 )
@@ -2371,10 +2371,14 @@ def crear_venta(request):
                     estadoid = Estado.objects.get(descripcion="Activo")
                 )
 
-                Despacho.objects.create(
+                ultimo_despacho = Despacho.objects.order_by('despachoid').last()
+                direccion_cliente = Direccioncliente.objects.get(clienteid=cliente_venta)
+                
+                Guiadespacho.objects.create(
                     fechaguia = datetime.datetime.now().date(),
-                    nroventa = ultima_ventas,
-                    estadoid = Estado.objects.get(descripcion="Activo")
+                    despachoid = ultimo_despacho,
+                    iddircliente = direccion_cliente
+
                 )   
 
             messages.warning(request, 'Venta realizada con exito')

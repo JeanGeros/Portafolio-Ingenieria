@@ -222,6 +222,9 @@ class Direccioncliente(models.Model):
     direccionid = models.ForeignKey(Direccion, models.DO_NOTHING, db_column='direccionid')
     clienteid = models.ForeignKey(Cliente, models.DO_NOTHING, db_column='clienteid')
 
+    def __str__(self):
+        return f"{self.iddircliente}"
+
     class Meta:
         managed = False
         db_table = 'direccioncliente'
@@ -363,11 +366,12 @@ class Familiaproducto(models.Model):
 class Guiadespacho(models.Model):
     nroguia = models.BigIntegerField(primary_key=True)
     fechaguia = models.DateField()
-    nroventa = models.ForeignKey('Venta', models.DO_NOTHING, db_column='nroventa')
-    estadoid = models.ForeignKey(Estado, models.DO_NOTHING, db_column='estadoid')
+    despachoid = models.ForeignKey(Despacho, models.DO_NOTHING, db_column='despachoid', blank=True, null=True)
+    iddircliente = models.ForeignKey(Direccioncliente, models.DO_NOTHING, db_column='iddircliente')
+
 
     def __str__(self):
-        return f"{self.descripcion}"
+        return f"{self.nroguia}"
 
     class Meta:
         managed = False
