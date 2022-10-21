@@ -15,6 +15,7 @@
                 <th>Cliente</th>
                 <th>Fecha de Venta</th>
                 <th>Tipo documento</th>
+                <th>Tipo entrega</th>
                 <th>Valor Total</th>
                 <th>Tipo de Pago</th>
             </tr>
@@ -25,6 +26,11 @@
                     <td>{{ venta.clienteid }}</td>
                     <td>{{ venta.fechaventa }}</td>
                     <td>{{ venta.tipodocumentoid }}</td>
+                    {% if despacho|length == 0 %}
+                    <td> Retiro En tienda </td>
+                    {% else %}
+                    <td> Despacho a domicilio</td>
+                    {% endif %}
                     <td>${{ venta.totalventa |localize |intcomma }} </td>
                     <td>{{ venta.tipopagoid.descripcion }}</td>
                 </tr>
@@ -53,6 +59,32 @@
             {% endfor %}
         </tbody>
     </table>
+    {% if despacho|length == 0 %}
+    <td>  </td>
+    {% else %}
+    <table class="table table-striped table-hover" style="background-color: white; margin-bottom: 35px;">
+        <thead class="table-dark" style="text-align:center">
+            <tr>
+                <th>Fecha Solicitud</th>
+                <th>Fecha Despacho</th>
+                <th>Estado</th>
+                <th>Direccion</th>
+            </tr>
+        </thead>
+        <tbody style="text-align:center">
+            {% for despa in despacho %}
+                <tr>
+                    <td>{{ despa.despachoid.fechasolicitud }}</td>
+                    <td>{{ despa.despachoid.fechadespacho }}</td>
+                    <td>{{despa.despachoid.estadoid }}</td>
+                    <td>{{ despa.iddircliente.direccionid }}, {{ despa.iddircliente.direccionid.comunaid }}</td>
+
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+
     <a href="{% url 'listar_ventas' %}" type="submit" class="btn">Volver</a>
 
     </div>

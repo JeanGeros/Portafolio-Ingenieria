@@ -119,3 +119,20 @@ class FormVenta(forms.ModelForm):
         model = Venta
         fields = '__all__'
 
+class FormDocu(forms.Form):
+    opciones_documentos =(
+        ("", "----------"),
+        ("1", "Boleta Afecta"),
+        ("2", "Factura Afecta"),
+        ("3", "Boleta Exenta"),
+        ("4", "Factura Exenta"),
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs) 
+        for field in iter(self.fields):  
+            self.fields[field].widget.attrs.update({  
+                'class': 'form-control'  
+            })  
+
+    Tipo_documento= forms.ChoiceField(choices = opciones_documentos)

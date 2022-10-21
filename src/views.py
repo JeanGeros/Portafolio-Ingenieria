@@ -49,7 +49,7 @@ from django.contrib import messages
 from src.forms import (
     FormClienteNormal1, FormClienteNormal2, FormClienteNormal3, addproductsForm, FormVendedorPersona,
     FormVendedorUsuario, FormVendedorEmpleado, FormEmpleadoPersona, FormEmpleadoUsuario, FormEmpleadoEmpleado,
-    FormProveedor, FormProductoproveedor, FormBodega, FormClienteEmpresa, FormCliente, FormTipodocumento, FormVenta 
+    FormProveedor, FormProductoproveedor, FormBodega, FormClienteEmpresa, FormCliente, FormTipodocumento, FormVenta, FormDocu
 )
 
 from .models import (
@@ -2485,9 +2485,21 @@ def creacion_doc(lista, nombre_archivo):
 
 @login_required(login_url="ingreso")
 def crear_venta(request):
+
+    if request.POST.get('VerPerfil') is not None:
+        request.session['_ver_perfil'] = request.POST
+        return redirect('ver_perfil')
+
+    if Usuario.objects.filter(nombreusuario=request.user).exists():
+        tipo_usuario = Usuario.objects.get(nombreusuario=request.user)
+        tipo_usuario = tipo_usuario.rolid.descripcion
+    else: 
+        tipo_usuario = None
+
     productos = Productoproveedor.objects.all()
     form = FormCliente()
     form_doc = FormVenta()
+    form_docu =FormDocu()
 
     total = 0
     if request.method == 'POST':
@@ -2498,7 +2510,7 @@ def crear_venta(request):
                 pass
             elif key == "clienteid":
                 cliente_venta = Cliente.objects.get(clienteid=value)
-            elif key == "tipodocumentoid":
+            elif key == "Tipo_documento":
                 documento_venta = Tipodocumento.objects.get(tipodocumentoid=value)
             elif key == "tipopagoid":
                 tipopagoid = Tipopago.objects.get(tipopagoid=value)
@@ -2525,86 +2537,88 @@ def crear_venta(request):
 
                     
         if len(productos_venta) >0: 
-            # Venta.objects.create(
-            #     fechaventa=datetime.now().date(),
-            #     totalventa=total_venta,
-            #     tipodocumentoid=documento_venta,
-            #     clienteid=cliente_venta,
-            #     tipopagoid=tipopagoid 
-            # )
+            Venta.objects.create(
+                fechaventa=datetime.now().date(),
+                totalventa=total_venta,
+                tipodocumentoid=documento_venta,
+                clienteid=cliente_venta,
+                tipopagoid=tipopagoid 
+            )
 
-            # ultima_ventas = Venta.objects.order_by('nroventa').last()
+            ultima_ventas = Venta.objects.order_by('nroventa').last()
             
-            # for producto in productos_venta:
-            #     Detalleventa.objects.create(
-            #         cantidad = producto[1],
-            #         subtotal = int(producto[2]) * int(producto[1]),
-            #         productoid = producto[0],
-            #         nroventa = ultima_ventas
-            #     )
-            #     producto_modificar = producto[0]
-            #     producto_vendido, created = Producto.objects.get_or_create(productoid=producto_modificar.productoid)
-            #     producto_vendido.stock = producto_vendido.stock-int(producto[1])
-            #     producto_vendido.save()
+            for producto in productos_venta:
+                Detalleventa.objects.create(
+                    cantidad = producto[1],
+                    subtotal = int(producto[2]) * int(producto[1]),
+                    productoid = producto[0],
+                    nroventa = ultima_ventas
+                )
+                producto_modificar = producto[0]
+                producto_vendido, created = Producto.objects.get_or_create(productoid=producto_modificar.productoid)
+                producto_vendido.stock = producto_vendido.stock-int(producto[1])
+                producto_vendido.save()
 
         
-            # if documento_venta.tipodocumentoid in [2,4]:
-            #     Factura.objects.create(
-            #         fechafactura = datetime.now().date(),
-            #         neto = int(total_venta)-(int(total_venta)*0.19),
-            #         iva = int(total_venta)*0.19,
-            #         totalfactura = total_venta,
-            #         nroventa = ultima_ventas,
-            #         estadoid = Estado.objects.get(descripcion="Activo")
-            #     )
+            if documento_venta.tipodocumentoid in [2,4]:
+                Factura.objects.create(
+                    fechafactura = datetime.now().date(),
+                    neto = int(total_venta)-(int(total_venta)*0.19),
+                    iva = int(total_venta)*0.19,
+                    totalfactura = total_venta,
+                    nroventa = ultima_ventas,
+                    estadoid = Estado.objects.get(descripcion="Activo")
+                )
             
-            # elif documento_venta.tipodocumentoid in [1,3]:
-            #     Boleta.objects.create(
-            #         fechaboleta = datetime.now().date(),
-            #         totalboleta = total_venta,
-            #         nroventa = ultima_ventas,
-            #         estadoid = Estado.objects.get(descripcion="Activo")
-            #     )
+            elif documento_venta.tipodocumentoid in [1,3]:
+                Boleta.objects.create(
+                    fechaboleta = datetime.now().date(),
+                    totalboleta = total_venta,
+                    nroventa = ultima_ventas,
+                    estadoid = Estado.objects.get(descripcion="Activo")
+                )
 
-            # if int(tipo_entrega) == 1:
-            #     Despacho.objects.create(
-            #         fechasolicitud = datetime.now().date(),
-            #         fechadespacho =  datetime.now().date(),
-            #         nroventa = ultima_ventas,
-            #         estadoid = Estado.objects.get(descripcion="Activo")
-            #     )
+            if int(tipo_entrega) == 1:
+                Despacho.objects.create(
+                    fechasolicitud = datetime.now().date(),
+                    fechadespacho =  datetime.now().date(),
+                    nroventa = ultima_ventas,
+                    estadoid = Estado.objects.get(descripcion="Activo")
+                )
 
-            #     ultimo_despacho = Despacho.objects.order_by('despachoid').last()
-            #     direccion_cliente = Direccioncliente.objects.get(clienteid=cliente_venta)
+                ultimo_despacho = Despacho.objects.order_by('despachoid').last()
+                direccion_cliente = Direccioncliente.objects.get(clienteid=cliente_venta)
                 
-            #     Guiadespacho.objects.create(
-            #         fechaguia = datetime.now().date(),
-            #         despachoid = ultimo_despacho,
-            #         iddircliente = direccion_cliente
-            #     )   
+                Guiadespacho.objects.create(
+                    fechaguia = datetime.now().date(),
+                    despachoid = ultimo_despacho,
+                    iddircliente = direccion_cliente
+                )   
 
             messages.warning(request, 'Venta realizada con exito')
-            return creacion_doc(productos_venta,'pdf',A4,'Boleta','pdf', valor=False)
+            return creacion_pdf(productos_venta,'pdf',A4,'Boleta','pdf', valor=False)
             # return redirect('listar_ventas')
         else:
             messages.warning(request, 'Ocurrio un error en la venta')
 
-    return render(request, 'ventas/crear_venta.html',{'productos':productos, 'form':form, 'form_doc':form_doc})
+    return render(request, 'ventas/crear_venta.html',{'productos':productos, 'form':form, 'form_doc':form_doc, 'form_docu': form_docu})
 
 @login_required(login_url="ingreso")
 def listar_ventas(request):
+    
+    if request.POST.get('VerPerfil') is not None:
+        request.session['_ver_perfil'] = request.POST
+        return redirect('ver_perfil')
+
+    if Usuario.objects.filter(nombreusuario=request.user).exists():
+        tipo_usuario = Usuario.objects.get(nombreusuario=request.user)
+        tipo_usuario = tipo_usuario.rolid.descripcion
+    else: 
+        tipo_usuario = None
+
     ventas = Venta.objects.all()
 
     if request.method == 'POST':
-        # if request.POST.get('CambiarEstado') is not None:
-        #     id_pedido = request.POST.get('CambiarEstado')
-        #     print(id_pedido)
-        #     cambiar_estado_pedido(id_pedido)
-        #     orden_compra = Ordencompra.objects.get(ordenid=id_pedido)
-        #     sweetify.success(request,
-        #                      f'La Nro:{orden_compra.ordenid} se elimino correctamente')
-        #     return redirect('listar_pedidos')
-
         if request.POST.get('VerVenta') is not None:
             request.session['_old_post'] = request.POST
             return HttpResponseRedirect('ver_venta')
@@ -2620,10 +2634,16 @@ def ver_venta(request):
     old_post = request.session.get('_old_post')
     detalle_venta = Detalleventa.objects.filter(nroventa=old_post['VerVenta'])
     ventas = Venta.objects.filter(nroventa=old_post['VerVenta'])
+    despacho = Despacho.objects.get(nroventa=old_post['VerVenta'])
+    print(despacho)
+    guia = Guiadespacho.objects.filter(despachoid=despacho)
+    print(guia)
+    
 
     context = {
         'detalle_venta': detalle_venta,
-        'ventas': ventas
+        'ventas': ventas,
+        'despacho':guia
     }
 
     return render(request, 'ventas/ver_venta.html', context)
