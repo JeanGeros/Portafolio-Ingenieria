@@ -26,6 +26,11 @@
         <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/timepicker/1.3.5/jquery.timepicker.min.css">
         {% load pwa %}
         {% progressive_web_app_meta %}
+
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    </head>
+
     </head>
 
     <body>
@@ -74,6 +79,13 @@
                                     <li><a class="dropdown-item fw-bolder text-black" href="#">Ejemplo</a></li>
                                 </ul>
                             </li>
+                            
+                            <form action="" method="post">
+                                {% csrf_token %}
+                                <button  id="" name="DescargarApp" value="DescargarApp" class="btn registrarme fw-bolder m-1">Descargar aplicacion</button>
+                            </form>
+                            <!-- <a href="https://drive.google.com/file/d/15iBWnDS3DXcGGSsxWqoyvhsxAhip6_hU/view?usp=sharing" type="button" class="btn ingresar fw-bolder m-1">Descarga la aplicacion movil</a> -->
+
                         {% endif %}  
                         {% if tipo_usuario == 'Vendedor' and tipo_usuario != None %}
                             <li class="nav-item">
@@ -134,34 +146,7 @@
                             </li>
                         {% endif %}
 
-                        <li class="nav-item">
-                            <a href="/vendedores" class="nav-link fw-bolder text-black">Administración <br> de vendedores</a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="/empleados" class="nav-link fw-bolder text-black">Administración <br> de empleados</a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="/clientes" class="nav-link fw-bolder text-black">Administración <br> de clientes</a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="/proveedores" class="nav-link fw-bolder text-black">Proveedores</a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="/pedidos" class="nav-link fw-bolder text-black">Mis ordenes</a>
-                        </li>
-
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle fw-bolder text-black" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            Facturación
-                            </a>
-                            <ul class="dropdown-menu">
-                                <li><a class="dropdown-item fw-bolder text-black" href="#">Dato 1</a></li>
-                                <li><a class="dropdown-item fw-bolder text-black" href="#">Dato 2</a></li>
-                                <li><hr class="dropdown-divider fw-bolder text-black"></li>
-                                <li><a class="dropdown-item fw-bolder text-black" href="#">Ejemplo</a></li>
-                            </ul>
-                        </li>
-
+                        
                     </ul>
                     
                     {% if user.is_authenticated %}
@@ -170,11 +155,14 @@
                             <i class="fa-solid fa-user fa-2x" ></i>
                             </a>
                             <ul class="dropdown-menu">
-                                <form action="" method="post">
-                                    {% csrf_token %}
-                                    <li><button  id="" name="VerPerfil" value="{{request.user}}" class="dropdown-item fw-bolder text-black">Mi Perfil</button></li>
-                                </form>
-                                <li><hr class="dropdown-divider fw-bolder text-black"></li>
+                                {% if tipo_usuario == 'Cliente' and tipo_usuario != None %}
+                                    <form action="" method="post">
+                                        {% csrf_token %}
+                                        <li><button  id="" name="VerPerfil" value="{{request.user}}" class="dropdown-item fw-bolder text-black">Mi Perfil</button></li>
+                                    </form>
+                                {% endif %}
+                                    <li><hr class="dropdown-divider fw-bolder text-black"></li>
+                                
                                 <li><a href="{% url 'logout'%}?next={{request.path}}" class="dropdown-item fw-bolder text-black">Cerrar Sesion</a></li>
                             </ul>
                         </li>

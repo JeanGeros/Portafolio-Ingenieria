@@ -2,7 +2,19 @@ var staticCacheName = "django-pwa-v" + new Date().getTime();
 var filesToCache = [
     '/',
     '/static/css/layout.css',
-    '/static/images/Ferme-nav.png'
+    '/static/images/Ferme-nav.png',
+    '/static/css/agregar_productos.css',
+    '/static/css/editar_cliente.css',
+    '/static/css/editar_perfil.css',
+    '/static/css/index.css',
+    '/static/css/ingreso_usuarios.css',
+    '/static/css/modulo_pedidos.css',
+    '/static/css/modulo_productos.css',
+    '/static/css/modulo_proveedores.css',
+    '/static/css/recepcion_productos.css',
+    '/static/css/registro_clientes_emp.css',
+    '/static/css/registro_clientes.css',
+    '/static/css/seleccion_registro.css',
 ];
 
 self.addEventListener("install", event => {

@@ -92,7 +92,6 @@ class AuthUserUserPermissions(models.Model):
         db_table = 'auth_user_user_permissions'
         unique_together = (('user', 'permission'),)
 
-
 class Bodega(models.Model):
     BodegaId = models.BigIntegerField(primary_key=True)
     pasillo = models.CharField(max_length=6)
@@ -104,7 +103,6 @@ class Bodega(models.Model):
     class Meta:
         managed = False
         db_table = 'bodega'
-
 
 class Boleta(models.Model):
     nroboleta = models.BigIntegerField(primary_key=True)
@@ -142,6 +140,7 @@ class Cliente(models.Model):
     class Meta:
         managed = False
         db_table = 'cliente'
+
 
 class Comuna(models.Model):
     comunaid = models.BigIntegerField(primary_key=True)
@@ -229,7 +228,6 @@ class Direccioncliente(models.Model):
         managed = False
         db_table = 'direccioncliente'
 
-
 class DjangoAdminLog(models.Model):
     action_time = models.DateTimeField()
     object_id = models.TextField(blank=True, null=True)
@@ -242,6 +240,7 @@ class DjangoAdminLog(models.Model):
     class Meta:
         managed = False
         db_table = 'django_admin_log'
+
 
 
 class DjangoContentType(models.Model):
@@ -312,7 +311,6 @@ class Error(models.Model):
         managed = False
         db_table = 'error'
 
-
 class Estado(models.Model):
     estadoid = models.BigIntegerField(primary_key=True)
     descripcion = models.CharField(max_length=10)
@@ -382,7 +380,7 @@ class Notacredito(models.Model):
     nronota = models.BigIntegerField(primary_key=True)
     fechanota = models.DateField()
     total = models.BigIntegerField()
-    numerofactura = models.ForeignKey(Factura, models.DO_NOTHING, db_column='numerofactura', blank=True, null=True)
+    numerofactura = models.ForeignKey(Factura, models.DO_NOTHING, db_column='numerofactura', blank=True, null=True, blank=True, null=True)
     estadoid = models.ForeignKey(Estado, models.DO_NOTHING, db_column='estadoid')
     nroboleta = models.BigIntegerField(blank=True, null=True)
 
@@ -425,6 +423,7 @@ class Persona(models.Model):
         managed = False
         db_table = 'persona'
 
+
 class Producto(models.Model):
     productoid = models.BigIntegerField(primary_key=True)
     nombre = models.CharField(max_length=50)
@@ -456,7 +455,6 @@ class Productoproveedor(models.Model):
         managed = False
         db_table = 'productoproveedor'
 
-
 class Proveedor(models.Model):
     proveedorid = models.BigIntegerField(primary_key=True)
     razonsocial = models.CharField(max_length=50)
@@ -475,6 +473,7 @@ class Proveedor(models.Model):
         db_table = 'proveedor'
 
 
+
 class Recepcion(models.Model):
     recepcionid = models.BigIntegerField(primary_key=True)
     fecharecepcion = models.DateField()
@@ -486,6 +485,7 @@ class Recepcion(models.Model):
     class Meta:
         managed = False
         db_table = 'recepcion'
+
 
 
 class Region(models.Model):
@@ -500,6 +500,7 @@ class Region(models.Model):
         db_table = 'region'
 
 
+
 class Rolusuario(models.Model):
     rolid = models.BigIntegerField(primary_key=True)
     descripcion = models.CharField(max_length=25)
@@ -512,6 +513,7 @@ class Rolusuario(models.Model):
         db_table = 'rolusuario'
 
 
+
 class Tipobarrio(models.Model):
     tipobarrioid = models.BigIntegerField(primary_key=True)
     descripcion = models.CharField(max_length=12)
@@ -522,6 +524,7 @@ class Tipobarrio(models.Model):
     class Meta:
         managed = False
         db_table = 'tipobarrio'
+
 
 
 class Tipodocumento(models.Model):
@@ -560,6 +563,7 @@ class Tipoproducto(models.Model):
         db_table = 'tipoproducto'
 
 
+
 class Tiporubro(models.Model):
     rubroid = models.BigIntegerField(primary_key=True)
     descripcion = models.CharField(max_length=50)
@@ -572,6 +576,7 @@ class Tiporubro(models.Model):
         db_table = 'tiporubro'
 
 
+
 class Tipovivienda(models.Model):
     tipoviviendaid = models.BigIntegerField(primary_key=True)
     descripcion = models.CharField(max_length=12)
@@ -582,6 +587,7 @@ class Tipovivienda(models.Model):
     class Meta:
         managed = False
         db_table = 'tipovivienda'
+
 
 
 class Usuario(models.Model):
@@ -599,6 +605,7 @@ class Usuario(models.Model):
     class Meta:
         managed = False
         db_table = 'usuario'
+
 
 
 class Venta(models.Model):
