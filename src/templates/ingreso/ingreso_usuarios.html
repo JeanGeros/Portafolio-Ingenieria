@@ -4,7 +4,7 @@
 {% block content %}
 
     <link rel="stylesheet" href="{% static 'css/ingreso_usuarios.css' %}">
-    <div class="form-signin w-100 m-auto p-5 text-center border rounded pb-5">
+    <div class="form-signin p-3 text-center border rounded pb-3">
         
         <form id="center" method="post" action="" class="">
           {% csrf_token %} 
@@ -19,15 +19,7 @@
               <input type="password" name="contraseña" class="form-control" id="exampleInputPassword1" placeholder="Contraseña" minlength="6" onkeypress="return SinEspacios(event)" />
               <label for="exampleInputPassword1" class="form-label font-style">Contraseña</label>
             </div>
-            <div class="checkbox mb-3">
-                <label class="font-style">
-                    <input type="checkbox" value="remember-me" > Recordar
-                </label>
-            </div>
-           
             <button type="submit" class="btn btn_aceptar border border-secondary text-black py-2 m-2" style="font-size: 1.3rem;">Iniciar Sesion</button>
-
-
           </form>
     </div>
 

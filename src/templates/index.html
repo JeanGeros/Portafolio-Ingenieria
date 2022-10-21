@@ -3,11 +3,23 @@
 
 {% block content %}
     <link rel="stylesheet" href="{% static 'css/index.css' %}">
-    <a href="https://drive.google.com/file/d/1SlhyZO5xume4be7tJ6y1n69hRqU4fXT5/view?usp=sharing" type="button" class="btn ingresar fw-bolder m-1 mt-5">Descarga la aplicacion movil</a>
 
-    <div class="text-center ">
+    {% if user.is_superuser and tipo_usuario != None and tipo_usuario == 'Administrador Sistema' %}
+        <a href="https://drive.google.com/file/d/1SlhyZO5xume4be7tJ6y1n69hRqU4fXT5/view?usp=sharing" type="button" class="btn ingresar fw-bolder m-1 mt-5" id="BotonDescargaApp">Descarga la aplicacion movil</a>
+    {% endif %}
+
+    <div class="text-center p-5">
         <h1>Encuentra los mejores productos de ferreteria</h1>
         <img class="logo-principal" src="{% static  'images/Ferme-logo.png' %}" alt="">
     </div>
+
+    <script>
+        let navegador = navigator.userAgent;
+        if (navigator.userAgent.match(/Android/i) || navigator.userAgent.match(/webOS/i) || navigator.userAgent.match(/iPhone/i) || navigator.userAgent.match(/iPad/i) || navigator.userAgent.match(/iPod/i) || navigator.userAgent.match(/BlackBerry/i) || navigator.userAgent.match(/Windows Phone/i)) {
+            document.getElementById("BotonDescargaApp").style.visibility = "visible"; // show            
+        } else {
+            document.getElementById("BotonDescargaApp").style.visibility = "hidden"; // hide
+        }
+    </script>
 
 {% endblock %}
