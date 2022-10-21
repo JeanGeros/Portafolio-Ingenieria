@@ -380,7 +380,7 @@ class Notacredito(models.Model):
     nronota = models.BigIntegerField(primary_key=True)
     fechanota = models.DateField()
     total = models.BigIntegerField()
-    numerofactura = models.ForeignKey(Factura, models.DO_NOTHING, db_column='numerofactura', blank=True, null=True, blank=True, null=True)
+    numerofactura = models.ForeignKey(Factura, models.DO_NOTHING, db_column='numerofactura', blank=True, null=True)
     estadoid = models.ForeignKey(Estado, models.DO_NOTHING, db_column='estadoid')
     nroboleta = models.BigIntegerField(blank=True, null=True)
 

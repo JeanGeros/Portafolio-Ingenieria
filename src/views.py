@@ -2,6 +2,7 @@ from copyreg import constructor
 import email
 from multiprocessing.sharedctypes import Value
 from pprint import pprint
+from symbol import flow_stmt
 from this import d
 from django.shortcuts import render, redirect
 from django.http import HttpResponseRedirect
@@ -2427,6 +2428,59 @@ def creacion_doc(lista, nombre_archivo):
 
     return response
 
+# def creacion_boleta(lista,tipo_doc,tamaño_pagina, nombre, extension, valor = None):
+#     response = HttpResponse(content_type=f'application/{tipo_doc}')  
+
+#     buff = BytesIO()  
+
+#     doc = SimpleDocTemplate(buff,  
+#         pagesize=tamaño_pagina,  
+#         rightMargin=40,  
+#         leftMargin=40,  
+#         topMargin=60,  
+#         bottomMargin=18,  
+#     ) 
+    
+#     doc
+#     header_image = []
+#     styles = getSampleStyleSheet()  
+#     text = '''
+#         <img src="Ferme-logo.png" width="50%" height="50%"/>
+#         '''
+
+#     p_text=Paragraph(text, styles)
+#     header_image.append(p_text)
+
+
+#     data = []  
+#     styles = getSampleStyleSheet()  
+#     styles = styles['Heading1']
+#     styles.alignment = TA_CENTER 
+
+#     header = Paragraph(f"{nombre}", styles)  
+    
+#     data.append(header)  
+
+#     t = Table(lista)  
+
+#     t.setStyle(TableStyle(  
+#         [  
+#         ('GRID', (0, 0), (12, -1), 1, colors.dodgerblue),  
+#         ('LINEBELOW', (0, 0), (-1, 0), 3, colors.darkblue),  
+#         ('BACKGROUND', (0, 0), (-1, 0), colors.dodgerblue)  
+#         ]  
+#     ))  
+    
+#     data.append(t)
+
+#     doc.build(header_image, data)  
+#     response.write(buff.getvalue())   
+
+#     buff.seek(0)
+
+#     respuesta = FileResponse(buff, as_attachment=valor, filename=f'{nombre}.{extension}')
+
+#     return respuesta
 
 
 @login_required(login_url="ingreso")
@@ -2471,73 +2525,73 @@ def crear_venta(request):
 
                     
         if len(productos_venta) >0: 
-            Venta.objects.create(
-                fechaventa=datetime.datetime.now().date(),
-                totalventa=total_venta,
-                tipodocumentoid=documento_venta,
-                clienteid=cliente_venta,
-                tipopagoid=tipopagoid
-            )
+            # Venta.objects.create(
+            #     fechaventa=datetime.now().date(),
+            #     totalventa=total_venta,
+            #     tipodocumentoid=documento_venta,
+            #     clienteid=cliente_venta,
+            #     tipopagoid=tipopagoid 
+            # )
 
-            ultima_ventas = Venta.objects.order_by('nroventa').last()
+            # ultima_ventas = Venta.objects.order_by('nroventa').last()
             
-            for producto in productos_venta:
-                Detalleventa.objects.create(
-                    cantidad = producto[1],
-                    subtotal = int(producto[2]) * int(producto[1]),
-                    productoid = producto[0],
-                    nroventa = ultima_ventas
-                )
-                producto_modificar = producto[0]
-                producto_vendido, created = Producto.objects.get_or_create(productoid=producto_modificar.productoid)
-                producto_vendido.stock = producto_vendido.stock-int(producto[1])
-                producto_vendido.save()
+            # for producto in productos_venta:
+            #     Detalleventa.objects.create(
+            #         cantidad = producto[1],
+            #         subtotal = int(producto[2]) * int(producto[1]),
+            #         productoid = producto[0],
+            #         nroventa = ultima_ventas
+            #     )
+            #     producto_modificar = producto[0]
+            #     producto_vendido, created = Producto.objects.get_or_create(productoid=producto_modificar.productoid)
+            #     producto_vendido.stock = producto_vendido.stock-int(producto[1])
+            #     producto_vendido.save()
 
         
-            if documento_venta.tipodocumentoid in [2,4]:
-                Factura.objects.create(
-                    fechafactura = datetime.datetime.now().date(),
-                    neto = int(total_venta)-(int(total_venta)*0.19),
-                    iva = int(total_venta)*0.19,
-                    totalfactura = total_venta,
-                    nroventa = ultima_ventas,
-                    estadoid = Estado.objects.get(descripcion="Activo")
-                )
+            # if documento_venta.tipodocumentoid in [2,4]:
+            #     Factura.objects.create(
+            #         fechafactura = datetime.now().date(),
+            #         neto = int(total_venta)-(int(total_venta)*0.19),
+            #         iva = int(total_venta)*0.19,
+            #         totalfactura = total_venta,
+            #         nroventa = ultima_ventas,
+            #         estadoid = Estado.objects.get(descripcion="Activo")
+            #     )
             
-            elif documento_venta.tipodocumentoid in [1,3]:
-                Boleta.objects.create(
-                    fechaboleta = datetime.datetime.now().date(),
-                    totalboleta = total_venta,
-                    nroventa = ultima_ventas,
-                    estadoid = Estado.objects.get(descripcion="Activo")
-                )
+            # elif documento_venta.tipodocumentoid in [1,3]:
+            #     Boleta.objects.create(
+            #         fechaboleta = datetime.now().date(),
+            #         totalboleta = total_venta,
+            #         nroventa = ultima_ventas,
+            #         estadoid = Estado.objects.get(descripcion="Activo")
+            #     )
 
-            if int(tipo_entrega) == 1:
-                Despacho.objects.create(
-                    fechasolicitud = datetime.datetime.now().date(),
-                    fechadespacho =  datetime.datetime.now().date(),
-                    nroventa = ultima_ventas,
-                    estadoid = Estado.objects.get(descripcion="Activo")
-                )
+            # if int(tipo_entrega) == 1:
+            #     Despacho.objects.create(
+            #         fechasolicitud = datetime.now().date(),
+            #         fechadespacho =  datetime.now().date(),
+            #         nroventa = ultima_ventas,
+            #         estadoid = Estado.objects.get(descripcion="Activo")
+            #     )
 
-                ultimo_despacho = Despacho.objects.order_by('despachoid').last()
-                direccion_cliente = Direccioncliente.objects.get(clienteid=cliente_venta)
+            #     ultimo_despacho = Despacho.objects.order_by('despachoid').last()
+            #     direccion_cliente = Direccioncliente.objects.get(clienteid=cliente_venta)
                 
-                Guiadespacho.objects.create(
-                    fechaguia = datetime.datetime.now().date(),
-                    despachoid = ultimo_despacho,
-                    iddircliente = direccion_cliente
-
-                )   
+            #     Guiadespacho.objects.create(
+            #         fechaguia = datetime.now().date(),
+            #         despachoid = ultimo_despacho,
+            #         iddircliente = direccion_cliente
+            #     )   
 
             messages.warning(request, 'Venta realizada con exito')
-            return redirect('listar_ventas')
+            return creacion_doc(productos_venta,'pdf',A4,'Boleta','pdf', valor=False)
+            # return redirect('listar_ventas')
         else:
             messages.warning(request, 'Ocurrio un error en la venta')
 
     return render(request, 'ventas/crear_venta.html',{'productos':productos, 'form':form, 'form_doc':form_doc})
 
-
+@login_required(login_url="ingreso")
 def listar_ventas(request):
     ventas = Venta.objects.all()
 
@@ -2561,7 +2615,7 @@ def listar_ventas(request):
 
     return render(request, 'ventas/listar_ventas.html', context)
 
-
+@login_required(login_url="ingreso")
 def ver_venta(request):
     old_post = request.session.get('_old_post')
     detalle_venta = Detalleventa.objects.filter(nroventa=old_post['VerVenta'])
