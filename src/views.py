@@ -2506,11 +2506,15 @@ def crear_venta(request):
         productos_venta = []
         for key, value in request.POST.items():
             print(f"key: {key}  value  {value}")
-            if key == "csrfmiddlewaretoken":
+            if key == "total" and value == "":
+                sweetify.warning(request, "Porfavor ingrese productos")
+            elif value == "":
+                sweetify.warning(request, "Ingrese todo los datos")
+            elif key == "csrfmiddlewaretoken":
                 pass
             elif key == "clienteid":
                 cliente_venta = Cliente.objects.get(clienteid=value)
-            elif key == "Tipo_documento":
+            elif key == "tipodocumentoid":
                 documento_venta = Tipodocumento.objects.get(tipodocumentoid=value)
             elif key == "tipopagoid":
                 tipopagoid = Tipopago.objects.get(tipopagoid=value)
@@ -2560,7 +2564,7 @@ def crear_venta(request):
                 producto_vendido.save()
 
         
-            if documento_venta.tipodocumentoid in [2,4]:
+            if documento_venta.tipodocumentoid == 2:
                 Factura.objects.create(
                     fechafactura = datetime.now().date(),
                     neto = int(total_venta)-(int(total_venta)*0.19),
@@ -2569,14 +2573,18 @@ def crear_venta(request):
                     nroventa = ultima_ventas,
                     estadoid = Estado.objects.get(descripcion="Activo")
                 )
-            
-            elif documento_venta.tipodocumentoid in [1,3]:
+                messages.warning(request, 'Venta realizada con exito')
+                return creacion_pdf(productos_venta,'pdf',A4,'Factura','pdf', valor=False)
+
+            elif documento_venta.tipodocumentoid == 1:
                 Boleta.objects.create(
                     fechaboleta = datetime.now().date(),
                     totalboleta = total_venta,
                     nroventa = ultima_ventas,
                     estadoid = Estado.objects.get(descripcion="Activo")
                 )
+                messages.warning(request, 'Venta realizada con exito')
+                return creacion_pdf(productos_venta,'pdf',A4,'Boleta','pdf', valor=False)
 
             if int(tipo_entrega) == 1:
                 Despacho.objects.create(
@@ -2595,8 +2603,7 @@ def crear_venta(request):
                     iddircliente = direccion_cliente
                 )   
 
-            messages.warning(request, 'Venta realizada con exito')
-            return creacion_pdf(productos_venta,'pdf',A4,'Boleta','pdf', valor=False)
+            # return creacion_pdf(productos_venta,'pdf',A4,'Boleta','pdf', valor=False)
             # return redirect('listar_ventas')
         else:
             messages.warning(request, 'Ocurrio un error en la venta')
@@ -2683,4 +2690,19 @@ def ver_factura(request):
         'despacho':despacho
     }
 
+    return render(request, 'facturas/ver_factura.html', context)
+
+@login_required(login_url="ingreso")
+def descarga_factura(request):
+    old_post = request.session.get('_old_post')
+
+    factura = Factura.objects.get(numerofactura=old_post['VerFactura'])
+    detalle_venta = Detalleventa.objects.filter(nroventa=factura.nroventa)
+
+    context = {
+        'factura': factura,
+        'detalle_venta':detalle_venta
+    }
+    creacion_pdf(productos_venta,'pdf',A4,'Boleta','pdf', valor=False)
+    
     return render(request, 'facturas/ver_factura.html', context)
