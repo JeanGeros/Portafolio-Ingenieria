@@ -1,5 +1,6 @@
 from django.db import models
 
+
 class Accionpagina(models.Model):
     accionid = models.BigIntegerField(primary_key=True)
     fechain = models.DateField()
@@ -42,6 +43,7 @@ class AuthGroupPermissions(models.Model):
         managed = False
         db_table = 'auth_group_permissions'
         unique_together = (('group', 'permission'),)
+
 
 class AuthPermission(models.Model):
     name = models.CharField(max_length=255, blank=True, null=True)
@@ -90,8 +92,9 @@ class AuthUserUserPermissions(models.Model):
         db_table = 'auth_user_user_permissions'
         unique_together = (('user', 'permission'),)
 
+
 class Bodega(models.Model):
-    BodegaId = models.BigIntegerField(primary_key=True)
+    bodegaId = models.BigIntegerField(primary_key=True)
     pasillo = models.CharField(max_length=6)
     estante = models.CharField(max_length=6)
     casillero = models.CharField(max_length=6)
@@ -102,6 +105,7 @@ class Bodega(models.Model):
     class Meta:
         managed = False
         db_table = 'bodega'
+
 
 class Boleta(models.Model):
     nroboleta = models.BigIntegerField(primary_key=True)
@@ -155,8 +159,9 @@ class Despacho(models.Model):
     despachoid = models.BigIntegerField(primary_key=True)
     fechasolicitud = models.DateField()
     fechadespacho = models.DateField(blank=True, null=True)
-    nroguia = models.ForeignKey('Guiadespacho', models.DO_NOTHING, db_column='nroguia')
-
+    nroventa = models.ForeignKey('Venta', models.DO_NOTHING, db_column='nroventa')
+    estadoid = models.ForeignKey('Estado', models.DO_NOTHING, db_column='estadoid')
+																			   
     class Meta:
         managed = False
         db_table = 'despacho'
@@ -214,6 +219,7 @@ class Direccioncliente(models.Model):
     class Meta:
         managed = False
         db_table = 'direccioncliente'
+
 
 class DjangoAdminLog(models.Model):
     action_time = models.DateTimeField()
@@ -297,6 +303,7 @@ class Error(models.Model):
         managed = False
         db_table = 'error'
 
+
 class Estado(models.Model):
     estadoid = models.BigIntegerField(primary_key=True)
     descripcion = models.CharField(max_length=10)
@@ -350,8 +357,8 @@ class Familiaproducto(models.Model):
 class Guiadespacho(models.Model):
     nroguia = models.BigIntegerField(primary_key=True)
     fechaguia = models.DateField()
-    nroventa = models.ForeignKey('Venta', models.DO_NOTHING, db_column='nroventa')
-    estadoid = models.ForeignKey(Estado, models.DO_NOTHING, db_column='estadoid')
+    despachoid = models.ForeignKey(Despacho, models.DO_NOTHING, db_column='despachoid', blank=True, null=True)
+    iddircliente = models.ForeignKey(Direccioncliente, models.DO_NOTHING, db_column='iddircliente')
 
     class Meta:
         managed = False
@@ -417,8 +424,8 @@ class Producto(models.Model):
     familiaproid = models.ForeignKey(Familiaproducto, models.DO_NOTHING, db_column='familiaproid')
     tipoproductoid = models.ForeignKey('Tipoproducto', models.DO_NOTHING, db_column='tipoproductoid')
     estadoid = models.ForeignKey(Estado, models.DO_NOTHING, db_column='estadoid')
-    imagen = models.ImageField(blank=True, null=True, upload_to="productos")
-    BodegaId = models.ForeignKey(Bodega, models.DO_NOTHING, db_column='BodegaId')
+    imagen = models.CharField(max_length=256, blank=True, null=True)
+    bodegaid = models.ForeignKey(Bodega, models.DO_NOTHING, db_column='bodegaid', blank=True, null=True)
 
     def __str__(self):
         return self.nombre
@@ -439,6 +446,7 @@ class Productoproveedor(models.Model):
     class Meta:
         managed = False
         db_table = 'productoproveedor'
+
 
 class Proveedor(models.Model):
     proveedorid = models.BigIntegerField(primary_key=True)
@@ -587,7 +595,7 @@ class Venta(models.Model):
     totalventa = models.BigIntegerField()
     tipodocumentoid = models.ForeignKey(Tipodocumento, models.DO_NOTHING, db_column='tipodocumentoid')
     clienteid = models.ForeignKey(Cliente, models.DO_NOTHING, db_column='clienteid')
-    tipopagoid = models.BigIntegerField()
+    tipopagoid = models.ForeignKey(Tipopago, models.DO_NOTHING, db_column='tipopagoid')
 
     # def __int__(self):
     #     return self.nroventa
