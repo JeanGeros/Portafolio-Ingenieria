@@ -2,6 +2,7 @@ from copyreg import constructor
 import email
 from multiprocessing.sharedctypes import Value
 from pprint import pprint
+from symbol import flow_stmt
 from this import d
 from django.shortcuts import render, redirect
 from django.http import HttpResponseRedirect
@@ -50,13 +51,14 @@ from django.contrib import messages
 from src.forms import (
     FormClienteNormal1, FormClienteNormal2, FormClienteNormal3, addproductsForm, FormVendedorPersona,
     FormVendedorUsuario, FormVendedorEmpleado, FormEmpleadoPersona, FormEmpleadoUsuario, FormEmpleadoEmpleado,
-    FormProveedor, FormProductoproveedor, FormBodega, FormClienteEmpresa
+    FormProveedor, FormProductoproveedor, FormBodega, FormClienteEmpresa, FormCliente, FormTipodocumento, FormVenta, FormDocu
 )
 
 from .models import (
-    Detalleorden, Estadoorden, Ordencompra, Persona, Direccion, Usuario, Cliente, Estado, Comuna, Tipobarrio, Tipovivienda, Rolusuario,
-    Proveedor, Tipoproducto, Producto, Familiaproducto, Empleado, Cargo, Tiporubro, Empresa, Recepcion, Productoproveedor, Bodega,
-    Direccioncliente, Venta, Detalleventa, Boleta
+     Detalleorden, Estadoorden, Guiadespacho, Ordencompra, Persona, Direccion, Usuario, Cliente, Estado, Comuna, Tipobarrio, Despacho,
+    Tipovivienda, Rolusuario, Direccioncliente, Empresa, Proveedor, Tipoproducto, Producto, Familiaproducto, Tipopago,
+    Empleado, Cargo, Tiporubro, Recepcion, Productoproveedor, Bodega, Boleta, Factura, Venta, Tipodocumento, Detalleventa, Boleta
+
 )
 
 from django.utils.encoding import smart_str
@@ -629,6 +631,7 @@ def Seleccion_registro(request):
     }
 
     return render(request, 'clientes/seleccion_registro.html', context)
+
 
 def Registro_clientes(request):
 
@@ -1703,6 +1706,7 @@ def Agregar_proveedor(request):
 
     return render(request, 'proveedores/agregar_proveedor.html', context)
 
+
 def Cambiar_estado_proveedor(id_proveedor):
     proveedor = Proveedor.objects.get(proveedorid=id_proveedor)
 
@@ -1712,6 +1716,7 @@ def Cambiar_estado_proveedor(id_proveedor):
     else:
         proveedor.estadoid = Estado.objects.get(descripcion="Activo")
         proveedor.save()
+
 
 @login_required(login_url="ingreso")
 def Listar_proveedores(request):
@@ -1752,6 +1757,7 @@ def Listar_proveedores(request):
 
     return render(request, 'proveedores/listar_proveedores.html', context)
 
+
 @login_required(login_url="ingreso")
 def Ver_proveedor(request):
 
@@ -1774,6 +1780,7 @@ def Ver_proveedor(request):
     }
 
     return render(request, 'proveedores/ver_proveedor.html', context)
+
 
 @login_required(login_url="ingreso")
 def Editar_proveedor(request):
@@ -1830,7 +1837,6 @@ def Editar_proveedor(request):
     }
 
     return render(request, 'proveedores/editar_proveedor.html', context)
-
 
 # ********************************Empleados************************************************
 
@@ -2077,6 +2083,7 @@ def Editar_empleado(request):
 
     return render(request, 'empleados/editar_empleado.html', context)
 
+
 def Cambiar_estado_empleado(id_empleado):
     empleado = Empleado.objects.get(empleadoid=id_empleado)
     persona_id = Empleado.objects.filter(empleadoid=id_empleado).values('personaid')
@@ -2226,7 +2233,6 @@ def RecepcionPedido(request, id=None):
             print(f"key:{key} value:{value}")
             orden_pedido = Ordencompra.objects.get(ordenid=id)
             detalle_orden = Detalleorden.objects.filter(ordenid=orden_pedido)
-
             if key == "csrfmiddlewaretoken":
                 pass
             else:
@@ -2699,3 +2705,281 @@ def creacion_doc(lista, nombre_archivo):
 
     return response
 
+# def creacion_boleta(lista,tipo_doc,tamaño_pagina, nombre, extension, valor = None):
+#     response = HttpResponse(content_type=f'application/{tipo_doc}')  
+
+#     buff = BytesIO()  
+
+#     doc = SimpleDocTemplate(buff,  
+#         pagesize=tamaño_pagina,  
+#         rightMargin=40,  
+#         leftMargin=40,  
+#         topMargin=60,  
+#         bottomMargin=18,  
+#     ) 
+    
+#     doc
+#     header_image = []
+#     styles = getSampleStyleSheet()  
+#     text = '''
+#         <img src="Ferme-logo.png" width="50%" height="50%"/>
+#         '''
+
+#     p_text=Paragraph(text, styles)
+#     header_image.append(p_text)
+
+
+#     data = []  
+#     styles = getSampleStyleSheet()  
+#     styles = styles['Heading1']
+#     styles.alignment = TA_CENTER 
+
+#     header = Paragraph(f"{nombre}", styles)  
+    
+#     data.append(header)  
+
+#     t = Table(lista)  
+
+#     t.setStyle(TableStyle(  
+#         [  
+#         ('GRID', (0, 0), (12, -1), 1, colors.dodgerblue),  
+#         ('LINEBELOW', (0, 0), (-1, 0), 3, colors.darkblue),  
+#         ('BACKGROUND', (0, 0), (-1, 0), colors.dodgerblue)  
+#         ]  
+#     ))  
+    
+#     data.append(t)
+
+#     doc.build(header_image, data)  
+#     response.write(buff.getvalue())   
+
+#     buff.seek(0)
+
+#     respuesta = FileResponse(buff, as_attachment=valor, filename=f'{nombre}.{extension}')
+
+#     return respuesta
+
+
+@login_required(login_url="ingreso")
+def crear_venta(request):
+
+    if request.POST.get('VerPerfil') is not None:
+        request.session['_ver_perfil'] = request.POST
+        return redirect('ver_perfil')
+
+    if Usuario.objects.filter(nombreusuario=request.user).exists():
+        tipo_usuario = Usuario.objects.get(nombreusuario=request.user)
+        tipo_usuario = tipo_usuario.rolid.descripcion
+    else: 
+        tipo_usuario = None
+
+    productos = Productoproveedor.objects.all()
+    form = FormCliente()
+    form_doc = FormVenta()
+    form_docu =FormDocu()
+
+    total = 0
+    if request.method == 'POST':
+        productos_venta = []
+        for key, value in request.POST.items():
+            print(f"key: {key}  value  {value}")
+            if key == "total" and value == "":
+                sweetify.warning(request, "Porfavor ingrese productos")
+            elif value == "":
+                sweetify.warning(request, "Ingrese todo los datos")
+            elif key == "csrfmiddlewaretoken":
+                pass
+            elif key == "clienteid":
+                cliente_venta = Cliente.objects.get(clienteid=value)
+            elif key == "tipodocumentoid":
+                documento_venta = Tipodocumento.objects.get(tipodocumentoid=value)
+            elif key == "tipopagoid":
+                tipopagoid = Tipopago.objects.get(tipopagoid=value)
+            elif key == "tipo_entrega":
+                tipo_entrega = value
+
+            else:
+                try:
+                    key = int(key)
+                    try:
+                        producto = Producto.objects.get(productoid=int(key))
+                    except Producto.DoesNotExist:
+                        sweetify.warning(request, "Ocurrio un Problema")
+                        print(error)
+                        return render(request, 'index.html')
+                except Exception as error:
+                    if "cantidad" in key:
+                        cantidad = value
+                    elif key != "total" and "total" in key:
+                        total = value.replace("$", "")
+                        productos_venta.append([producto, cantidad, total])
+                    elif key == "total":
+                        total_venta = value
+
+                    
+        if len(productos_venta) >0: 
+            Venta.objects.create(
+                fechaventa=datetime.now().date(),
+                totalventa=total_venta,
+                tipodocumentoid=documento_venta,
+                clienteid=cliente_venta,
+                tipopagoid=tipopagoid 
+            )
+
+            ultima_ventas = Venta.objects.order_by('nroventa').last()
+            
+            for producto in productos_venta:
+                Detalleventa.objects.create(
+                    cantidad = producto[1],
+                    subtotal = int(producto[2]) * int(producto[1]),
+                    productoid = producto[0],
+                    nroventa = ultima_ventas
+                )
+                producto_modificar = producto[0]
+                producto_vendido, created = Producto.objects.get_or_create(productoid=producto_modificar.productoid)
+                producto_vendido.stock = producto_vendido.stock-int(producto[1])
+                producto_vendido.save()
+
+        
+            if documento_venta.tipodocumentoid == 2:
+                Factura.objects.create(
+                    fechafactura = datetime.now().date(),
+                    neto = int(total_venta)-(int(total_venta)*0.19),
+                    iva = int(total_venta)*0.19,
+                    totalfactura = total_venta,
+                    nroventa = ultima_ventas,
+                    estadoid = Estado.objects.get(descripcion="Activo")
+                )
+                messages.warning(request, 'Venta realizada con exito')
+                return creacion_pdf(productos_venta,'pdf',A4,'Factura','pdf', valor=False)
+
+            elif documento_venta.tipodocumentoid == 1:
+                Boleta.objects.create(
+                    fechaboleta = datetime.now().date(),
+                    totalboleta = total_venta,
+                    nroventa = ultima_ventas,
+                    estadoid = Estado.objects.get(descripcion="Activo")
+                )
+                messages.warning(request, 'Venta realizada con exito')
+                return creacion_pdf(productos_venta,'pdf',A4,'Boleta','pdf', valor=False)
+
+            if int(tipo_entrega) == 1:
+                Despacho.objects.create(
+                    fechasolicitud = datetime.now().date(),
+                    fechadespacho =  datetime.now().date(),
+                    nroventa = ultima_ventas,
+                    estadoid = Estado.objects.get(descripcion="Activo")
+                )
+
+                ultimo_despacho = Despacho.objects.order_by('despachoid').last()
+                direccion_cliente = Direccioncliente.objects.get(clienteid=cliente_venta)
+                
+                Guiadespacho.objects.create(
+                    fechaguia = datetime.now().date(),
+                    despachoid = ultimo_despacho,
+                    iddircliente = direccion_cliente
+                )   
+
+            # return creacion_pdf(productos_venta,'pdf',A4,'Boleta','pdf', valor=False)
+            # return redirect('listar_ventas')
+        else:
+            messages.warning(request, 'Ocurrio un error en la venta')
+
+    return render(request, 'ventas/crear_venta.html',{'productos':productos, 'form':form, 'form_doc':form_doc, 'form_docu': form_docu})
+
+@login_required(login_url="ingreso")
+def listar_ventas(request):
+    
+    if request.POST.get('VerPerfil') is not None:
+        request.session['_ver_perfil'] = request.POST
+        return redirect('ver_perfil')
+
+    if Usuario.objects.filter(nombreusuario=request.user).exists():
+        tipo_usuario = Usuario.objects.get(nombreusuario=request.user)
+        tipo_usuario = tipo_usuario.rolid.descripcion
+    else: 
+        tipo_usuario = None
+
+    ventas = Venta.objects.all()
+
+    if request.method == 'POST':
+        if request.POST.get('VerVenta') is not None:
+            request.session['_old_post'] = request.POST
+            return HttpResponseRedirect('ver_venta')
+
+    context = {
+        'ventas': ventas
+    }
+
+    return render(request, 'ventas/listar_ventas.html', context)
+
+@login_required(login_url="ingreso")
+def ver_venta(request):
+    old_post = request.session.get('_old_post')
+    detalle_venta = Detalleventa.objects.filter(nroventa=old_post['VerVenta'])
+    venta = Venta.objects.get(nroventa=old_post['VerVenta'])
+    despacho = Despacho.objects.get(nroventa=old_post['VerVenta'])
+    guia = Guiadespacho.objects.filter(despachoid=despacho)
+
+    context = {
+        'detalle_venta': detalle_venta,
+        'venta': venta,
+        'despacho':guia
+    }
+
+    return render(request, 'ventas/ver_venta.html', context)
+
+@login_required(login_url="ingreso")
+def listar_facturas(request):
+    
+    if request.POST.get('VerPerfil') is not None:
+        request.session['_ver_perfil'] = request.POST
+        return redirect('ver_perfil')
+
+    if Usuario.objects.filter(nombreusuario=request.user).exists():
+        tipo_usuario = Usuario.objects.get(nombreusuario=request.user)
+        tipo_usuario = tipo_usuario.rolid.descripcion
+    else: 
+        tipo_usuario = None
+
+    facturas = Factura.objects.all()
+
+    if request.method == 'POST':
+        if request.POST.get('VerFactura') is not None:
+            request.session['_old_post'] = request.POST
+            return HttpResponseRedirect('ver_factura')
+
+    context = {
+        'facturas': facturas
+    }
+
+    return render(request, 'facturas/listar_facturas.html', context)
+
+@login_required(login_url="ingreso")
+def ver_factura(request):
+    old_post = request.session.get('_old_post')
+    detalle_factura = Factura.objects.get(numerofactura=old_post['VerFactura'])
+    despacho = Despacho.objects.filter(nroventa=detalle_factura.nroventa)
+
+    print(despacho)
+    context = {
+        'factura': detalle_factura,
+        'despacho':despacho
+    }
+
+    return render(request, 'facturas/ver_factura.html', context)
+
+@login_required(login_url="ingreso")
+def descarga_factura(request):
+    old_post = request.session.get('_old_post')
+
+    factura = Factura.objects.get(numerofactura=old_post['VerFactura'])
+    detalle_venta = Detalleventa.objects.filter(nroventa=factura.nroventa)
+
+    context = {
+        'factura': factura,
+        'detalle_venta':detalle_venta
+    }
+    # creacion_pdf(productos_venta,'pdf',A4,'Boleta','pdf', valor=False)
+    
+    return render(request, 'facturas/ver_factura.html', context)

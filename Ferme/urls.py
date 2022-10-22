@@ -75,6 +75,16 @@ urlpatterns = [
     path('boletas/ver_boleta', views.Ver_boleta, name="ver_boleta"),
     
 
+    path('ventas/', views.listar_ventas, name="listar_ventas"),
+    path('ventas/crear_venta', views.crear_venta, name="crear_venta"),
+    path('ventas/ver_venta', views.ver_venta, name="ver_venta"),
+
+    path('facturas/', views.listar_facturas, name="listar_facturas"),
+    path('facturas/ver_factura', views.ver_factura, name="ver_factura"),
+
+    
+
+
 
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 

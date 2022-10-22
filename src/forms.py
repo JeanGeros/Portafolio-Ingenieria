@@ -3,7 +3,7 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 
-from .models import Producto, Persona, Direccion, Proveedor, Usuario, Cliente, Empleado, Productoproveedor, Bodega, Empresa
+from .models import Producto, Persona, Direccion, Proveedor, Usuario, Cliente, Empleado, Productoproveedor, Bodega, Empresa, Tipodocumento, Venta
 
 class FormRegistroUsuario(UserCreationForm):
 
@@ -94,7 +94,6 @@ class FormEmpleadoEmpleado(forms.ModelForm):
 
 
 class FormProductoproveedor(forms.ModelForm):
-
     class Meta:
         model = Productoproveedor
         fields = '__all__'
@@ -105,5 +104,35 @@ class FormBodega(forms.ModelForm):
         model = Bodega
         fields = '__all__'
 
+class FormCliente(forms.ModelForm):
+    class Meta:
+        model = Cliente
+        fields = '__all__'
+    
+class FormTipodocumento(forms.ModelForm):
+    class Meta:
+        model = Tipodocumento
+        fields = '__all__'
 
+class FormVenta(forms.ModelForm):
+    class Meta:
+        model = Venta
+        fields = '__all__'
 
+class FormDocu(forms.Form):
+    opciones_documentos =(
+        ("", "----------"),
+        ("1", "Boleta Afecta"),
+        ("2", "Factura Afecta"),
+        ("3", "Boleta Exenta"),
+        ("4", "Factura Exenta"),
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs) 
+        for field in iter(self.fields):  
+            self.fields[field].widget.attrs.update({  
+                'class': 'form-control'  
+            })  
+
+    Tipo_documento= forms.ChoiceField(choices = opciones_documentos)
