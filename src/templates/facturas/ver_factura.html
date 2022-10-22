@@ -56,11 +56,51 @@
             </tr>
             </tbody>
         </table>
+        <form action="" method="post">
+            {% csrf_token %}    
+            <div class="container p-3">
+                <div class="row">
+                    <div class="col-md-4">
+                    </div>
+        
+                    <div class="col-md-4 text-center">
+                        <br>
+                        <div class="row border border-dark rounded">
+                            <div class="col-md-6">
+                                <label for="">Exportar a documento tipo:</label></br></br>
+                                <input type="radio" name="informeCheck" value="informeExcel" id="informeCheck1" onclick="checkeado(this.form)"> Excel</br></br>
+                                <input type="radio" name="informeCheck" value="informeWord" id="informeCheck2" onclick="checkeado(this.form)"> Word</br></br>
+                                <input type="radio" name="informeCheck" value="informePdf" id="informeCheck3" onclick="checkeado(this.form)"> PDF</br><br>
 
+                            </div>
+                            <div class="col-md-6 " style="display: flex;
+                            justify-content: center;
+                            align-items: center;
+                            flex-direction: column;">
+                                <button type="submit" name="descargarInforme" value="descargarInforme" id="descargarInforme" class="btn btn_aceptar border border-secondary text-black">Descargar</button><br><br>
+                            </div>
+
+                        </div>
+                    </div>
+        
+                    <div class="col-md-4">
+                    </div>
+                </div>
+            </div>
+        </form>
     
 
         <a href="{% url 'listar_facturas' %}" type="submit" class="btn">Volver</a>
 
     </div>
+    <script>
+        document.getElementById("descargarInforme").disabled=true;
+        function checkeado(form)
+        {
+            if (form.informeCheck3.checked == true || form.informeCheck1.checked == true || form.informeCheck2.checked == true){
+                form.descargarInforme.disabled = false;
+            }
+        }
+    </script>
 {% endlocalize %}
 {% endblock %}
