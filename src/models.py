@@ -589,6 +589,9 @@ class Venta(models.Model):
     clienteid = models.ForeignKey(Cliente, models.DO_NOTHING, db_column='clienteid')
     tipopagoid = models.BigIntegerField()
 
+    # def __int__(self):
+    #     return self.nroventa
+
     class Meta:
         managed = False
         db_table = 'venta'

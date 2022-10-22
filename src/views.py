@@ -43,6 +43,8 @@ from reportlab.lib import colors
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, NextPageTemplate
 from io import BytesIO
 import re
+from docx.oxml.ns import nsdecls
+from docx.oxml import parse_xml
 
 from django.contrib import messages
 from src.forms import (
@@ -54,22 +56,23 @@ from src.forms import (
 from .models import (
     Detalleorden, Estadoorden, Ordencompra, Persona, Direccion, Usuario, Cliente, Estado, Comuna, Tipobarrio, Tipovivienda, Rolusuario,
     Proveedor, Tipoproducto, Producto, Familiaproducto, Empleado, Cargo, Tiporubro, Empresa, Recepcion, Productoproveedor, Bodega,
-    Direccioncliente, Venta, Detalleventa
+    Direccioncliente, Venta, Detalleventa, Boleta
 )
+
 from django.utils.encoding import smart_str
+
 def Index(request):
     
     if request.POST.get('VerPerfil') is not None:
         request.session['_ver_perfil'] = request.POST
         return redirect('ver_perfil')
     
-    if request.POST.get('DescargarApp') is not None:
+    # if request.POST.get('DescargarApp') is not None:
         
-
-        response = HttpResponse(content_type='application/force-download') # mimetype is replaced by content_type for django 1.7
-        response['Content-Disposition'] = 'attachment; filename=%s' % smart_str('app-debug.apk')
-        response['X-Sendfile'] = smart_str('/')
-        return response
+    #     response = HttpResponse(content_type='application/force-download') # mimetype is replaced by content_type for django 1.7
+    #     response['Content-Disposition'] = 'attachment; filename=%s' % smart_str('app-debug.apk')
+    #     response['X-Sendfile'] = smart_str('/')
+    #     return response
 
     if Usuario.objects.filter(nombreusuario=request.user).exists():
         tipo_usuario = Usuario.objects.get(nombreusuario=request.user)
@@ -436,7 +439,7 @@ def Revisar_compras(request):
         EnviarCorreo = request.POST.get('EnviarCorreo')
 
         if EnviarCorreo is not None:
-            template = get_template('compras.html')
+            template = get_template('perfiles/descargar_compras.html')
             content = template.render({'val':val})
             email = EmailMultiAlternatives(
                 "asunto",
@@ -1397,6 +1400,7 @@ def Cambiar_estado_vendedor(id_vendedor):
         user.is_active = True
         user.save()
 
+@login_required(login_url="ingreso")
 def Listar_clientes_vendedor(request):
 
     if request.POST.get('VerPerfil') is not None:
@@ -1424,6 +1428,7 @@ def Listar_clientes_vendedor(request):
 
     return render(request, 'vendedores/listar_clientes_vendedor.html', context)
 
+@login_required(login_url="ingreso")
 def Ver_cliente_vendedor(request):
 
     if request.POST.get('VerPerfil') is not None:
@@ -1596,6 +1601,7 @@ def Agregar_cliente_vendedor(request):
 
     return render(request, 'vendedores/agregar_cliente_vendedor.html', context)
 
+@login_required(login_url="ingreso")
 def Editar_cliente_vendedor(request):
 
     if request.POST.get('VerPerfil') is not None:
@@ -2001,7 +2007,6 @@ def Agregar_empleado(request):
 
     return render(request, 'empleados/agregar_empleado.html', context)
 
-
 @login_required(login_url="ingreso")
 def Ver_empleado(request):
 
@@ -2184,7 +2189,6 @@ def Crear_pedido(request, id=None):
     }
     return render(request, 'pedidos/crear_pedido.html', context)
 
-
 def filtro_proveedor(request):
     proveedores = Proveedor.objects.all()
     context = {
@@ -2192,7 +2196,6 @@ def filtro_proveedor(request):
     }
 
     return render(request, 'pedidos/crear_pedido_proveedores.html', context)
-
 
 def cambiar_estado_pedido(id_pedido):
     orden_compra = Ordencompra.objects.get(ordenid=int(id_pedido))
@@ -2208,7 +2211,6 @@ def cambiar_estado_pedido(id_pedido):
         print(detalle)
         detalle.estadoid = estado_eliminado_detale
         detalle.save()
-
 
 def Listar_pedidos(request):
     ordenes = Ordencompra.objects.all()
@@ -2233,7 +2235,6 @@ def Listar_pedidos(request):
 
     return render(request, 'pedidos/listar_pedidos.html', context)
 
-
 def Ver_pedidos(request):
     old_post = request.session.get('_old_post')
     detalle_orden = Detalleorden.objects.filter(ordenid=old_post['VerPedido'])
@@ -2245,7 +2246,6 @@ def Ver_pedidos(request):
     }
 
     return render(request, 'pedidos/ver_pedido.html', context)
-
 
 # ***************************Recepcionar pedidos*******************************************
 
@@ -2310,6 +2310,319 @@ def RecepcionPedido(request, id=None):
 
     return render(request, 'recepcion_pedido.html', context)
 
+#****************************Boletas*******************************************************
+
+def Listar_boletas(request):
+
+    if request.POST.get('VerPerfil') is not None:
+        request.session['_ver_perfil'] = request.POST
+        return redirect('ver_perfil')
+
+    if Usuario.objects.filter(nombreusuario=request.user).exists():
+        tipo_usuario = Usuario.objects.get(nombreusuario=request.user)
+        tipo_usuario = tipo_usuario.rolid.descripcion
+    else: 
+        tipo_usuario = None
+
+    boletas = Boleta.objects.all()
+
+    if request.method == 'POST':
+
+        if request.POST.get('VerBoleta') is not None:
+            request.session['_ver_boleta'] = request.POST
+            return HttpResponseRedirect('ver_boleta')
+
+    context = {
+        'boletas': boletas,
+        'tipo_usuario': tipo_usuario,
+    }
+
+    return render(request, 'boletas/listar_boletas.html', context)
+
+def Ver_boleta(request):
+
+    if request.POST.get('VerPerfil') is not None:
+        request.session['_ver_perfil'] = request.POST
+        return redirect('ver_perfil')
+
+    if Usuario.objects.filter(nombreusuario=request.user).exists():
+        tipo_usuario = Usuario.objects.get(nombreusuario=request.user)
+        tipo_usuario = tipo_usuario.rolid.descripcion
+    else: 
+        tipo_usuario = None
+
+    ver_boleta = request.session.get('_ver_boleta')
+    boleta = Boleta.objects.get(nroboleta = ver_boleta['VerBoleta'])
+    productos_boleta = Detalleventa.objects.filter(nroventa = boleta.nroventa.nroventa)
+
+    if request.method == 'POST':
+
+        tipoInforme = request.POST.get('informeCheck')
+        descargarInforme = request.POST.get('descargarInforme')
+        
+        if tipoInforme is not None and descargarInforme is not None:
+
+            lista1 = []
+            lista2 = []
+            lista3 = []
+            lista1.append(["Nro Boleta","Fecha","Total","Estado"])  
+            val = Boleta.objects.filter(nroboleta = ver_boleta['VerBoleta']).values_list('nroboleta','fechaboleta','totalboleta','estadoid__descripcion')
+
+            for valores in val:
+
+                lista1.append(list(valores)) 
+
+            lista2.append(["Nro Venta","Tipo pago","Run cliente","DV"])  
+            val = Boleta.objects.filter(nroboleta = ver_boleta['VerBoleta']).values_list('nroventa__nroventa','nroventa__tipodocumentoid__descripcion','nroventa__clienteid__personaid__runcuerpo','nroventa__clienteid__personaid__dv')
+
+            for valores in val:
+
+                lista2.append(list(valores))
+
+            lista3.append(["Producto","Cantidad","Subtotal"])  
+            val = Detalleventa.objects.filter(nroventa = boleta.nroventa.nroventa).values_list('productoid__nombre','cantidad','subtotal')
+
+            for valores in val:
+
+                lista3.append(list(valores))
+
+            if tipoInforme == "informeExcel":
+
+                nombre_archivo = "Detalle boleta"
+                tipo_doc = 'ms-excel'
+                extension = 'xlsx'
+                
+                lista1.append("")
+                lista2.append("")
+
+                lista = lista1 + lista2 + lista3
+                
+                return  creacion_excel(nombre_archivo, lista, tipo_doc, extension)
+
+            if tipoInforme == "informePdf":
+                
+                tipo_doc = 'pdf'
+                extension = 'pdf'
+                nombre = 'Detalle boleta'
+                
+                # return creacion_pdf(lista,tipo_doc,A4,nombre,extension, valor=False)
+                response = HttpResponse(content_type=f'application/{tipo_doc}')  
+
+                buff = BytesIO()  
+
+                doc = SimpleDocTemplate(buff,  
+                    pagesize=A4,  
+                    rightMargin=40,  
+                    leftMargin=40,  
+                    topMargin=60,  
+                    bottomMargin=18,  
+                ) 
+                
+                data = []  
+                styles = getSampleStyleSheet()  
+                styles = styles['Heading1']
+                styles.alignment = TA_CENTER 
+
+                header = Paragraph(f"{nombre}", styles)  
+                
+                data.append(header)  
+
+                t = Table(lista1)  
+
+                t.setStyle(TableStyle(  
+                    [  
+                    ('GRID', (0, 0), (12, -1), 1, colors.dodgerblue),  
+                    ('LINEBELOW', (0, 0), (-1, 0), 3, colors.darkblue),  
+                    ('BACKGROUND', (0, 0), (-1, 0), colors.dodgerblue)  
+                    ]  
+                ))  
+                
+                data.append(t)
+
+                styles = getSampleStyleSheet()  
+                styles.pageBreakBefore = 2
+                styles = styles['Heading1']
+                styles.alignment = TA_CENTER  
+                header = Paragraph("", styles) 
+                data.append(header)  
+                header = Paragraph("", styles) 
+                data.append(header)  
+
+                t = Table(lista2)  
+
+                t.setStyle(TableStyle(  
+                    [  
+                    ('GRID', (0, 0), (12, -1), 1, colors.dodgerblue),  
+                    ('LINEBELOW', (0, 0), (-1, 0), 3, colors.darkblue),  
+                    ('BACKGROUND', (0, 0), (-1, 0), colors.dodgerblue)  
+                    ]  
+                ))  
+                
+                data.append(t)
+
+                styles = getSampleStyleSheet()  
+                styles.pageBreakBefore = 3
+                styles = styles['Heading1']
+                styles.alignment = TA_CENTER 
+                header = Paragraph("", styles) 
+                data.append(header)  
+                header = Paragraph("", styles) 
+                data.append(header)  
+
+                t = Table(lista3)  
+
+                t.setStyle(TableStyle(  
+                    [  
+                    ('GRID', (0, 0), (12, -1), 1, colors.dodgerblue),  
+                    ('LINEBELOW', (0, 0), (-1, 0), 3, colors.darkblue),  
+                    ('BACKGROUND', (0, 0), (-1, 0), colors.dodgerblue)  
+                    ]  
+                ))  
+                
+                data.append(t)
+
+                doc.build(data)  
+                response.write(buff.getvalue())   
+
+                buff.seek(0)
+                return FileResponse(buff, as_attachment=False, filename=f'{nombre}.{extension}')
+
+            if tipoInforme == "informeWord":
+
+                nombre_archivo = "Detalle boleta"
+                # return  creacion_doc(lista1, nombre_archivo)
+                document = Document()
+                document.add_heading('Detalle Boleta', 0)
+
+                filas = 0
+                for x in lista1:
+                    columnas = len(x)
+                    filas += 1
+
+                # add grid table
+                table = document.add_table(rows=filas, cols=columnas, style="Table Grid")
+
+                for x in range(columnas):
+                    table.rows[0].cells[x]._tc.get_or_add_tcPr().append(parse_xml(r'<w:shd {} w:fill="D9D9D9"/>'.format(nsdecls('w'))))
+                
+                # access first row's cells
+                heading_row = table.rows[0].cells
+
+                # add headings
+                cont = 0
+                for value in lista1[0]:
+                    heading_row[cont].text = value
+                    cont += 1
+
+                lista1.pop(0)
+                cont = 0
+                cont2 = 0
+
+                for value in lista1:
+                    cont += 1
+                    data_row = table.rows[cont].cells
+
+                    for x in value:
+                        data_row[cont2].text = f'{x}'
+                        cont2 += 1
+                    cont2 = 0
+
+                document.add_paragraph("")
+
+                # parrafo.add_run().add_break()
+                filas = 0
+                for x in lista2:
+                    columnas = len(x)
+                    filas += 1
+
+                # add grid table
+                table2 = document.add_table(rows=filas, cols=columnas, style="Table Grid")
+
+                for x in range(columnas):
+                    table2.rows[0].cells[x]._tc.get_or_add_tcPr().append(parse_xml(r'<w:shd {} w:fill="D9D9D9"/>'.format(nsdecls('w'))))
+
+                # access first row's cells
+                heading_row = table2.rows[0].cells
+
+                # add headings
+                cont = 0
+                for value in lista2[0]:
+                    heading_row[cont].text = value
+                    cont += 1
+
+                lista2.pop(0)
+                cont = 0
+                cont2 = 0
+
+                for value in lista2:
+                    cont += 1
+                    data_row = table2.rows[cont].cells
+
+                    for x in value:
+                        data_row[cont2].text = f'{x}'
+                        cont2 += 1
+                    cont2 = 0 
+
+                document.add_paragraph("")
+
+                filas = 0
+                for x in lista3:
+                    columnas = len(x)
+                    filas += 1
+
+                # add grid table
+                table3 = document.add_table(rows=filas, cols=columnas, style="Table Grid")
+
+                for x in range(columnas):
+                    table3.rows[0].cells[x]._tc.get_or_add_tcPr().append(parse_xml(r'<w:shd {} w:fill="D9D9D9"/>'.format(nsdecls('w'))))
+
+                # access first row's cells
+                heading_row = table3.rows[0].cells
+
+                # add headings
+                cont = 0
+                for value in lista3[0]:
+                    heading_row[cont].text = value
+                    cont += 1
+
+                lista3.pop(0)
+                cont = 0
+                cont2 = 0
+
+                for value in lista3:
+                    cont += 1
+                    data_row = table3.rows[cont].cells
+
+                    for x in value:
+                        data_row[cont2].text = f'{x}'
+                        cont2 += 1
+                    cont2 = 0  
+
+                response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document')
+                response['Content-Disposition'] = f'attachment; filename={nombre_archivo}.docx'
+                document.save(response)
+
+                return response
+
+    context = {
+        'boleta': boleta,
+        'tipo_usuario': tipo_usuario,
+        'productos_boleta': productos_boleta
+    }
+
+    return render(request, 'boletas/ver_boleta.html', context)
+
+def Cambiar_estado_boleta(id_boleta):
+    boleta = Boleta.objects.get(nroboleta=id_boleta)
+
+    if boleta.estadoid.descripcion == 'Activo':
+        boleta.estadoid = Estado.objects.get(descripcion="Inactivo")
+        boleta.save()
+    else:
+        boleta.estadoid = Estado.objects.get(descripcion="Activo")
+        boleta.save()
+
+#****************************Creacion de archivos******************************************
 
 def creacion_excel(nombre_archivo, lista, tipo_doc, extension):
     book = openpyxl.Workbook()  # Se crea un libro
