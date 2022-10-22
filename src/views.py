@@ -2633,18 +2633,54 @@ def listar_ventas(request):
 def ver_venta(request):
     old_post = request.session.get('_old_post')
     detalle_venta = Detalleventa.objects.filter(nroventa=old_post['VerVenta'])
-    ventas = Venta.objects.filter(nroventa=old_post['VerVenta'])
+    venta = Venta.objects.get(nroventa=old_post['VerVenta'])
     despacho = Despacho.objects.get(nroventa=old_post['VerVenta'])
-    print(despacho)
     guia = Guiadespacho.objects.filter(despachoid=despacho)
-    print(guia)
-    
 
     context = {
         'detalle_venta': detalle_venta,
-        'ventas': ventas,
+        'venta': venta,
         'despacho':guia
     }
 
     return render(request, 'ventas/ver_venta.html', context)
 
+@login_required(login_url="ingreso")
+def listar_facturas(request):
+    
+    if request.POST.get('VerPerfil') is not None:
+        request.session['_ver_perfil'] = request.POST
+        return redirect('ver_perfil')
+
+    if Usuario.objects.filter(nombreusuario=request.user).exists():
+        tipo_usuario = Usuario.objects.get(nombreusuario=request.user)
+        tipo_usuario = tipo_usuario.rolid.descripcion
+    else: 
+        tipo_usuario = None
+
+    facturas = Factura.objects.all()
+
+    if request.method == 'POST':
+        if request.POST.get('VerFactura') is not None:
+            request.session['_old_post'] = request.POST
+            return HttpResponseRedirect('ver_factura')
+
+    context = {
+        'facturas': facturas
+    }
+
+    return render(request, 'facturas/listar_facturas.html', context)
+
+@login_required(login_url="ingreso")
+def ver_factura(request):
+    old_post = request.session.get('_old_post')
+    detalle_factura = Factura.objects.get(numerofactura=old_post['VerFactura'])
+    despacho = Despacho.objects.filter(nroventa=detalle_factura.nroventa)
+
+    print(despacho)
+    context = {
+        'factura': detalle_factura,
+        'despacho':despacho
+    }
+
+    return render(request, 'facturas/ver_factura.html', context)

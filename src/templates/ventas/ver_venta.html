@@ -21,20 +21,18 @@
             </tr>
         </thead>
         <tbody style="text-align:center">
-            {% for venta in ventas %}
-                <tr>
-                    <td>{{ venta.clienteid }}</td>
-                    <td>{{ venta.fechaventa }}</td>
-                    <td>{{ venta.tipodocumentoid }}</td>
-                    {% if despacho|length == 0 %}
-                    <td> Retiro En tienda </td>
-                    {% else %}
-                    <td> Despacho a domicilio</td>
-                    {% endif %}
-                    <td>${{ venta.totalventa |localize |intcomma }} </td>
-                    <td>{{ venta.tipopagoid.descripcion }}</td>
-                </tr>
-            {% endfor %}
+            <tr>
+                <td>{{ venta.clienteid }}</td>
+                <td>{{ venta.fechaventa }}</td>
+                <td>{{ venta.tipodocumentoid }}</td>
+                {% if despacho|length == 0 %}
+                <td> Retiro En tienda </td>
+                {% else %}
+                <td> Despacho a domicilio</td>
+                {% endif %}
+                <td>${{ venta.totalventa |localize |intcomma }} </td>
+                <td>{{ venta.tipopagoid.descripcion }}</td>
+            </tr>
         </tbody>
     </table>
 
@@ -78,7 +76,6 @@
                     <td>{{ despa.despachoid.fechadespacho }}</td>
                     <td>{{despa.despachoid.estadoid }}</td>
                     <td>{{ despa.iddircliente.direccionid }}, {{ despa.iddircliente.direccionid.comunaid }}</td>
-
                 </tr>
             {% endfor %}
         </tbody>

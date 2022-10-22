@@ -1,0 +1,63 @@
+{% extends 'layout.html' %}
+{% load widget_tweaks %}
+{% load static %}
+{% block content %}
+{% load l10n %}
+{% localize on %}
+{% load humanize %}
+
+    <link rel="stylesheet" href="{% static 'css/modulo_productos.css' %}">
+    <div class="container text-end caja rounded mt-5">
+    <h1 class="text-center">Administración de Facturas</h1>
+    
+    <table class="table table-striped table-hover "  id="datos" style="background-color: white">
+        <thead  class="table-dark" style="text-align:center">
+            <tr>
+                <th>Fecha Creación</th>
+                <th>Neto</th>
+                <th>IVA</th>
+                <th>Total</th>
+                <th>Nro Venta </th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody style="text-align:center">
+            {% for factura in facturas %}
+                <tr>
+                    <td>{{ factura.fechafactura|date:"SHORT_DATE_FORMAT"}}</td>
+                    <td>${{ factura.neto|localize |intcomma }}</td>
+                    <td>${{ factura.iva|localize |intcomma }}</td>
+                    <td>${{ factura.totalfactura|localize |intcomma }}</td>
+                    <td>{{ factura.nroventa.nroventa    }}</td>
+
+                    <td>
+                        <form method="POST" action="">
+                            {% csrf_token %}
+                            <div class="btn-group">
+                                <button  id="" name="VerFactura" value="{{factura.numerofactura}}" class="btn btn_aceptar border border-secondary">Ver</button>
+                                <!-- {% if producto.productoid.estadoid.descripcion == 'Activo' %}
+                                    <button type="submit" id="" name="CambiarEstado" value="{{producto.productoid.productoid}}" class="btn btn_aceptar border border-secondary">Desactivar Producto</button>
+                                {% else %}
+                                    <button type="submit" id="" name="CambiarEstado" value="{{producto.productoid.productoid}}" class="btn btn_aceptar border border-secondary">Activar Producto</button>
+                                {% endif %} -->
+                                
+                            </div>
+                        </form>
+                    </td>
+                </tr>
+            {% endfor %}
+            <tr class='noSearch hide'>
+                <td colspan="7"></td>
+            </tr>
+        </tbody>
+    </table>
+
+            <!-- <div align="left" class="btn_crear mb-5">
+                <a href="{% url 'agregar_productos' %}" type="button" class="btn btn-primary">Crear</a>
+            </div> -->
+
+    </div>
+    
+
+    {% endlocalize %}
+    {% endblock %}
