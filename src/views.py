@@ -675,6 +675,33 @@ def Registro_clientes(request):
         elif usuarioRegistro3 == True:
             sweetify.warning(request, "El usuario ingresado ya esta registrado")
         else:
+
+            rolusuario = Rolusuario.objects.filter(descripcion="Cliente").values('rolid')
+
+            django_cursor = connection.cursor()
+            cursor = django_cursor.connection.cursor()
+            procedimiento = cursor.callproc(
+                'SP_InsertClientePersona', 
+                [
+                    int(run_cuerpo), 
+                    dv, 
+                    apellido_paterno, 
+                    apellido_materno, 
+                    nombres, 
+                    int(telefono), 
+                    rolusuario[0]['rolid'], 
+                    calle,
+                    str(numero),
+                    nombre_sector,
+                    tipo_vivienda_id,
+                    tipo_barrio_id,
+                    comuna_id,
+                    email,
+                    nombre_usuario,
+                    contraseña
+                ]
+            )
+
             user = User.objects.create_user(
                 username=nombre_usuario,
                 first_name=nombres,
@@ -686,71 +713,10 @@ def Registro_clientes(request):
             user.set_password(contraseña)
             user.set_password(confirme_contraseña)
 
-            # Estado activo = 1 e inactivo = 2
-            Persona.objects.create(
-                runcuerpo = run_cuerpo,
-                dv = dv,
-                apellidopaterno = apellido_paterno,
-                apellidomaterno = apellido_materno,
-                nombres = nombres,
-                telefono = telefono,
-                estadoid = Estado.objects.get(descripcion="Activo")
-            )
-            
-            ValidarDireccion = Direccion.objects.filter(calle = calle, 
-                numero = numero, 
-                tipoviviendaid = tipo_vivienda_id).exists()
-
-            if ValidarDireccion == False:
-
-                Direccion.objects.create(
-                    calle = calle,
-                    numero = numero,
-                    comunaid = Comuna.objects.get(comunaid=comuna_id),
-                    tipoviviendaid = Tipovivienda.objects.get(tipoviviendaid=tipo_vivienda_id),
-                    tipobarrioid = Tipobarrio.objects.get(tipobarrioid=tipo_barrio_id),
-                    nombresector = nombre_sector
-                )
-
-            direccion = Direccion.objects.get(
-                    calle = calle,
-                    numero = numero,
-                    comunaid = Comuna.objects.get(comunaid=comuna_id),
-                    tipoviviendaid = Tipovivienda.objects.get(tipoviviendaid=tipo_vivienda_id),
-                    tipobarrioid = Tipobarrio.objects.get(tipobarrioid=tipo_barrio_id),
-                    nombresector = nombre_sector
-                )
-
-            Cliente.objects.create(
-                personaid = Persona.objects.get(runcuerpo=run_cuerpo, dv=dv),
-                estadoid = Estado.objects.get(descripcion="Activo")
-            )
-
-            cliente = Cliente.objects.get(
-                personaid = Persona.objects.get(runcuerpo=run_cuerpo, dv=dv),
-                estadoid = Estado.objects.get(descripcion="Activo")
-            )
-
-            Direccioncliente.objects.create(
-                direccionid = direccion,
-                clienteid = cliente
-            )
-
-            Usuario.objects.create(
-                email = email,
-                password = contraseña,
-                personaid = Persona.objects.get(runcuerpo=run_cuerpo, dv=dv),
-                rolid = Rolusuario.objects.get(descripcion="Cliente"),
-                nombreusuario = nombre_usuario
-            )
-
-            if (Persona is not None and 
-                Direccion is not None and
-                Usuario is not None and
-                Cliente is not None and 
+            if (procedimiento is not None and 
                 user is not None):
-
                 user.save()
+
                 sweetify.success(request, "Se ha registrado correctamente")
                 return redirect('index')
             else:
