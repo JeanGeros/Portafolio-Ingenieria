@@ -1193,6 +1193,29 @@ def Agregar_vendedor(request):
             sweetify.error(request, "El vendedor ya cuenta con un usuario")
 
         else:
+            cargo = Cargo.objects.filter(descripcion="Vendedor").values('cargoid')
+            rolusuario = Rolusuario.objects.filter(descripcion="Vendedor").values('rolid')
+
+            django_cursor = connection.cursor()
+            cursor = django_cursor.connection.cursor()
+            procedimiento = cursor.callproc(
+                'SP_Insertempleado', 
+                [
+                    int(run_cuerpo), 
+                    dv, 
+                    apellido_paterno, 
+                    apellido_materno, 
+                    nombres, 
+                    int(telefono), 
+                    fecha_ingreso, 
+                    int(cargo[0]['cargoid']), 
+                    email, 
+                    nombre_usuario, 
+                    contraseña, 
+                    rolusuario[0]['rolid']
+                ]
+            )
+
             user = User.objects.create_user(
                 username=nombre_usuario,
                 first_name=nombres,
@@ -1204,37 +1227,8 @@ def Agregar_vendedor(request):
             user.set_password(contraseña)
             user.set_password(confirme_contraseña)
 
-            # Estado activo = 1 e inactivo = 2
-            Persona.objects.create(
-                runcuerpo=run_cuerpo,
-                dv=dv,
-                apellidopaterno=apellido_paterno,
-                apellidomaterno=apellido_materno,
-                nombres=nombres,
-                telefono=telefono,
-                estadoid=Estado.objects.get(descripcion="Activo")
-            )
-
-            Usuario.objects.create(
-                email=email,
-                password=contraseña,
-                personaid=Persona.objects.get(runcuerpo=run_cuerpo, dv=dv),
-                rolid=Rolusuario.objects.get(descripcion="Vendedor"),
-                nombreusuario=nombre_usuario
-            )
-
-            Empleado.objects.create(
-                fechaingreso=fecha_ingreso,
-                personaid=Persona.objects.get(runcuerpo=run_cuerpo, dv=dv),
-                cargoid=Cargo.objects.get(descripcion="Vendedor"),
-                estadoid=Estado.objects.get(descripcion="Activo")
-            )
-
-            if (Persona is not None and
-                    Usuario is not None and
-                    Empleado is not None and
-                    user is not None):
-
+            if (procedimiento is not None and 
+                user is not None):
                 user.save()
                 sweetify.success(request, "Vendedor creado correctamente")
                 return redirect('listar_vendedores')
@@ -1482,81 +1476,45 @@ def Agregar_cliente_vendedor(request):
         elif usuarioRegistro3 == True:
             sweetify.warning(request,"El cliente ya cuenta con un usuario")
         else: 
+            rolusuario = Rolusuario.objects.filter(descripcion="Cliente").values('rolid')
+
+            django_cursor = connection.cursor()
+            cursor = django_cursor.connection.cursor()
+            procedimiento = cursor.callproc(
+                'SP_InsertClientePersona', 
+                [
+                    int(run_cuerpo), 
+                    dv, 
+                    apellido_paterno, 
+                    apellido_materno, 
+                    nombres, 
+                    int(telefono), 
+                    rolusuario[0]['rolid'], 
+                    calle,
+                    str(numero),
+                    nombre_sector,
+                    tipo_vivienda_id,
+                    tipo_barrio_id,
+                    comuna_id,
+                    email,
+                    nombre_usuario,
+                    contraseña
+                ]
+            )
+
             user = User.objects.create_user(
-                username = nombre_usuario,
-                first_name = nombres,
-                last_name = apellido_paterno,
-                email = email,
-                is_superuser = False,
-                is_active = True
+                username=nombre_usuario,
+                first_name=nombres,
+                last_name=apellido_paterno,
+                email=email,
+                is_superuser=False,
+                is_active=True
             )
             user.set_password(contraseña)
             user.set_password(confirme_contraseña)
-            
-            # Estado activo = 1 e inactivo = 2 
-            Persona.objects.create(
-                runcuerpo = run_cuerpo,
-                dv = dv,
-                apellidopaterno = apellido_paterno,
-                apellidomaterno = apellido_materno,
-                nombres = nombres,
-                telefono = telefono,
-                estadoid = Estado.objects.get(descripcion="Activo")
-            )
-            
-            ValidarDireccion = Direccion.objects.filter(calle = calle, 
-                numero = numero, 
-                tipoviviendaid = tipo_vivienda_id).exists()
 
-            if ValidarDireccion == False:
-
-                Direccion.objects.create(
-                    calle = calle,
-                    numero = numero,
-                    comunaid = Comuna.objects.get(comunaid=comuna_id),
-                    tipoviviendaid = Tipovivienda.objects.get(tipoviviendaid=tipo_vivienda_id),
-                    tipobarrioid = Tipobarrio.objects.get(tipobarrioid=tipo_barrio_id),
-                    nombresector = nombre_sector
-                )
-
-            direccion = Direccion.objects.get(
-                    calle = calle,
-                    numero = numero,
-                    comunaid = Comuna.objects.get(comunaid=comuna_id),
-                    tipoviviendaid = Tipovivienda.objects.get(tipoviviendaid=tipo_vivienda_id),
-                    tipobarrioid = Tipobarrio.objects.get(tipobarrioid=tipo_barrio_id),
-                    nombresector = nombre_sector
-                )
-
-            Cliente.objects.create(
-                personaid = Persona.objects.get(runcuerpo=run_cuerpo, dv=dv),
-                estadoid = Estado.objects.get(descripcion="Activo")
-            )
-
-            cliente = Cliente.objects.get(
-                personaid = Persona.objects.get(runcuerpo=run_cuerpo, dv=dv),
-                estadoid = Estado.objects.get(descripcion="Activo")
-            )
-
-            Direccioncliente.objects.create(
-                direccionid = direccion,
-                clienteid = cliente
-            )
-
-            Usuario.objects.create(
-                email = email,
-                password = contraseña,
-                personaid = Persona.objects.get(runcuerpo=run_cuerpo, dv=dv),
-                rolid = Rolusuario.objects.get(descripcion="Cliente"),
-                nombreusuario = nombre_usuario
-            )
-
-            if (Persona is not None and 
-                Direccion is not None and 
-                Usuario is not None and 
-                Cliente is not None and 
+            if (procedimiento is not None and 
                 user is not None):
-                
                 user.save()
 
                 sweetify.success(request,"Cliente creado correctamente")
