@@ -2,7 +2,7 @@ from copyreg import constructor
 import email
 from multiprocessing.sharedctypes import Value
 from pprint import pprint
-from symbol import flow_stmt
+# from symbol import flow_stmt
 from this import d
 from django.shortcuts import render, redirect
 from django.http import HttpResponseRedirect
@@ -16,7 +16,7 @@ from django.contrib.auth.models import User
 import sweetify
 
 import datetime
-import qrcode
+# import qrcode
 from django.contrib.auth.decorators import login_required
 from django.db.models import Sum
 
@@ -2911,7 +2911,8 @@ def listar_ventas(request):
             return HttpResponseRedirect('ver_venta')
 
     context = {
-        'ventas': ventas
+        'ventas': ventas,
+        'tipo_usuario': tipo_usuario
     }
 
     return render(request, 'ventas/listar_ventas.html', context)

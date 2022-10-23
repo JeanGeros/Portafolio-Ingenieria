@@ -5,10 +5,10 @@
     <link rel="stylesheet" href="{% static 'css/index.css' %}">
 
     {% if user.is_superuser and tipo_usuario != None and tipo_usuario == 'Administrador Sistema' %}
-        <a href="https://drive.google.com/file/d/1SlhyZO5xume4be7tJ6y1n69hRqU4fXT5/view?usp=sharing" type="button" class="btn ingresar fw-bolder m-1 mt-5" id="BotonDescargaApp">Descarga la aplicacion movil</a>
+        <a href="https://drive.google.com/file/d/1SlhyZO5xume4be7tJ6y1n69hRqU4fXT5/view?usp=sharing" type="button" class="btn ingresar fw-bolder m-1 mt-4" id="BotonDescargaApp">Descarga la aplicacion movil</a>
     {% endif %}
 
-    <div class="text-center p-1">
+    <div class="text-center p-4 ">
         <h1>Encuentra los mejores productos de ferreteria</h1>
         <img class="logo-principal" src="{% static  'images/Ferme-logo.png' %}" alt="">
     </div>
