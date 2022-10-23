@@ -2,6 +2,7 @@ from copyreg import constructor
 import email
 from multiprocessing.sharedctypes import Value
 from pprint import pprint
+from symbol import flow_stmt
 from this import d
 from django.shortcuts import render, redirect
 from django.http import HttpResponseRedirect
@@ -46,17 +47,21 @@ import re
 from docx.oxml.ns import nsdecls
 from docx.oxml import parse_xml
 
+from docx.oxml.ns import nsdecls
+from docx.oxml import parse_xml
+
 from django.contrib import messages
 from src.forms import (
     FormClienteNormal1, FormClienteNormal2, FormClienteNormal3, addproductsForm, FormVendedorPersona,
     FormVendedorUsuario, FormVendedorEmpleado, FormEmpleadoPersona, FormEmpleadoUsuario, FormEmpleadoEmpleado,
-    FormProveedor, FormProductoproveedor, FormBodega, FormClienteEmpresa
+    FormProveedor, FormProductoproveedor, FormBodega, FormClienteEmpresa, FormCliente, FormTipodocumento, FormVenta, FormDocu
 )
 
 from .models import (
-    Detalleorden, Estadoorden, Ordencompra, Persona, Direccion, Usuario, Cliente, Estado, Comuna, Tipobarrio, Tipovivienda, Rolusuario,
-    Proveedor, Tipoproducto, Producto, Familiaproducto, Empleado, Cargo, Tiporubro, Empresa, Recepcion, Productoproveedor, Bodega,
-    Direccioncliente, Venta, Detalleventa, Boleta
+     Detalleorden, Estadoorden, Guiadespacho, Ordencompra, Persona, Direccion, Usuario, Cliente, Estado, Comuna, Tipobarrio, Despacho,
+    Tipovivienda, Rolusuario, Direccioncliente, Empresa, Proveedor, Tipoproducto, Producto, Familiaproducto, Tipopago,
+    Empleado, Cargo, Tiporubro, Recepcion, Productoproveedor, Bodega, Boleta, Factura, Venta, Tipodocumento, Detalleventa, Boleta
+
 )
 
 from django.utils.encoding import smart_str
@@ -629,6 +634,7 @@ def Seleccion_registro(request):
     }
 
     return render(request, 'clientes/seleccion_registro.html', context)
+
 
 def Registro_clientes(request):
 
@@ -1703,6 +1709,7 @@ def Agregar_proveedor(request):
 
     return render(request, 'proveedores/agregar_proveedor.html', context)
 
+
 def Cambiar_estado_proveedor(id_proveedor):
     proveedor = Proveedor.objects.get(proveedorid=id_proveedor)
 
@@ -1712,6 +1719,7 @@ def Cambiar_estado_proveedor(id_proveedor):
     else:
         proveedor.estadoid = Estado.objects.get(descripcion="Activo")
         proveedor.save()
+
 
 @login_required(login_url="ingreso")
 def Listar_proveedores(request):
@@ -1752,6 +1760,7 @@ def Listar_proveedores(request):
 
     return render(request, 'proveedores/listar_proveedores.html', context)
 
+
 @login_required(login_url="ingreso")
 def Ver_proveedor(request):
 
@@ -1774,6 +1783,7 @@ def Ver_proveedor(request):
     }
 
     return render(request, 'proveedores/ver_proveedor.html', context)
+
 
 @login_required(login_url="ingreso")
 def Editar_proveedor(request):
@@ -1830,7 +1840,6 @@ def Editar_proveedor(request):
     }
 
     return render(request, 'proveedores/editar_proveedor.html', context)
-
 
 # ********************************Empleados************************************************
 
@@ -2077,6 +2086,7 @@ def Editar_empleado(request):
 
     return render(request, 'empleados/editar_empleado.html', context)
 
+
 def Cambiar_estado_empleado(id_empleado):
     empleado = Empleado.objects.get(empleadoid=id_empleado)
     persona_id = Empleado.objects.filter(empleadoid=id_empleado).values('personaid')
@@ -2226,7 +2236,6 @@ def RecepcionPedido(request, id=None):
             print(f"key:{key} value:{value}")
             orden_pedido = Ordencompra.objects.get(ordenid=id)
             detalle_orden = Detalleorden.objects.filter(ordenid=orden_pedido)
-
             if key == "csrfmiddlewaretoken":
                 pass
             else:
@@ -2698,4 +2707,527 @@ def creacion_doc(lista, nombre_archivo):
     document.save(response)
 
     return response
+
+# def creacion_boleta(lista,tipo_doc,tamaño_pagina, nombre, extension, valor = None):
+#     response = HttpResponse(content_type=f'application/{tipo_doc}')  
+
+#     buff = BytesIO()  
+
+#     doc = SimpleDocTemplate(buff,  
+#         pagesize=tamaño_pagina,  
+#         rightMargin=40,  
+#         leftMargin=40,  
+#         topMargin=60,  
+#         bottomMargin=18,  
+#     ) 
+    
+#     doc
+#     header_image = []
+#     styles = getSampleStyleSheet()  
+#     text = '''
+#         <img src="Ferme-logo.png" width="50%" height="50%"/>
+#         '''
+
+#     p_text=Paragraph(text, styles)
+#     header_image.append(p_text)
+
+
+#     data = []  
+#     styles = getSampleStyleSheet()  
+#     styles = styles['Heading1']
+#     styles.alignment = TA_CENTER 
+
+#     header = Paragraph(f"{nombre}", styles)  
+    
+#     data.append(header)  
+
+#     t = Table(lista)  
+
+#     t.setStyle(TableStyle(  
+#         [  
+#         ('GRID', (0, 0), (12, -1), 1, colors.dodgerblue),  
+#         ('LINEBELOW', (0, 0), (-1, 0), 3, colors.darkblue),  
+#         ('BACKGROUND', (0, 0), (-1, 0), colors.dodgerblue)  
+#         ]  
+#     ))  
+    
+#     data.append(t)
+
+#     doc.build(header_image, data)  
+#     response.write(buff.getvalue())   
+
+#     buff.seek(0)
+
+#     respuesta = FileResponse(buff, as_attachment=valor, filename=f'{nombre}.{extension}')
+
+#     return respuesta
+
+
+@login_required(login_url="ingreso")
+def crear_venta(request):
+
+    if request.POST.get('VerPerfil') is not None:
+        request.session['_ver_perfil'] = request.POST
+        return redirect('ver_perfil')
+
+    if Usuario.objects.filter(nombreusuario=request.user).exists():
+        tipo_usuario = Usuario.objects.get(nombreusuario=request.user)
+        tipo_usuario = tipo_usuario.rolid.descripcion
+    else: 
+        tipo_usuario = None
+
+    productos = Productoproveedor.objects.all()
+    form = FormCliente()
+    form_doc = FormVenta()
+    form_docu =FormDocu()
+
+    total = 0
+    if request.method == 'POST':
+        productos_venta = []
+        for key, value in request.POST.items():
+            print(f"key: {key}  value  {value}")
+            if key == "total" and value == "":
+                sweetify.warning(request, "Porfavor ingrese productos")
+            elif value == "":
+                sweetify.warning(request, "Ingrese todo los datos")
+            elif key == "csrfmiddlewaretoken":
+                pass
+            elif key == "clienteid":
+                cliente_venta = Cliente.objects.get(clienteid=value)
+            elif key == "tipodocumentoid":
+                documento_venta = Tipodocumento.objects.get(tipodocumentoid=value)
+            elif key == "tipopagoid":
+                tipopagoid = Tipopago.objects.get(tipopagoid=value)
+            elif key == "tipo_entrega":
+                tipo_entrega = value
+
+            else:
+                try:
+                    key = int(key)
+                    try:
+                        producto = Producto.objects.get(productoid=int(key))
+                    except Producto.DoesNotExist:
+                        sweetify.warning(request, "Ocurrio un Problema")
+                        print(error)
+                        return render(request, 'index.html')
+                except Exception as error:
+                    if "cantidad" in key:
+                        cantidad = value
+                    elif key != "total" and "total" in key:
+                        total = value.replace("$", "")
+                        productos_venta.append([producto, cantidad, total])
+                    elif key == "total":
+                        total_venta = value
+
+                    
+        if len(productos_venta) >0: 
+            Venta.objects.create(
+                fechaventa=datetime.now().date(),
+                totalventa=total_venta,
+                tipodocumentoid=documento_venta,
+                clienteid=cliente_venta,
+                tipopagoid=tipopagoid 
+            )
+
+            ultima_ventas = Venta.objects.order_by('nroventa').last()
+            
+            for producto in productos_venta:
+                Detalleventa.objects.create(
+                    cantidad = producto[1],
+                    subtotal = int(producto[2]) * int(producto[1]),
+                    productoid = producto[0],
+                    nroventa = ultima_ventas
+                )
+                producto_modificar = producto[0]
+                producto_vendido, created = Producto.objects.get_or_create(productoid=producto_modificar.productoid)
+                producto_vendido.stock = producto_vendido.stock-int(producto[1])
+                producto_vendido.save()
+
+        
+            if documento_venta.tipodocumentoid == 2:
+                Factura.objects.create(
+                    fechafactura = datetime.now().date(),
+                    neto = int(total_venta)-(int(total_venta)*0.19),
+                    iva = int(total_venta)*0.19,
+                    totalfactura = total_venta,
+                    nroventa = ultima_ventas,
+                    estadoid = Estado.objects.get(descripcion="Activo")
+                )
+                messages.warning(request, 'Venta realizada con exito')
+                return creacion_pdf(productos_venta,'pdf',A4,'Factura','pdf', valor=False)
+
+            elif documento_venta.tipodocumentoid == 1:
+                Boleta.objects.create(
+                    fechaboleta = datetime.now().date(),
+                    totalboleta = total_venta,
+                    nroventa = ultima_ventas,
+                    estadoid = Estado.objects.get(descripcion="Activo")
+                )
+                messages.warning(request, 'Venta realizada con exito')
+                return creacion_pdf(productos_venta,'pdf',A4,'Boleta','pdf', valor=False)
+
+            if int(tipo_entrega) == 1:
+                Despacho.objects.create(
+                    fechasolicitud = datetime.now().date(),
+                    fechadespacho =  datetime.now().date(),
+                    nroventa = ultima_ventas,
+                    estadoid = Estado.objects.get(descripcion="Activo")
+                )
+
+                ultimo_despacho = Despacho.objects.order_by('despachoid').last()
+                direccion_cliente = Direccioncliente.objects.get(clienteid=cliente_venta)
+                
+                Guiadespacho.objects.create(
+                    fechaguia = datetime.now().date(),
+                    despachoid = ultimo_despacho,
+                    iddircliente = direccion_cliente
+                )   
+
+            # return creacion_pdf(productos_venta,'pdf',A4,'Boleta','pdf', valor=False)
+            # return redirect('listar_ventas')
+        else:
+            messages.warning(request, 'Ocurrio un error en la venta')
+
+    return render(request, 'ventas/crear_venta.html',{'productos':productos, 'form':form, 'form_doc':form_doc, 'form_docu': form_docu})
+
+@login_required(login_url="ingreso")
+def listar_ventas(request):
+    
+    if request.POST.get('VerPerfil') is not None:
+        request.session['_ver_perfil'] = request.POST
+        return redirect('ver_perfil')
+
+    if Usuario.objects.filter(nombreusuario=request.user).exists():
+        tipo_usuario = Usuario.objects.get(nombreusuario=request.user)
+        tipo_usuario = tipo_usuario.rolid.descripcion
+    else: 
+        tipo_usuario = None
+
+    ventas = Venta.objects.all()
+
+    if request.method == 'POST':
+        if request.POST.get('VerVenta') is not None:
+            request.session['_old_post'] = request.POST
+            return HttpResponseRedirect('ver_venta')
+
+    context = {
+        'ventas': ventas
+    }
+
+    return render(request, 'ventas/listar_ventas.html', context)
+
+@login_required(login_url="ingreso")
+def ver_venta(request):
+    old_post = request.session.get('_old_post')
+    detalle_venta = Detalleventa.objects.filter(nroventa=old_post['VerVenta'])
+    venta = Venta.objects.get(nroventa=old_post['VerVenta'])
+    despacho = Despacho.objects.get(nroventa=old_post['VerVenta'])
+    guia = Guiadespacho.objects.filter(despachoid=despacho)
+
+    context = {
+        'detalle_venta': detalle_venta,
+        'venta': venta,
+        'despacho':guia
+    }
+
+    return render(request, 'ventas/ver_venta.html', context)
+
+@login_required(login_url="ingreso")
+def listar_facturas(request):
+    
+    if request.POST.get('VerPerfil') is not None:
+        request.session['_ver_perfil'] = request.POST
+        return redirect('ver_perfil')
+
+    if Usuario.objects.filter(nombreusuario=request.user).exists():
+        tipo_usuario = Usuario.objects.get(nombreusuario=request.user)
+        tipo_usuario = tipo_usuario.rolid.descripcion
+    else: 
+        tipo_usuario = None
+
+    facturas = Factura.objects.all()
+
+    if request.method == 'POST':
+        if request.POST.get('VerFactura') is not None:
+            request.session['_old_post'] = request.POST
+            return HttpResponseRedirect('ver_factura')
+        elif request.POST.get('DescargarFactura') is not None:
+            request.session['_old_post'] = request.POST
+            return HttpResponseRedirect('ver_factura')
+
+    context = {
+        'facturas': facturas
+    }
+
+    return render(request, 'facturas/listar_facturas.html', context)
+
+def ver_factura(request):
+
+    if request.POST.get('VerPerfil') is not None:
+        request.session['_ver_perfil'] = request.POST
+        return redirect('ver_perfil')
+
+    if Usuario.objects.filter(nombreusuario=request.user).exists():
+        tipo_usuario = Usuario.objects.get(nombreusuario=request.user)
+        tipo_usuario = tipo_usuario.rolid.descripcion
+    else: 
+        tipo_usuario = None
+
+    old_post = request.session.get('_old_post')
+
+    factura = Factura.objects.get(numerofactura=old_post['VerFactura'])
+    detalle_venta = Detalleventa.objects.filter(nroventa = factura.nroventa)
+
+    if request.method == 'POST':
+
+        tipoInforme = request.POST.get('informeCheck')
+        descargarInforme = request.POST.get('descargarInforme')
+        
+        if tipoInforme is not None and descargarInforme is not None:
+
+            lista1 = []
+            lista2 = []
+            lista3 = []
+            lista1.append(["Nro Factura","Fecha","Neto","IVA","Total","Estado"])  
+            val = Factura.objects.filter(numerofactura = old_post['VerFactura']).values_list('numerofactura','fechafactura','neto','iva','totalfactura','estadoid__descripcion')
+
+            for valores in val:
+                lista1.append(list(valores)) 
+            lista2.append(["Nro Venta","Tipo pago","Run cliente","DV"])  
+            val = Factura.objects.filter(numerofactura = old_post['VerFactura']).values_list('nroventa__nroventa','nroventa__tipodocumentoid__descripcion','nroventa__clienteid__personaid__runcuerpo','nroventa__clienteid__personaid__dv')
+
+            for valores in val:
+                lista2.append(list(valores))
+            lista3.append(["Producto","Cantidad","Subtotal"])  
+            val = Detalleventa.objects.filter(nroventa = factura.nroventa.nroventa).values_list('productoid__nombre','cantidad','subtotal')
+
+            for valores in val:
+                lista3.append(list(valores))
+
+            if tipoInforme == "informeExcel":
+
+                nombre_archivo = "Detalle Factura"
+                tipo_doc = 'ms-excel'
+                extension = 'xlsx'
+                
+                lista1.append("")
+                lista2.append("")
+
+                lista = lista1 + lista2 + lista3
+                
+                return  creacion_excel(nombre_archivo, lista, tipo_doc, extension)
+
+            if tipoInforme == "informePdf":
+                
+                tipo_doc = 'pdf'
+                extension = 'pdf'
+                nombre = 'Detalle Factura'
+                
+                # return creacion_pdf(lista,tipo_doc,A4,nombre,extension, valor=False)
+                response = HttpResponse(content_type=f'application/{tipo_doc}')  
+
+                buff = BytesIO()  
+
+                doc = SimpleDocTemplate(buff,  
+                    pagesize=A4,  
+                    rightMargin=40,  
+                    leftMargin=40,  
+                    topMargin=60,  
+                    bottomMargin=18,  
+                ) 
+                
+                data = []  
+                styles = getSampleStyleSheet()  
+                styles = styles['Heading1']
+                styles.alignment = TA_CENTER 
+
+                header = Paragraph(f"{nombre}", styles)  
+                
+                data.append(header)  
+
+                t = Table(lista1)  
+
+                t.setStyle(TableStyle(  
+                    [  
+                    ('GRID', (0, 0), (12, -1), 1, colors.dodgerblue),  
+                    ('LINEBELOW', (0, 0), (-1, 0), 3, colors.darkblue),  
+                    ('BACKGROUND', (0, 0), (-1, 0), colors.dodgerblue)  
+                    ]  
+                ))  
+                
+                data.append(t)
+
+                styles = getSampleStyleSheet()  
+                styles.pageBreakBefore = 2
+                styles = styles['Heading1']
+                styles.alignment = TA_CENTER  
+                header = Paragraph("", styles) 
+                data.append(header)  
+                header = Paragraph("", styles) 
+                data.append(header)  
+
+                t = Table(lista2)  
+
+                t.setStyle(TableStyle(  
+                    [  
+                    ('GRID', (0, 0), (12, -1), 1, colors.dodgerblue),  
+                    ('LINEBELOW', (0, 0), (-1, 0), 3, colors.darkblue),  
+                    ('BACKGROUND', (0, 0), (-1, 0), colors.dodgerblue)  
+                    ]  
+                ))  
+                
+                data.append(t)
+
+                styles = getSampleStyleSheet()  
+                styles.pageBreakBefore = 3
+                styles = styles['Heading1']
+                styles.alignment = TA_CENTER 
+                header = Paragraph("", styles) 
+                data.append(header)  
+                header = Paragraph("", styles) 
+                data.append(header)  
+
+                t = Table(lista3)  
+
+                t.setStyle(TableStyle(  
+                    [  
+                    ('GRID', (0, 0), (12, -1), 1, colors.dodgerblue),  
+                    ('LINEBELOW', (0, 0), (-1, 0), 3, colors.darkblue),  
+                    ('BACKGROUND', (0, 0), (-1, 0), colors.dodgerblue)  
+                    ]  
+                ))  
+                
+                data.append(t)
+
+                doc.build(data)  
+                response.write(buff.getvalue())   
+
+                buff.seek(0)
+                return FileResponse(buff, as_attachment=False, filename=f'{nombre}.{extension}')
+
+            if tipoInforme == "informeWord":
+
+                nombre_archivo = "Detalle Factura"
+                # return  creacion_doc(lista1, nombre_archivo)
+                document = Document()
+                document.add_heading('Detalle Factura', 0)
+
+                filas = 0
+                for x in lista1:
+                    columnas = len(x)
+                    filas += 1
+
+                # add grid table
+                table = document.add_table(rows=filas, cols=columnas, style="Table Grid")
+
+                for x in range(columnas):
+                    table.rows[0].cells[x]._tc.get_or_add_tcPr().append(parse_xml(r'<w:shd {} w:fill="D9D9D9"/>'.format(nsdecls('w'))))
+                
+                # access first row's cells
+                heading_row = table.rows[0].cells
+
+                # add headings
+                cont = 0
+                for value in lista1[0]:
+                    heading_row[cont].text = value
+                    cont += 1
+
+                lista1.pop(0)
+                cont = 0
+                cont2 = 0
+
+                for value in lista1:
+                    cont += 1
+                    data_row = table.rows[cont].cells
+
+                    for x in value:
+                        data_row[cont2].text = f'{x}'
+                        cont2 += 1
+                    cont2 = 0
+
+                document.add_paragraph("")
+
+                # parrafo.add_run().add_break()
+                filas = 0
+                for x in lista2:
+                    columnas = len(x)
+                    filas += 1
+
+                # add grid table
+                table2 = document.add_table(rows=filas, cols=columnas, style="Table Grid")
+
+                for x in range(columnas):
+                    table2.rows[0].cells[x]._tc.get_or_add_tcPr().append(parse_xml(r'<w:shd {} w:fill="D9D9D9"/>'.format(nsdecls('w'))))
+
+                # access first row's cells
+                heading_row = table2.rows[0].cells
+
+                # add headings
+                cont = 0
+                for value in lista2[0]:
+                    heading_row[cont].text = value
+                    cont += 1
+
+                lista2.pop(0)
+                cont = 0
+                cont2 = 0
+
+                for value in lista2:
+                    cont += 1
+                    data_row = table2.rows[cont].cells
+
+                    for x in value:
+                        data_row[cont2].text = f'{x}'
+                        cont2 += 1
+                    cont2 = 0 
+
+                document.add_paragraph("")
+
+                filas = 0
+                for x in lista3:
+                    columnas = len(x)
+                    filas += 1
+
+                # add grid table
+                table3 = document.add_table(rows=filas, cols=columnas, style="Table Grid")
+
+                for x in range(columnas):
+                    table3.rows[0].cells[x]._tc.get_or_add_tcPr().append(parse_xml(r'<w:shd {} w:fill="D9D9D9"/>'.format(nsdecls('w'))))
+
+                # access first row's cells
+                heading_row = table3.rows[0].cells
+
+                # add headings
+                cont = 0
+                for value in lista3[0]:
+                    heading_row[cont].text = value
+                    cont += 1
+
+                lista3.pop(0)
+                cont = 0
+                cont2 = 0
+
+                for value in lista3:
+                    cont += 1
+                    data_row = table3.rows[cont].cells
+
+                    for x in value:
+                        data_row[cont2].text = f'{x}'
+                        cont2 += 1
+                    cont2 = 0  
+
+                response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document')
+                response['Content-Disposition'] = f'attachment; filename={nombre_archivo}.docx'
+                document.save(response)
+
+                return response
+
+
+    context = {
+        'factura': factura,
+        'tipo_usuario': tipo_usuario,
+        'productos_boleta': detalle_venta
+    }
+
+    return render(request, 'facturas/ver_factura.html', context)
 

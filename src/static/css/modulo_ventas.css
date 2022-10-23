@@ -6,32 +6,30 @@
 }
 
 .label {
-    padding: 18px!important;
-}
-
-.imagen-producto {
-    padding-right: 15px!important;
-    padding-bottom: 52px!important;
-}
-
-.modificar-imagen {
-    display: -webkit-inline-box; 
-    text-align: initial!important; 
-    padding-top: 15px;
+    padding: 14px!important;
 }
 
 .caja {
     padding-top: 2%;
     padding-bottom: 3%;
-    padding-left: 2%;
-    padding-right: 2%;
+    padding-left: 4%;
+    padding-right: 4%;
     margin-top: 5%!important;
     margin-bottom: 6%!important;
     background-color: #D9D9D9;
 }
 
+.divPadre{
+    justify-content: center;
+
+}
+.divHijo{
+    width: 45% !important; 
+    margin-inline: 2rem;
+}
+ 
 .textos {
-    width: 17%;
+    width: 20%;
 }
 
 .btn {
@@ -43,9 +41,10 @@
 }
 
 .dateinput {
-    width: 25%;
+    width: 120%;
     height: 10%;
-
+    margin-top: 20px;
+    margin-bottom: 21px;
 }
 
 .input-run {
@@ -66,12 +65,6 @@
 }
 
 #id_imagen {
-    margin-left: -175px;
-    width: 60%;
-}
+    width: 120%;
+} 
 
-#imagen-clear_id {
-    margin-bottom: 3%;
-}
-
-.hide {display: none;}
