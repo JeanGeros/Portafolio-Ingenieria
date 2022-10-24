@@ -43,9 +43,14 @@
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                         <img class="logo-navbar" src="{% static 'images/Ferme-nav.png' %}" alt="">
-                        <li class="nav-item">
-                            <a href="/ventas" class="nav-link fw-bolder text-black">Ventas</a>
-                        </li>
+                        {% if !user.is_authenticated %}
+                            <li class="nav-item">
+                                <a href="#" class="nav-link fw-bolder text-black">Inicio</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="#" class="nav-link fw-bolder text-black">Compra con nosotros</a>
+                            </li>
+                        {% endif %}
                         {% if user.is_superuser and tipo_usuario != None and tipo_usuario == 'Administrador Sistema' %}
                             <li class="nav-item">
                                 <a class="nav-link fw-bolder text-black" href="/productos">Administración <br> de productos</a>
