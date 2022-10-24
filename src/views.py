@@ -467,6 +467,7 @@ def Revisar_compras(request):
             smtpObj.login(de_email, settings.EMAIL_HOST_PASSWORD)
             smtpObj.sendmail(de_email, para_email, mime_message.as_string())
             sweetify.success(request,"Las compras realizadas fueron enviadas a su correo")
+            return redirect('revisar_compras')
         
         tipoInforme = request.POST.get('informeCheck')
         descargarInforme = request.POST.get('descargarInforme')
