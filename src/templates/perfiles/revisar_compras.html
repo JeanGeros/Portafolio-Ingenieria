@@ -6,7 +6,7 @@
     <link rel="stylesheet" href="{% static 'css/registro_clientes.css' %}">
     <div class="container text-end caja rounded mt-5">
         <h1 class="text-center pt-4">Mis compras</h1>
-
+        {% if val != None %}
         <table class="table table-striped table-hover" style="background-color: white">
             <thead class="table-dark" style="text-align:center">
                 <tr>
@@ -40,9 +40,9 @@
                     <div class="row">
                         <div class="col-md-6 border border-dark rounded">
                             <label for="">Exportar a documento tipo:</label></br></br>
-                            <input type="radio" name="informeCheck" value="informeExcel" id="informeCheck1"> Excel</br></br>
-                            <input type="radio" name="informeCheck" value="informeWord" id="informeCheck2"> Word</br></br>
-                            <input type="radio" name="informeCheck" value="informePdf" id="informeCheck3"> PDF</br><br>
+                            <input type="radio" name="informeCheck" value="informeExcel" id="informeCheck1" onclick="checkeado(this.form)"> Excel</br></br>
+                            <input type="radio" name="informeCheck" value="informeWord" id="informeCheck2" onclick="checkeado(this.form)"> Word</br></br>
+                            <input type="radio" name="informeCheck" value="informePdf" id="informeCheck3" onclick="checkeado(this.form)"> PDF</br><br>
                             <button type="submit" name="descargarInforme" value="descargarInforme" id="descargarInforme" class="btn btn_aceptar border border-secondary text-black">Descargar</button><br><br>
 
                         </div>
@@ -60,12 +60,25 @@
             </div>
         </div>
         </form>
-        
+        {% else %}
+            <br>
+            <h1 class="text-center">Aun no ha realizado compras</h1>
+        {% endif %}
   
         <div align="left" class="btn_crear mb-5">
             <a href="{% url 'ver_perfil' %}" type="button" class="btn btn_aceptar border border-secondary text-black">Volver</a>
         </div>
   
     </div>
+    <script>
+        document.getElementById("descargarInforme").disabled=true;
+        function checkeado(form)
+        {
+            if (form.informeCheck3.checked == true || form.informeCheck1.checked == true || form.informeCheck2.checked == true){
+                form.descargarInforme.disabled = false;
+            }
+
+        }
+    </script>
 
 {% endblock %}

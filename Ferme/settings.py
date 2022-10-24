@@ -168,7 +168,7 @@ PWA_SERVICE_WORKER_PATH = os.path.join(BASE_DIR, 'serviceworker.js')
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'mail.ferme.cl'
-EMAIT_PORT = 465
+EMAIT_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'contacto@ferme.cl'
 EMAIL_HOST_PASSWORD = 'FerreteriaFerme1234'

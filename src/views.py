@@ -485,6 +485,9 @@ def Revisar_compras(request):
 
                 nombre_archivo = "Compras"
                 return  creacion_doc(lista, nombre_archivo)
+    
+    if val.exists() == False:
+        val = None
 
     context = {
         'tipo_usuario': tipo_usuario,
