@@ -29,8 +29,11 @@ from django.http import FileResponse
 import webbrowser
 import os
 from django.conf import settings
-from django.core.mail import EmailMultiAlternatives, send_mail
+# from django.core.mail import EmailMultiAlternatives, send_mail
 from django.template.loader import get_template
+from django.template import loader
+import smtplib
+from email.mime.text import MIMEText
 from docx import Document
 from django.http import HttpResponse
 
@@ -446,37 +449,25 @@ def Revisar_compras(request):
         if EnviarCorreo is not None:
             template = get_template('perfiles/descargar_compras.html')
             content = template.render({'val':val})
-            from django.template import loader
-            import smtplib
-            from email.mime.text import MIMEText
+            
             message = loader.render_to_string(
                 'perfiles/descargar_compras.html',
                 {
                     'val': val
                 }
             )
-            from_email = 'contacto@ferme.cl'
-            to_email = correo[0]['email']
+            de_email = settings.EMAIL_HOST_USER
+            para_email = correo[0]['email']
             mime_message = MIMEText(message, "html", _charset="utf-8")
-            mime_message["From"] = from_email
-            mime_message["To"] = to_email
-            mime_message["Subject"] = "Correo de prueba para compras"  # Asunto
-            # sender = 'contacto@ferme.cl'
-            # receivers = [correo[0]['email']]
+            mime_message["From"] = de_email
+            mime_message["To"] = para_email
+            mime_message["Subject"] = "Detalle de las compras realizadas"
             
-            smtpObj = smtplib.SMTP('mail.ferme.cl', 587)
-            smtpObj.login('contacto@ferme.cl','FerreteriaFerme1234')
-            smtpObj.sendmail(from_email, to_email, mime_message.as_string())
-            print("Successfully sent email")
-            
-            # send_mail(
-            #     "asunto",
-            #     "cuerpo",
-            #     settings.EMAIL_HOST_USER,
-            #     reply_to=[correo[0]['email']],
-            #     html_message=html_message,
-            #     fail_silently=False
-            # )
+            smtpObj = smtplib.SMTP(settings.EMAIL_HOST, 587)
+            smtpObj.login(de_email, settings.EMAIL_HOST_PASSWORD)
+            smtpObj.sendmail(de_email, para_email, mime_message.as_string())
+            sweetify.success(request,"Las compras realizadas fueron enviadas a su correo")
+            return redirect('revisar_compras')
         
         tipoInforme = request.POST.get('informeCheck')
         descargarInforme = request.POST.get('descargarInforme')
