@@ -451,23 +451,17 @@ def Revisar_compras(request):
             sender = 'contacto@ferme.cl'
             receivers = [correo[0]['email']]
 
-            message = """From: From Person <from@fromdomain.com>
-            To: To Person <to@todomain.com>
-            Subject: SMTP e-mail test
-
-            This is a test e-mail message.
-            """
-
+            message = loader.render_to_string(
+                'perfiles/descargar_compras.html',
+                {
+                    'val': val
+                }
+            )
             smtpObj = smtplib.SMTP('mail.ferme.cl', 587)
             smtpObj.login('contacto@ferme.cl','FerreteriaFerme1234')
             smtpObj.sendmail(sender, receivers, message)         
             print("Successfully sent email")
-            # html_message = loader.render_to_string(
-            #     'perfiles/descargar_compras.html',
-            #     {
-            #         'val': val
-            #     }
-            # )
+            
             # send_mail(
             #     "asunto",
             #     "cuerpo",
