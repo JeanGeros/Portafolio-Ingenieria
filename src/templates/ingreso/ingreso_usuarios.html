@@ -6,7 +6,7 @@
     <link rel="stylesheet" href="{% static 'css/ingreso_usuarios.css' %}">
     <div class="form-signin p-3 text-center border rounded pb-3">
         
-        <form id="center" method="post" action="" class="">
+        <form id="formulario" method="post" action="" class="" >
           {% csrf_token %} 
             <img class="mb-4" src="{% static 'images/Ferme-logo.png' %}" width="150" height="150">
             <h1 class="h3 mb-3 fw-normal text-center">Iniciar Sesion</h1>
@@ -19,11 +19,20 @@
               <input type="password" name="contraseña" class="form-control" id="exampleInputPassword1" placeholder="Contraseña" minlength="6" onkeypress="return SinEspacios(event)" />
               <label for="exampleInputPassword1" class="form-label font-style">Contraseña</label>
             </div>
-            <button type="submit" class="btn btn_aceptar border border-secondary text-black py-2 m-2" style="font-size: 1.3rem;">Iniciar Sesion</button>
+            <button type="submit" class="btn btn_aceptar border border-secondary text-black py-2 m-2" style="font-size: 1.3rem;" id="cargando" onclick="Cargando(this)">Iniciar Sesion</button>
           </form>
     </div>
 
     <script src="{% static 'js/ingreso_usuarios.js' %}"></script>
+    <script>
+      function Cargando(){
+        let boton = document.getElementById("cargando");
+        let formulario = document.getElementById("formulario")
+        boton.innerHTML = 'Cargando...';
+        boton.disabled = true;
+        formulario.submit();
+      }
+    </script>
 
 {% endblock %}
 
