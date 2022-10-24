@@ -458,7 +458,8 @@ def Revisar_compras(request):
             This is a test e-mail message.
             """
 
-            smtpObj = smtplib.SMTP('mail.ferme.cl', 25)
+            smtpObj = smtplib.SMTP('mail.ferme.cl', 587)
+            smtpObj.login('contacto@ferme.cl','FerreteriaFerme1234')
             smtpObj.sendmail(sender, receivers, message)         
             print("Successfully sent email")
             # html_message = loader.render_to_string(
