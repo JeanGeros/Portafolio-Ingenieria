@@ -447,21 +447,34 @@ def Revisar_compras(request):
             template = get_template('perfiles/descargar_compras.html')
             content = template.render({'val':val})
             from django.template import loader
+            import smtplib
+            sender = 'contacto@ferme.cl'
+            receivers = [correo[0]['email']]
 
-            html_message = loader.render_to_string(
-                'perfiles/descargar_compras.html',
-                {
-                    'val': val
-                }
-            )
-            send_mail(
-                "asunto",
-                "cuerpo",
-                settings.EMAIL_HOST_USER,
-                reply_to=[correo[0]['email']],
-                html_message=html_message,
-                fail_silently=False
-            )
+            message = """From: From Person <from@fromdomain.com>
+            To: To Person <to@todomain.com>
+            Subject: SMTP e-mail test
+
+            This is a test e-mail message.
+            """
+
+            smtpObj = smtplib.SMTP('mail.ferme.cl', 25)
+            smtpObj.sendmail(sender, receivers, message)         
+            print("Successfully sent email")
+            # html_message = loader.render_to_string(
+            #     'perfiles/descargar_compras.html',
+            #     {
+            #         'val': val
+            #     }
+            # )
+            # send_mail(
+            #     "asunto",
+            #     "cuerpo",
+            #     settings.EMAIL_HOST_USER,
+            #     reply_to=[correo[0]['email']],
+            #     html_message=html_message,
+            #     fail_silently=False
+            # )
         
         tipoInforme = request.POST.get('informeCheck')
         descargarInforme = request.POST.get('descargarInforme')
