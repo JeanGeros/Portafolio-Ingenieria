@@ -448,18 +448,23 @@ def Revisar_compras(request):
             content = template.render({'val':val})
             from django.template import loader
             import smtplib
-            sender = 'contacto@ferme.cl'
-            receivers = [correo[0]['email']]
-
+            from email.mime.text import MIMEText
             message = loader.render_to_string(
                 'perfiles/descargar_compras.html',
                 {
                     'val': val
                 }
             )
+            mime_message = MIMEText(message, "html", _charset="utf-8")
+            mime_message["From"] = 'contacto@ferme.cl'
+            mime_message["To"] = [correo[0]['email']]
+            mime_message["Subject"] = "Correo de prueba para compras"  # Asunto
+            # sender = 'contacto@ferme.cl'
+            # receivers = [correo[0]['email']]
+            
             smtpObj = smtplib.SMTP('mail.ferme.cl', 587)
             smtpObj.login('contacto@ferme.cl','FerreteriaFerme1234')
-            smtpObj.sendmail(sender, receivers, message)         
+            smtpObj.sendmail('contacto@ferme.cl', [correo[0]['email']], mime_message.as_string())
             print("Successfully sent email")
             
             # send_mail(
