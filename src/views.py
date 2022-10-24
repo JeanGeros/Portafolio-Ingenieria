@@ -29,7 +29,7 @@ from django.http import FileResponse
 import webbrowser
 import os
 from django.conf import settings
-from django.core.mail import EmailMultiAlternatives
+from django.core.mail import EmailMultiAlternatives, send_mail
 from django.template.loader import get_template
 from docx import Document
 from django.http import HttpResponse
@@ -446,15 +446,22 @@ def Revisar_compras(request):
         if EnviarCorreo is not None:
             template = get_template('perfiles/descargar_compras.html')
             content = template.render({'val':val})
-            email = EmailMultiAlternatives(
+            from django.template import loader
+
+            html_message = loader.render_to_string(
+                'perfiles/descargar_compras.html',
+                {
+                    'val': val
+                }
+            )
+            send_mail(
                 "asunto",
                 "cuerpo",
                 settings.EMAIL_HOST_USER,
-                [correo[0]['email']]
+                reply_to=[correo[0]['email']],
+                html_message=html_message,
+                fail_silently=False
             )
-
-            email.attach_alternative(content,'text/html')
-            email.send()
         
         tipoInforme = request.POST.get('informeCheck')
         descargarInforme = request.POST.get('descargarInforme')
