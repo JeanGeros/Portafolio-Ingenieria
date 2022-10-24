@@ -455,16 +455,18 @@ def Revisar_compras(request):
                     'val': val
                 }
             )
+            from_email = 'contacto@ferme.cl'
+            to_email = correo[0]['email']
             mime_message = MIMEText(message, "html", _charset="utf-8")
-            mime_message["From"] = 'contacto@ferme.cl'
-            mime_message["To"] = [correo[0]['email']]
+            mime_message["From"] = from_email
+            mime_message["To"] = to_email
             mime_message["Subject"] = "Correo de prueba para compras"  # Asunto
             # sender = 'contacto@ferme.cl'
             # receivers = [correo[0]['email']]
             
             smtpObj = smtplib.SMTP('mail.ferme.cl', 587)
             smtpObj.login('contacto@ferme.cl','FerreteriaFerme1234')
-            smtpObj.sendmail('contacto@ferme.cl', [correo[0]['email']], mime_message.as_string())
+            smtpObj.sendmail(from_email, to_email, mime_message.as_string())
             print("Successfully sent email")
             
             # send_mail(
