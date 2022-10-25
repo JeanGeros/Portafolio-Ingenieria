@@ -1002,7 +1002,7 @@ def Editar_cliente(request):
         cliente_usuario.email = email
         cliente_usuario.save()
 
-        user_django = User.objects.get(email=email_cliente)
+        user_django = User.objects.get(email=email_cliente[0]['email'])
         user_django.username = user_django.username
         user_django.first_name = nombres
         user_django.last_name = apellido_paterno
