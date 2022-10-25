@@ -237,10 +237,8 @@ def Listar_productos(request):
 
     return render(request, 'productos/listar_productos.html', context)
 
-@login_required(login_url="ingreso")
 def Cambiar_estado_producto(id_producto):
     producto = Producto.objects.get(productoid=id_producto)
-
     if producto.estadoid.descripcion == 'Activo':
         producto.estadoid = Estado.objects.get(descripcion="Inactivo")
         producto.save()
@@ -959,6 +957,7 @@ def Editar_cliente(request):
     cliente_usuario = Usuario.objects.get(personaid=cliente[0]['personaid'])
     direccion1 = Direccioncliente.objects.filter(clienteid=old_post['EditarCliente']).values('direccionid')
     direccion = Direccion.objects.get(direccionid=direccion1[0]['direccionid'])
+    email_cliente = Usuario.objects.filter(personaid=cliente[0]['personaid']).values('email')
 
     form1 = FormClienteNormal1(request.POST or None, instance=cliente_persona)
     form2 = FormClienteNormal2(request.POST or None, instance=direccion)
@@ -1003,7 +1002,7 @@ def Editar_cliente(request):
         cliente_usuario.email = email
         cliente_usuario.save()
 
-        user_django = User.objects.get(email=cliente_usuario)
+        user_django = User.objects.get(email=email_cliente[0]['email'])
         user_django.username = user_django.username
         user_django.first_name = nombres
         user_django.last_name = apellido_paterno
@@ -2220,7 +2219,7 @@ def RecepcionPedido(request, id=None):
                     detalle = Detalleorden.objects.get(ordenid=id, productoid=id_producto)
 
                     Recepcion.objects.create(
-                        fecharecepcion=datetime.datetime.now().date(),
+                        fecharecepcion=datetime.now().date(),
                         cantidad=detalle.cantidad,
                         productoid=detalle.productoid,
                         proveedorid=orden_pedido.proveedorid,
@@ -2750,7 +2749,7 @@ def crear_venta(request):
     else: 
         tipo_usuario = None
 
-    productos = Productoproveedor.objects.all()
+    productos = Productoproveedor.objects.all().exclude(productoid__stock__lte=0)
     form = FormCliente()
     form_doc = FormVenta()
     form_docu =FormDocu()
@@ -2792,7 +2791,6 @@ def crear_venta(request):
                         productos_venta.append([producto, cantidad, total])
                     elif key == "total":
                         total_venta = value
-
                     
         if len(productos_venta) >0: 
             Venta.objects.create(
@@ -2817,7 +2815,6 @@ def crear_venta(request):
                 producto_vendido.stock = producto_vendido.stock-int(producto[1])
                 producto_vendido.save()
 
-        
             if documento_venta.tipodocumentoid == 2:
                 Factura.objects.create(
                     fechafactura = datetime.now().date(),
@@ -2827,10 +2824,44 @@ def crear_venta(request):
                     nroventa = ultima_ventas,
                     estadoid = Estado.objects.get(descripcion="Activo")
                 )
+                if int(tipo_entrega) == 1:
+                    Despacho.objects.create(
+                        fechasolicitud = datetime.now().date(),
+                        fechadespacho =  datetime.now().date(),
+                        nroventa = ultima_ventas,
+                        estadoid = Estado.objects.get(descripcion="Activo")
+                    )
+
+                    ultimo_despacho = Despacho.objects.order_by('despachoid').last()
+                    direccion_cliente = Direccioncliente.objects.get(clienteid=cliente_venta)
+                    
+                    Guiadespacho.objects.create(
+                        fechaguia = datetime.now().date(),
+                        despachoid = ultimo_despacho,
+                        iddircliente = direccion_cliente
+                    )  
                 messages.warning(request, 'Venta realizada con exito')
+                productos_venta.insert(0 , ["Nombre Producto", "Cantidad", "Total"]) 
                 return creacion_pdf(productos_venta,'pdf',A4,'Factura','pdf', valor=False)
 
             elif documento_venta.tipodocumentoid == 1:
+                if int(tipo_entrega) == 1:
+                    Despacho.objects.create(
+                        fechasolicitud = datetime.now().date(),
+                        fechadespacho =  datetime.now().date(),
+                        nroventa = ultima_ventas,
+                        estadoid = Estado.objects.get(descripcion="Activo")
+                    )
+
+                    ultimo_despacho = Despacho.objects.order_by('despachoid').last()
+                    direccion_cliente = Direccioncliente.objects.get(clienteid=cliente_venta)
+                    
+                    Guiadespacho.objects.create(
+                        fechaguia = datetime.now().date(),
+                        despachoid = ultimo_despacho,
+                        iddircliente = direccion_cliente
+                    )  
+
                 Boleta.objects.create(
                     fechaboleta = datetime.now().date(),
                     totalboleta = total_venta,
@@ -2838,27 +2869,10 @@ def crear_venta(request):
                     estadoid = Estado.objects.get(descripcion="Activo")
                 )
                 messages.warning(request, 'Venta realizada con exito')
+                productos_venta.insert(0 , ["Nombre Producto", "Cantidad", "Total"]) 
                 return creacion_pdf(productos_venta,'pdf',A4,'Boleta','pdf', valor=False)
 
-            if int(tipo_entrega) == 1:
-                Despacho.objects.create(
-                    fechasolicitud = datetime.now().date(),
-                    fechadespacho =  datetime.now().date(),
-                    nroventa = ultima_ventas,
-                    estadoid = Estado.objects.get(descripcion="Activo")
-                )
-
-                ultimo_despacho = Despacho.objects.order_by('despachoid').last()
-                direccion_cliente = Direccioncliente.objects.get(clienteid=cliente_venta)
-                
-                Guiadespacho.objects.create(
-                    fechaguia = datetime.now().date(),
-                    despachoid = ultimo_despacho,
-                    iddircliente = direccion_cliente
-                )   
-
-            # return creacion_pdf(productos_venta,'pdf',A4,'Boleta','pdf', valor=False)
-            # return redirect('listar_ventas')
+ 
         else:
             messages.warning(request, 'Ocurrio un error en la venta')
 
@@ -2896,9 +2910,16 @@ def ver_venta(request):
     old_post = request.session.get('_old_post')
     detalle_venta = Detalleventa.objects.filter(nroventa=old_post['VerVenta'])
     venta = Venta.objects.get(nroventa=old_post['VerVenta'])
-    despacho = Despacho.objects.get(nroventa=old_post['VerVenta'])
-    guia = Guiadespacho.objects.filter(despachoid=despacho)
+    try:
+        despacho = Despacho.objects.get(nroventa=old_post['VerVenta'])
+        guia = Guiadespacho.objects.filter(despachoid=despacho)
+    except Despacho.DoesNotExist:
+        despacho= []
+        guia= []
+        
 
+    print(despacho)
+    print(guia  )
     context = {
         'detalle_venta': detalle_venta,
         'venta': venta,

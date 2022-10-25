@@ -21,11 +21,15 @@
 
 .divPadre{
     justify-content: center;
+    padding-bottom: 100px !important;
 
 }
+
 .divHijo{
-    width: 45% !important; 
+    width: 40% !important; 
     margin-inline: 2rem;
+    padding: 50px;
+    padding-top: 20px !important;
 }
  
 .textos {
