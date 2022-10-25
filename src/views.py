@@ -957,6 +957,7 @@ def Editar_cliente(request):
     cliente_usuario = Usuario.objects.get(personaid=cliente[0]['personaid'])
     direccion1 = Direccioncliente.objects.filter(clienteid=old_post['EditarCliente']).values('direccionid')
     direccion = Direccion.objects.get(direccionid=direccion1[0]['direccionid'])
+    email_cliente = Usuario.objects.filter(personaid=cliente[0]['personaid']).values('email')
 
     form1 = FormClienteNormal1(request.POST or None, instance=cliente_persona)
     form2 = FormClienteNormal2(request.POST or None, instance=direccion)
@@ -1001,7 +1002,7 @@ def Editar_cliente(request):
         cliente_usuario.email = email
         cliente_usuario.save()
 
-        user_django = User.objects.get(email=cliente_usuario)
+        user_django = User.objects.get(email=email_cliente)
         user_django.username = user_django.username
         user_django.first_name = nombres
         user_django.last_name = apellido_paterno
