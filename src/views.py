@@ -140,6 +140,16 @@ def Ingreso(request):
 @login_required(login_url="ingreso")
 def Agregar_productos(request):
 
+    if request.POST.get('VerPerfil') is not None:
+        request.session['_ver_perfil'] = request.POST
+        return redirect('ver_perfil')
+
+    if Usuario.objects.filter(nombreusuario=request.user).exists():
+        tipo_usuario = Usuario.objects.get(nombreusuario=request.user)
+        tipo_usuario = tipo_usuario.rolid.descripcion
+    else: 
+        tipo_usuario = None
+
     form = addproductsForm(request.POST, request.FILES)
     form_prov = FormProductoproveedor(request.POST, request.FILES)
     form_bodega = FormBodega(request.POST, request.FILES)
@@ -204,7 +214,8 @@ def Agregar_productos(request):
     context = {
         'form': form,
         'form2': form_prov,
-        'form_bodega': form_bodega
+        'form_bodega': form_bodega,
+        'tipo_usuario': tipo_usuario,
     }
 
     return render(request, 'productos/agregar_productos.html', context)
@@ -212,6 +223,17 @@ def Agregar_productos(request):
 
 @login_required(login_url="ingreso")
 def Listar_productos(request):
+
+    if request.POST.get('VerPerfil') is not None:
+        request.session['_ver_perfil'] = request.POST
+        return redirect('ver_perfil')
+
+    if Usuario.objects.filter(nombreusuario=request.user).exists():
+        tipo_usuario = Usuario.objects.get(nombreusuario=request.user)
+        tipo_usuario = tipo_usuario.rolid.descripcion
+    else: 
+        tipo_usuario = None
+
     productos = Productoproveedor.objects.all()
 
     if request.method == 'POST':
@@ -233,11 +255,13 @@ def Listar_productos(request):
 
     context = {
         'productos': productos,
+        'tipo_usuario': tipo_usuario,
     }
 
     return render(request, 'productos/listar_productos.html', context)
 
 def Cambiar_estado_producto(id_producto):
+    
     producto = Producto.objects.get(productoid=id_producto)
     if producto.estadoid.descripcion == 'Activo':
         producto.estadoid = Estado.objects.get(descripcion="Inactivo")
@@ -248,13 +272,25 @@ def Cambiar_estado_producto(id_producto):
 
 @login_required(login_url="ingreso")
 def Ver_producto(request):
+
+    if request.POST.get('VerPerfil') is not None:
+        request.session['_ver_perfil'] = request.POST
+        return redirect('ver_perfil')
+
+    if Usuario.objects.filter(nombreusuario=request.user).exists():
+        tipo_usuario = Usuario.objects.get(nombreusuario=request.user)
+        tipo_usuario = tipo_usuario.rolid.descripcion
+    else: 
+        tipo_usuario = None
+
     old_post = request.session.get('_old_post')
     producto = Productoproveedor.objects.get(productoid=old_post['VerProducto'])
     prov_producto = Productoproveedor.objects.get(productoid=old_post['VerProducto'],
                                                   proveedorid=old_post['proveedor'])
     context = {
         'producto': producto,
-        'prov_producto': prov_producto
+        'prov_producto': prov_producto,
+        'tipo_usuario': tipo_usuario,
     }
 
     return render(request, 'productos/ver_producto.html', context)
@@ -262,6 +298,17 @@ def Ver_producto(request):
 
 @login_required(login_url="ingreso")
 def Editar_producto(request):
+
+    if request.POST.get('VerPerfil') is not None:
+        request.session['_ver_perfil'] = request.POST
+        return redirect('ver_perfil')
+
+    if Usuario.objects.filter(nombreusuario=request.user).exists():
+        tipo_usuario = Usuario.objects.get(nombreusuario=request.user)
+        tipo_usuario = tipo_usuario.rolid.descripcion
+    else: 
+        tipo_usuario = None
+
     old_post = request.session.get('_old_post')
 
     producto = Producto.objects.get(productoid=old_post['EditarProducto'])
@@ -330,7 +377,8 @@ def Editar_producto(request):
 
     context = {
         'form': form,
-        'form2': form2
+        'form2': form2,
+        'tipo_usuario': tipo_usuario,
     }
 
     return render(request, 'productos/editar_productos.html', context)
@@ -642,9 +690,15 @@ def Seleccion_registro(request):
     if request.POST.get('VerPerfil') is not None:
         request.session['_ver_perfil'] = request.POST
         return redirect('ver_perfil')
+
+    if Usuario.objects.filter(nombreusuario=request.user).exists():
+        tipo_usuario = Usuario.objects.get(nombreusuario=request.user)
+        tipo_usuario = tipo_usuario.rolid.descripcion
+    else: 
+        tipo_usuario = None
     
     context = {
-
+        'tipo_usuario': tipo_usuario,
     }
 
     return render(request, 'clientes/seleccion_registro.html', context)
@@ -2081,6 +2135,17 @@ def Cambiar_estado_empleado(id_empleado):
 # *********************************Pedidos************************************************
 @csrf_exempt
 def Crear_pedido(request, id=None):
+
+    if request.POST.get('VerPerfil') is not None:
+        request.session['_ver_perfil'] = request.POST
+        return redirect('ver_perfil')
+
+    if Usuario.objects.filter(nombreusuario=request.user).exists():
+        tipo_usuario = Usuario.objects.get(nombreusuario=request.user)
+        tipo_usuario = tipo_usuario.rolid.descripcion
+    else: 
+        tipo_usuario = None
+
     proveedor = Proveedor.objects.get(proveedorid=id)
     listaProds = Productoproveedor.objects.filter(proveedorid=proveedor)
 
@@ -2134,18 +2199,33 @@ def Crear_pedido(request, id=None):
         return redirect('listar_pedidos')
 
     context = {
-        'listaProds': listaProds
+        'listaProds': listaProds,
+        'tipo_usuario': tipo_usuario,
     }
     return render(request, 'pedidos/crear_pedido.html', context)
 
+@login_required(login_url="ingreso")
 def filtro_proveedor(request):
+
+    if request.POST.get('VerPerfil') is not None:
+        request.session['_ver_perfil'] = request.POST
+        return redirect('ver_perfil')
+
+    if Usuario.objects.filter(nombreusuario=request.user).exists():
+        tipo_usuario = Usuario.objects.get(nombreusuario=request.user)
+        tipo_usuario = tipo_usuario.rolid.descripcion
+    else: 
+        tipo_usuario = None
+
     proveedores = Proveedor.objects.all()
     context = {
         'proveedores': proveedores,
+        'tipo_usuario': tipo_usuario,
     }
 
     return render(request, 'pedidos/crear_pedido_proveedores.html', context)
 
+@login_required(login_url="ingreso")
 def cambiar_estado_pedido(id_pedido):
     orden_compra = Ordencompra.objects.get(ordenid=int(id_pedido))
     detalle_orden = Detalleorden.objects.filter(ordenid=int(id_pedido))
@@ -2161,7 +2241,19 @@ def cambiar_estado_pedido(id_pedido):
         detalle.estadoid = estado_eliminado_detale
         detalle.save()
 
+@login_required(login_url="ingreso")
 def Listar_pedidos(request):
+
+    if request.POST.get('VerPerfil') is not None:
+        request.session['_ver_perfil'] = request.POST
+        return redirect('ver_perfil')
+
+    if Usuario.objects.filter(nombreusuario=request.user).exists():
+        tipo_usuario = Usuario.objects.get(nombreusuario=request.user)
+        tipo_usuario = tipo_usuario.rolid.descripcion
+    else: 
+        tipo_usuario = None
+
     ordenes = Ordencompra.objects.all()
 
     if request.method == 'POST':
@@ -2179,26 +2271,52 @@ def Listar_pedidos(request):
             return HttpResponseRedirect('ver_pedido')
 
     context = {
-        'ordenes': ordenes
+        'ordenes': ordenes,
+        'tipo_usuario': tipo_usuario,
     }
 
     return render(request, 'pedidos/listar_pedidos.html', context)
 
+@login_required(login_url="ingreso")
 def Ver_pedidos(request):
+
+    if request.POST.get('VerPerfil') is not None:
+        request.session['_ver_perfil'] = request.POST
+        return redirect('ver_perfil')
+
+    if Usuario.objects.filter(nombreusuario=request.user).exists():
+        tipo_usuario = Usuario.objects.get(nombreusuario=request.user)
+        tipo_usuario = tipo_usuario.rolid.descripcion
+    else: 
+        tipo_usuario = None
+
     old_post = request.session.get('_old_post')
     detalle_orden = Detalleorden.objects.filter(ordenid=old_post['VerPedido'])
     recepcion_orden = Recepcion.objects.filter(ordenid=old_post['VerPedido'])
 
     context = {
         'detalle_orden': detalle_orden,
-        'recepcion_orden':recepcion_orden
+        'recepcion_orden':recepcion_orden,
+        'tipo_usuario': tipo_usuario,
     }
 
     return render(request, 'pedidos/ver_pedido.html', context)
 
 # ***************************Recepcionar pedidos*******************************************
 
+@login_required(login_url="ingreso")
 def RecepcionPedido(request, id=None):
+
+    if request.POST.get('VerPerfil') is not None:
+        request.session['_ver_perfil'] = request.POST
+        return redirect('ver_perfil')
+
+    if Usuario.objects.filter(nombreusuario=request.user).exists():
+        tipo_usuario = Usuario.objects.get(nombreusuario=request.user)
+        tipo_usuario = tipo_usuario.rolid.descripcion
+    else: 
+        tipo_usuario = None
+
     if id:
         orden_pedido = Ordencompra.objects.filter(ordenid=id)
         detalle_orden = Detalleorden.objects.filter(ordenid=id, estadoid=1)
@@ -2254,12 +2372,13 @@ def RecepcionPedido(request, id=None):
         'ordenPedido': orden_pedido,
         'productos': productos,
         'detalleOrden': detalle_orden,
+        'tipo_usuario': tipo_usuario,
     }
 
     return render(request, 'recepcion_pedido.html', context)
 
 #****************************Boletas*******************************************************
-
+@login_required(login_url="ingreso")
 def Listar_boletas(request):
 
     if request.POST.get('VerPerfil') is not None:
@@ -2287,6 +2406,7 @@ def Listar_boletas(request):
 
     return render(request, 'boletas/listar_boletas.html', context)
 
+@login_required(login_url="ingreso")
 def Ver_boleta(request):
 
     if request.POST.get('VerPerfil') is not None:
@@ -2681,61 +2801,6 @@ def creacion_doc(lista, nombre_archivo):
 
     return response
 
-# def creacion_boleta(lista,tipo_doc,tamaño_pagina, nombre, extension, valor = None):
-#     response = HttpResponse(content_type=f'application/{tipo_doc}')  
-
-#     buff = BytesIO()  
-
-#     doc = SimpleDocTemplate(buff,  
-#         pagesize=tamaño_pagina,  
-#         rightMargin=40,  
-#         leftMargin=40,  
-#         topMargin=60,  
-#         bottomMargin=18,  
-#     ) 
-    
-#     doc
-#     header_image = []
-#     styles = getSampleStyleSheet()  
-#     text = '''
-#         <img src="Ferme-logo.png" width="50%" height="50%"/>
-#         '''
-
-#     p_text=Paragraph(text, styles)
-#     header_image.append(p_text)
-
-
-#     data = []  
-#     styles = getSampleStyleSheet()  
-#     styles = styles['Heading1']
-#     styles.alignment = TA_CENTER 
-
-#     header = Paragraph(f"{nombre}", styles)  
-    
-#     data.append(header)  
-
-#     t = Table(lista)  
-
-#     t.setStyle(TableStyle(  
-#         [  
-#         ('GRID', (0, 0), (12, -1), 1, colors.dodgerblue),  
-#         ('LINEBELOW', (0, 0), (-1, 0), 3, colors.darkblue),  
-#         ('BACKGROUND', (0, 0), (-1, 0), colors.dodgerblue)  
-#         ]  
-#     ))  
-    
-#     data.append(t)
-
-#     doc.build(header_image, data)  
-#     response.write(buff.getvalue())   
-
-#     buff.seek(0)
-
-#     respuesta = FileResponse(buff, as_attachment=valor, filename=f'{nombre}.{extension}')
-
-#     return respuesta
-
-
 @login_required(login_url="ingreso")
 def crear_venta(request):
 
@@ -2876,7 +2941,7 @@ def crear_venta(request):
         else:
             messages.warning(request, 'Ocurrio un error en la venta')
 
-    return render(request, 'ventas/crear_venta.html',{'productos':productos, 'form':form, 'form_doc':form_doc, 'form_docu': form_docu})
+    return render(request, 'ventas/crear_venta.html',{'productos':productos, 'form':form, 'form_doc':form_doc, 'form_docu': form_docu, 'tipo_usuario': tipo_usuario})
 
 @login_required(login_url="ingreso")
 def listar_ventas(request):
@@ -2907,6 +2972,17 @@ def listar_ventas(request):
 
 @login_required(login_url="ingreso")
 def ver_venta(request):
+
+    if request.POST.get('VerPerfil') is not None:
+        request.session['_ver_perfil'] = request.POST
+        return redirect('ver_perfil')
+
+    if Usuario.objects.filter(nombreusuario=request.user).exists():
+        tipo_usuario = Usuario.objects.get(nombreusuario=request.user)
+        tipo_usuario = tipo_usuario.rolid.descripcion
+    else: 
+        tipo_usuario = None
+
     old_post = request.session.get('_old_post')
     detalle_venta = Detalleventa.objects.filter(nroventa=old_post['VerVenta'])
     venta = Venta.objects.get(nroventa=old_post['VerVenta'])
@@ -2923,7 +2999,8 @@ def ver_venta(request):
     context = {
         'detalle_venta': detalle_venta,
         'venta': venta,
-        'despacho':guia
+        'despacho':guia,
+        'tipo_usuario': tipo_usuario
     }
 
     return render(request, 'ventas/ver_venta.html', context)
@@ -2952,11 +3029,13 @@ def listar_facturas(request):
             return HttpResponseRedirect('ver_factura')
 
     context = {
-        'facturas': facturas
+        'facturas': facturas,
+        'tipo_usuario': tipo_usuario
     }
 
     return render(request, 'facturas/listar_facturas.html', context)
 
+@login_required(login_url="ingreso")
 def ver_factura(request):
 
     if request.POST.get('VerPerfil') is not None:
@@ -3217,7 +3296,6 @@ def ver_factura(request):
                 document.save(response)
 
                 return response
-
 
     context = {
         'factura': factura,
