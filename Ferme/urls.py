@@ -82,6 +82,10 @@ urlpatterns = [
     path('facturas/', views.listar_facturas, name="listar_facturas"),
     path('facturas/ver_factura', views.ver_factura, name="ver_factura"),
 
+    path('guias_despacho/', views.listar_guias_despacho, name="listar_guias_despacho"),
+    path('guias_despacho/ver_guia_despacho', views.ver_guia_despacho, name="ver_guia_despacho"),
+
+
     
 
 

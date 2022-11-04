@@ -2627,7 +2627,7 @@ def creacion_pdf(lista,tipo_doc,tamaño_pagina, nombre, extension, valor = None)
         ('GRID', (0, 0), (12, -1), 1, colors.dodgerblue),  
         ('LINEBELOW', (0, 0), (-1, 0), 3, colors.darkblue),  
         ('BACKGROUND', (0, 0), (-1, 0), colors.dodgerblue)  
-        ]  
+        ]   
     ))  
     
     data.append(t)
@@ -2640,6 +2640,65 @@ def creacion_pdf(lista,tipo_doc,tamaño_pagina, nombre, extension, valor = None)
     respuesta = FileResponse(buff, as_attachment=valor, filename=f'{nombre}.{extension}')
 
     return respuesta
+
+def creacion_guia(lista,tipo_doc,tamaño_pagina, nombre, extension, valor = None):
+    response = HttpResponse(content_type=f'application/{tipo_doc}')  
+
+    buff = BytesIO()  
+    
+    #Data setting for invoice , Can be generated from Database or Excel ##
+    my_prod={1:['Hard Disk',80],2:['RAM',90],3:['Monitor',75],
+            4:['CPU',55],5:['Keyboard',20],6:['Mouse',10],
+            7:['Mother board',50],8:['Power Sypply',20],
+            9:['Speaker',50],10:['Microphone',45]}
+
+    #sales table keeps the product id and quantity sold 
+    my_sale={1:2,3:2,7:1,4:3,6:5,5:3,2:1,9:1,10:3} # product id and quanity
+    discount_rate=10 # 10% discount 
+    tax_rate=12 # tax rate  in percentage 
+
+
+    from reportlab.pdfgen import canvas
+    from reportlab.lib.units import inch
+    from reportlab.lib.pagesizes import letter, A4
+    from temp_invoice import my_temp # import the template
+
+    #my_prod={1:['Hard Disk',80,1],2:['RAM',90,2],3:['Monitor',75,2]}
+    c = canvas.Canvas(buff, pagesize=letter)
+    c=my_temp(c) # run the template
+
+    c.setFillColorRGB(0,0,1) # font colour
+    c.setFont("Helvetica", 20)
+    row_gap=0.6 # gap between each row
+    line_y= 5.4 # location of fist Y position 
+    total=0
+    for items in my_sale:
+        c.drawString(0.1*inch,line_y*inch,str(my_prod[items][0])) # p Name
+        c.drawRightString(4.5*inch,line_y*inch,str(my_prod[items][1])) # p Price
+        c.drawRightString(5.5*inch,line_y*inch,str(my_sale[items])) # p Qunt 
+        sub_total=my_prod[items][1]*my_sale[items]
+        c.drawRightString(7*inch,line_y*inch,str(sub_total)) # Sub Total 
+        total=round(total+sub_total,1)
+        line_y=line_y-row_gap
+        
+    c.drawRightString(7*inch,2.1*inch,str(float(total))) # Total 
+    discount=round((discount_rate/100) * total,1)
+    c.drawRightString(4*inch,1.8*inch,str(discount_rate)+'%') # discount
+    c.drawRightString(7*inch,1.8*inch,'-'+str(discount)) # discount
+    tax=round((tax_rate/100) * (total-discount),1)
+    c.drawRightString(4*inch,1.2*inch,str(tax_rate)+'%') # tax 
+    c.drawRightString(7*inch,1.2*inch,str(tax)) # tax 
+    total_final=total-discount+tax
+    c.setFont("Times-Bold", 22)
+    c.setFillColorRGB(1,0,0) # font colour
+    c.drawRightString(7*inch,0.8*inch,str(total_final)) # tax 
+    c.showPage()
+    c.save()
+
+    respuesta = FileResponse(buff, as_attachment=valor, filename=f'{nombre}.{extension}')
+
+    return respuesta
+
 
 def creacion_doc(lista, nombre_archivo):
     document = Document()
@@ -2681,59 +2740,7 @@ def creacion_doc(lista, nombre_archivo):
 
     return response
 
-# def creacion_boleta(lista,tipo_doc,tamaño_pagina, nombre, extension, valor = None):
-#     response = HttpResponse(content_type=f'application/{tipo_doc}')  
 
-#     buff = BytesIO()  
-
-#     doc = SimpleDocTemplate(buff,  
-#         pagesize=tamaño_pagina,  
-#         rightMargin=40,  
-#         leftMargin=40,  
-#         topMargin=60,  
-#         bottomMargin=18,  
-#     ) 
-    
-#     doc
-#     header_image = []
-#     styles = getSampleStyleSheet()  
-#     text = '''
-#         <img src="Ferme-logo.png" width="50%" height="50%"/>
-#         '''
-
-#     p_text=Paragraph(text, styles)
-#     header_image.append(p_text)
-
-
-#     data = []  
-#     styles = getSampleStyleSheet()  
-#     styles = styles['Heading1']
-#     styles.alignment = TA_CENTER 
-
-#     header = Paragraph(f"{nombre}", styles)  
-    
-#     data.append(header)  
-
-#     t = Table(lista)  
-
-#     t.setStyle(TableStyle(  
-#         [  
-#         ('GRID', (0, 0), (12, -1), 1, colors.dodgerblue),  
-#         ('LINEBELOW', (0, 0), (-1, 0), 3, colors.darkblue),  
-#         ('BACKGROUND', (0, 0), (-1, 0), colors.dodgerblue)  
-#         ]  
-#     ))  
-    
-#     data.append(t)
-
-#     doc.build(header_image, data)  
-#     response.write(buff.getvalue())   
-
-#     buff.seek(0)
-
-#     respuesta = FileResponse(buff, as_attachment=valor, filename=f'{nombre}.{extension}')
-
-#     return respuesta
 
 
 @login_required(login_url="ingreso")
@@ -2957,8 +2964,105 @@ def listar_facturas(request):
 
     return render(request, 'facturas/listar_facturas.html', context)
 
-def ver_factura(request):
+from reportlab.lib.units import inch
 
+def my_temp(c, nro_venta):
+    c.translate(inch,inch)
+# define a large font
+    c.setFont("Helvetica", 14)
+# choose some colors
+    c.setStrokeColorRGB(0.1,0.8,0.1)
+    c.setFillColorRGB(0,0,1) # font colour
+
+    c.drawImage('src\static\images\Ferme-logo.jpg',0*inch,8.7*inch, width=70, height=70)
+
+    c.setFillColorRGB(255,0,0) # font colour
+    c.setFont("Times-Bold", 18)
+    c.drawString(1.2*inch, 9.3*inch, "FERME SPA")
+    c.setFont("Times-Bold", 13)
+    c.setFillColorRGB(0,0,255) # font colour
+    c.drawString(1.2*inch, 9.1*inch, "Giro: Ferreteria ")
+    c.drawString(1.2*inch, 8.9*inch, "San Bernardo - Santiago")
+    #linea verde
+    c.setStrokeColorCMYK(0,0,0,1) # vertical line colour 
+    
+    from  datetime import date
+    dt = date.today().strftime('%d-%b-%Y')
+
+    #cuadrado arriba - derecha
+    c.setStrokeColorCMYK(0,0,0,1) # Color linea 
+    c.line(4*inch,9.8*inch,4*inch,8.6*inch)# linea vertical 
+    c.line(6.8*inch,9.8*inch,6.8*inch,8.6*inch)# linea vertical 
+    c.line(6.8*inch,9.8*inch,4*inch,9.8*inch)# linea horizontal  
+    c.line(6.8*inch,8.6*inch,4*inch,8.6*inch)# linea horizontal  
+
+    #info dentro de cuadrado
+    c.setFillColorRGB(1,0,0) # font colour
+    c.setFont("Times-Bold", 14)
+    c.drawString(4.6*inch,9.5*inch,'RUT: 99.999.999-9')
+    c.drawString(4.2*inch,9.1*inch,'FACTURA ELECTRONICA')
+    c.drawString(5*inch,8.7*inch,f'NRO° {nro_venta}')
+
+    c.setFont("Helvetica", 12)
+    c.drawString(4.2*inch,8.1*inch,f'Fecha Emision:  {dt}')
+
+    #BAJO EL LOGO
+    c.setStrokeColorCMYK(0,0,0,1) # Color linea 
+    c.line(0*inch,8.5*inch,0*inch,7.5*inch)# linea vertical 
+    c.line(4*inch,8.5*inch,4*inch,7.5*inch)# linea vertical 
+    c.line(0*inch,8.5*inch,4*inch,8.5*inch)# linea horizontal  
+
+    c.setFont("Times-Bold", 11)
+    c.setFillColorRGB(0,0,255) # font colour
+    c.drawString(0.1*inch, 8.3*inch, "SEÑOR(ES):")
+    c.drawString(0.1*inch, 8.1*inch, "GIRO:")
+    c.drawString(0.1*inch, 7.9*inch, "DIRECCION:")
+    c.drawString(0.1*inch, 7.7*inch, "COMUNA:")
+    c.drawString(0.1*inch, 7.5*inch, "CONTACTO:")
+
+
+    c.drawString(1.2*inch, 8.9*inch, "San Bernardo - Santiago")
+
+    # c.rotate(45) # rotate by 45 degree 
+    # c.setFillColorCMYK(0,0,0,0.08) # font colour CYAN, MAGENTA, YELLOW and BLACK
+    # c.setFont("Helvetica", 140) # font style and size
+    # c.drawString(2*inch, 1*inch, "FERME") # String written 
+
+    # c.rotate(-45) # restore the rotation 
+    c.setFillColorRGB(0,0,0) # font colour
+    c.setFont("Times-Roman", 16)
+    c.drawString(0.5*inch,7.2*inch,'Descripcion')
+    c.drawString(4*inch,7.2*inch,'Precio')
+    c.drawString(4.9*inch,7.2*inch,'Cantidad')
+    c.drawString(6*inch,7.2*inch,'Total')
+
+    # TABLA PRODUCTOS
+    c.setStrokeColorCMYK(0,0,0,1) # vertical line colour 
+    c.line(0,7.5*inch,6.8*inch,7.5*inch)
+    c.line(0,7.1*inch,6.8*inch,7.1*inch)
+    c.line(0*inch,7.5*inch,0*inch,2.5*inch)# first vertical line
+    c.line(3.9*inch,7.5*inch,3.9*inch,2.5*inch)# second vertical line
+    c.line(4.8*inch,7.5*inch,4.8*inch,2.5*inch)# third vertical line
+    c.line(5.9*inch,7.5*inch,5.9*inch,2.5*inch)# fourty vertical line
+    c.line(6.8*inch,7.5*inch,6.8*inch,2.5*inch)# fifty vertical line
+    c.line(0.01*inch,2.5*inch,6.8*inch,2.5*inch)# horizontal line total
+
+    c.drawString(1*inch,1.8*inch,'Discount')
+    c.drawString(1*inch,1.2*inch,'Tax')
+    c.setFont("Times-Bold", 22)
+    c.drawString(2*inch,0.8*inch,'Total')
+    c.setFont("Times-Roman", 22)
+    c.drawString(5.6*inch,-0.1*inch,'Signature')
+
+    c.setStrokeColorRGB(0.1,0.8,0.1) # Bottom Line colour 
+    c.line(0,-0.7*inch,6.8*inch,-0.7*inch)
+    c.setFont("Helvetica", 8) # font size
+    c.setFillColorRGB(1,0,0) # font colour
+    c.drawString(0, -0.9*inch," www.ferme.cl")
+    
+    return c
+
+def ver_factura(request):
     if request.POST.get('VerPerfil') is not None:
         request.session['_ver_perfil'] = request.POST
         return redirect('ver_perfil')
@@ -3014,92 +3118,62 @@ def ver_factura(request):
                 return  creacion_excel(nombre_archivo, lista, tipo_doc, extension)
 
             if tipoInforme == "informePdf":
+                response = HttpResponse(content_type=f'application/pdf')  
                 
-                tipo_doc = 'pdf'
-                extension = 'pdf'
-                nombre = 'Detalle Factura'
-                
-                # return creacion_pdf(lista,tipo_doc,A4,nombre,extension, valor=False)
-                response = HttpResponse(content_type=f'application/{tipo_doc}')  
-
                 buff = BytesIO()  
 
-                doc = SimpleDocTemplate(buff,  
-                    pagesize=A4,  
-                    rightMargin=40,  
-                    leftMargin=40,  
-                    topMargin=60,  
-                    bottomMargin=18,  
-                ) 
-                
-                data = []  
-                styles = getSampleStyleSheet()  
-                styles = styles['Heading1']
-                styles.alignment = TA_CENTER 
+                #Data setting for invoice , Can be generated from Database or Excel ##
+                my_prod = {1:['Hard Disk',80], 2:['RAM',90], 3:['Monitor',75], 4:['CPU',55], 5:['Keyboard',20], 6:['Mouse',10], 7:['Mother board',50],8:['Power Sypply',20], 9:['Speaker',50],10:['Microphone',45]}
 
-                header = Paragraph(f"{nombre}", styles)  
-                
-                data.append(header)  
+                #sales table keeps the product id and quantity sold 
+                my_sale={1:2,3:2,7:1,4:3,6:5,5:3,2:1,9:1,10:3} # product id and quanity
+                discount_rate=10 # 10% discount 
+                tax_rate=12 # tax rate  in percentage 
 
-                t = Table(lista1)  
 
-                t.setStyle(TableStyle(  
-                    [  
-                    ('GRID', (0, 0), (12, -1), 1, colors.dodgerblue),  
-                    ('LINEBELOW', (0, 0), (-1, 0), 3, colors.darkblue),  
-                    ('BACKGROUND', (0, 0), (-1, 0), colors.dodgerblue)  
-                    ]  
-                ))  
-                
-                data.append(t)
+                from reportlab.pdfgen import canvas
+                from reportlab.lib.units import inch
+                from reportlab.lib.pagesizes import letter, A4
 
-                styles = getSampleStyleSheet()  
-                styles.pageBreakBefore = 2
-                styles = styles['Heading1']
-                styles.alignment = TA_CENTER  
-                header = Paragraph("", styles) 
-                data.append(header)  
-                header = Paragraph("", styles) 
-                data.append(header)  
+                #my_prod={1:['Hard Disk',80,1],2:['RAM',90,2],3:['Monitor',75,2]}
+                c = canvas.Canvas(buff, pagesize=letter)
+                print(factura)
+                c=my_temp(c,factura.numerofactura) # run the template
 
-                t = Table(lista2)  
+                c.setFillColorRGB(0,0,1) # font colour
+                c.setFont("Helvetica", 13)
+                row_gap=0.2 # gap between each row
+                line_y=6.8 # location of fist Y position 
+                total=0
 
-                t.setStyle(TableStyle(  
-                    [  
-                    ('GRID', (0, 0), (12, -1), 1, colors.dodgerblue),  
-                    ('LINEBELOW', (0, 0), (-1, 0), 3, colors.darkblue),  
-                    ('BACKGROUND', (0, 0), (-1, 0), colors.dodgerblue)  
-                    ]  
-                ))  
-                
-                data.append(t)
+                for items in my_sale:
+                    c.drawString(0.1*inch,line_y*inch,str(my_prod[items][0])) # p Name
+                    c.drawRightString(4.5*inch,line_y*inch,str(my_prod[items][1])) # p Price
+                    c.drawRightString(5.5*inch,line_y*inch,str(my_sale[items])) # p Qunt 
+                    sub_total=my_prod[items][1]*my_sale[items]
+                    c.drawRightString(6.5*inch,line_y*inch,str(sub_total)) # Sub Total 
+                    total=round(total+sub_total,1)
+                    line_y=line_y-row_gap
+                    
+                c.drawRightString(7*inch,2.1*inch,str(float(total))) # Total 
+                discount=round((discount_rate/100) * total,1)
+                c.drawRightString(4*inch,1.8*inch,str(discount_rate)+'%') # discount
+                c.drawRightString(7*inch,1.8*inch,'-'+str(discount)) # discount
+                tax=round((tax_rate/100) * (total-discount),1)
+                c.drawRightString(4*inch,1.2*inch,str(tax_rate)+'%') # tax 
+                c.drawRightString(7*inch,1.2*inch,str(tax)) # tax 
+                total_final=total-discount+tax
+                c.setFont("Times-Bold", 22)
+                c.setFillColorRGB(1,0,0) # font colour
+                c.drawRightString(7*inch,0.8*inch,str(total_final)) # tax 
+                c.showPage()
+                c.save()
 
-                styles = getSampleStyleSheet()  
-                styles.pageBreakBefore = 3
-                styles = styles['Heading1']
-                styles.alignment = TA_CENTER 
-                header = Paragraph("", styles) 
-                data.append(header)  
-                header = Paragraph("", styles) 
-                data.append(header)  
-
-                t = Table(lista3)  
-
-                t.setStyle(TableStyle(  
-                    [  
-                    ('GRID', (0, 0), (12, -1), 1, colors.dodgerblue),  
-                    ('LINEBELOW', (0, 0), (-1, 0), 3, colors.darkblue),  
-                    ('BACKGROUND', (0, 0), (-1, 0), colors.dodgerblue)  
-                    ]  
-                ))  
-                
-                data.append(t)
-
-                doc.build(data)  
                 response.write(buff.getvalue())   
 
                 buff.seek(0)
-                return FileResponse(buff, as_attachment=False, filename=f'{nombre}.{extension}')
+
+                return FileResponse(buff, as_attachment=False, filename=f'factura.pdf')
 
             if tipoInforme == "informeWord":
 
@@ -3226,4 +3300,301 @@ def ver_factura(request):
     }
 
     return render(request, 'facturas/ver_factura.html', context)
+
+@login_required(login_url="ingreso")
+def listar_guias_despacho(request):
+    
+    if request.POST.get('VerPerfil') is not None:
+        request.session['_ver_perfil'] = request.POST
+        return redirect('ver_perfil')
+
+    if Usuario.objects.filter(nombreusuario=request.user).exists():
+        tipo_usuario = Usuario.objects.get(nombreusuario=request.user)
+        tipo_usuario = tipo_usuario.rolid.descripcion
+    else: 
+        tipo_usuario = None
+
+    guias_despacho = Guiadespacho.objects.all()
+
+    if request.method == 'POST':
+        if request.POST.get('VerGuiaDespacho') is not None:
+            request.session['_old_post'] = request.POST
+            return HttpResponseRedirect('ver_guia_despacho')
+    #     elif request.POST.get('DescargarFactura') is not None:
+    #         request.session['_old_post'] = request.POST
+    #         return HttpResponseRedirect('ver_factura')
+
+    context = {
+        'guias_despacho': guias_despacho
+    }
+
+    return render(request, 'guias_despacho/listar_guias_despacho.html', context)
+
+def ver_guia_despacho(request):
+
+    if request.POST.get('VerPerfil') is not None:
+        request.session['_ver_perfil'] = request.POST
+        return redirect('ver_perfil')
+
+    if Usuario.objects.filter(nombreusuario=request.user).exists():
+        tipo_usuario = Usuario.objects.get(nombreusuario=request.user)
+        tipo_usuario = tipo_usuario.rolid.descripcion
+    else: 
+        tipo_usuario = None
+
+    old_post = request.session.get('_old_post')
+
+    guia = Guiadespacho.objects.get(nroguia=old_post['VerGuiaDespacho'])
+
+    # if request.method == 'POST':
+
+    #     tipoInforme = request.POST.get('informeCheck')
+    #     descargarInforme = request.POST.get('descargarInforme')
+        
+    #     if tipoInforme is not None and descargarInforme is not None:
+
+    #         lista1 = []
+    #         lista2 = []
+    #         lista3 = []
+    #         lista1.append(["Nro Factura","Fecha","Neto","IVA","Total","Estado"])  
+    #         val = Factura.objects.filter(numerofactura = old_post['VerFactura']).values_list('numerofactura','fechafactura','neto','iva','totalfactura','estadoid__descripcion')
+
+    #         for valores in val:
+    #             lista1.append(list(valores)) 
+    #         lista2.append(["Nro Venta","Tipo pago","Run cliente","DV"])  
+    #         val = Factura.objects.filter(numerofactura = old_post['VerFactura']).values_list('nroventa__nroventa','nroventa__tipodocumentoid__descripcion','nroventa__clienteid__personaid__runcuerpo','nroventa__clienteid__personaid__dv')
+
+    #         for valores in val:
+    #             lista2.append(list(valores))
+    #         lista3.append(["Producto","Cantidad","Subtotal"])  
+    #         val = Detalleventa.objects.filter(nroventa = factura.nroventa.nroventa).values_list('productoid__nombre','cantidad','subtotal')
+
+    #         for valores in val:
+    #             lista3.append(list(valores))
+
+    #         if tipoInforme == "informeExcel":
+
+    #             nombre_archivo = "Detalle Factura"
+    #             tipo_doc = 'ms-excel'
+    #             extension = 'xlsx'
+                
+    #             lista1.append("")
+    #             lista2.append("")
+
+    #             lista = lista1 + lista2 + lista3
+                
+    #             return  creacion_excel(nombre_archivo, lista, tipo_doc, extension)
+
+    #         if tipoInforme == "informePdf":
+                
+    #             tipo_doc = 'pdf'
+    #             extension = 'pdf'
+    #             nombre = 'Detalle Factura'
+                
+    #             # return creacion_pdf(lista,tipo_doc,A4,nombre,extension, valor=False)
+    #             response = HttpResponse(content_type=f'application/{tipo_doc}')  
+
+    #             buff = BytesIO()  
+
+    #             doc = SimpleDocTemplate(buff,  
+    #                 pagesize=A4,  
+    #                 rightMargin=40,  
+    #                 leftMargin=40,  
+    #                 topMargin=60,  
+    #                 bottomMargin=18,  
+    #             ) 
+                
+    #             data = []  
+    #             styles = getSampleStyleSheet()  
+    #             styles = styles['Heading1']
+    #             styles.alignment = TA_CENTER 
+
+    #             header = Paragraph(f"{nombre}", styles)  
+                
+    #             data.append(header)  
+
+    #             t = Table(lista1)  
+
+    #             t.setStyle(TableStyle(  
+    #                 [  
+    #                 ('GRID', (0, 0), (12, -1), 1, colors.dodgerblue),  
+    #                 ('LINEBELOW', (0, 0), (-1, 0), 3, colors.darkblue),  
+    #                 ('BACKGROUND', (0, 0), (-1, 0), colors.dodgerblue)  
+    #                 ]  
+    #             ))  
+                
+    #             data.append(t)
+
+    #             styles = getSampleStyleSheet()  
+    #             styles.pageBreakBefore = 2
+    #             styles = styles['Heading1']
+    #             styles.alignment = TA_CENTER  
+    #             header = Paragraph("", styles) 
+    #             data.append(header)  
+    #             header = Paragraph("", styles) 
+    #             data.append(header)  
+
+    #             t = Table(lista2)  
+
+    #             t.setStyle(TableStyle(  
+    #                 [  
+    #                 ('GRID', (0, 0), (12, -1), 1, colors.dodgerblue),  
+    #                 ('LINEBELOW', (0, 0), (-1, 0), 3, colors.darkblue),  
+    #                 ('BACKGROUND', (0, 0), (-1, 0), colors.dodgerblue)  
+    #                 ]  
+    #             ))  
+                
+    #             data.append(t)
+
+    #             styles = getSampleStyleSheet()  
+    #             styles.pageBreakBefore = 3
+    #             styles = styles['Heading1']
+    #             styles.alignment = TA_CENTER 
+    #             header = Paragraph("", styles) 
+    #             data.append(header)  
+    #             header = Paragraph("", styles) 
+    #             data.append(header)  
+
+    #             t = Table(lista3)  
+
+    #             t.setStyle(TableStyle(  
+    #                 [  
+    #                 ('GRID', (0, 0), (12, -1), 1, colors.dodgerblue),  
+    #                 ('LINEBELOW', (0, 0), (-1, 0), 3, colors.darkblue),  
+    #                 ('BACKGROUND', (0, 0), (-1, 0), colors.dodgerblue)  
+    #                 ]  
+    #             ))  
+                
+    #             data.append(t)
+
+    #             doc.build(data)  
+    #             response.write(buff.getvalue())   
+
+    #             buff.seek(0)
+    #             return FileResponse(buff, as_attachment=False, filename=f'{nombre}.{extension}')
+
+    #         if tipoInforme == "informeWord":
+
+    #             nombre_archivo = "Detalle Factura"
+    #             # return  creacion_doc(lista1, nombre_archivo)
+    #             document = Document()
+    #             document.add_heading('Detalle Factura', 0)
+
+    #             filas = 0
+    #             for x in lista1:
+    #                 columnas = len(x)
+    #                 filas += 1
+
+    #             # add grid table
+    #             table = document.add_table(rows=filas, cols=columnas, style="Table Grid")
+
+    #             for x in range(columnas):
+    #                 table.rows[0].cells[x]._tc.get_or_add_tcPr().append(parse_xml(r'<w:shd {} w:fill="D9D9D9"/>'.format(nsdecls('w'))))
+                
+    #             # access first row's cells
+    #             heading_row = table.rows[0].cells
+
+    #             # add headings
+    #             cont = 0
+    #             for value in lista1[0]:
+    #                 heading_row[cont].text = value
+    #                 cont += 1
+
+    #             lista1.pop(0)
+    #             cont = 0
+    #             cont2 = 0
+
+    #             for value in lista1:
+    #                 cont += 1
+    #                 data_row = table.rows[cont].cells
+
+    #                 for x in value:
+    #                     data_row[cont2].text = f'{x}'
+    #                     cont2 += 1
+    #                 cont2 = 0
+
+    #             document.add_paragraph("")
+
+    #             # parrafo.add_run().add_break()
+    #             filas = 0
+    #             for x in lista2:
+    #                 columnas = len(x)
+    #                 filas += 1
+
+    #             # add grid table
+    #             table2 = document.add_table(rows=filas, cols=columnas, style="Table Grid")
+
+    #             for x in range(columnas):
+    #                 table2.rows[0].cells[x]._tc.get_or_add_tcPr().append(parse_xml(r'<w:shd {} w:fill="D9D9D9"/>'.format(nsdecls('w'))))
+
+    #             # access first row's cells
+    #             heading_row = table2.rows[0].cells
+
+    #             # add headings
+    #             cont = 0
+    #             for value in lista2[0]:
+    #                 heading_row[cont].text = value
+    #                 cont += 1
+
+    #             lista2.pop(0)
+    #             cont = 0
+    #             cont2 = 0
+
+    #             for value in lista2:
+    #                 cont += 1
+    #                 data_row = table2.rows[cont].cells
+
+    #                 for x in value:
+    #                     data_row[cont2].text = f'{x}'
+    #                     cont2 += 1
+    #                 cont2 = 0 
+
+    #             document.add_paragraph("")
+
+    #             filas = 0
+    #             for x in lista3:
+    #                 columnas = len(x)
+    #                 filas += 1
+
+    #             # add grid table
+    #             table3 = document.add_table(rows=filas, cols=columnas, style="Table Grid")
+
+    #             for x in range(columnas):
+    #                 table3.rows[0].cells[x]._tc.get_or_add_tcPr().append(parse_xml(r'<w:shd {} w:fill="D9D9D9"/>'.format(nsdecls('w'))))
+
+    #             # access first row's cells
+    #             heading_row = table3.rows[0].cells
+
+    #             # add headings
+    #             cont = 0
+    #             for value in lista3[0]:
+    #                 heading_row[cont].text = value
+    #                 cont += 1
+
+    #             lista3.pop(0)
+    #             cont = 0
+    #             cont2 = 0
+
+    #             for value in lista3:
+    #                 cont += 1
+    #                 data_row = table3.rows[cont].cells
+
+    #                 for x in value:
+    #                     data_row[cont2].text = f'{x}'
+    #                     cont2 += 1
+    #                 cont2 = 0  
+
+    #             response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document')
+    #             response['Content-Disposition'] = f'attachment; filename={nombre_archivo}.docx'
+    #             document.save(response)
+
+    #             return response
+
+
+    context = {
+        'guia': guia,
+        'tipo_usuario': tipo_usuario,
+    }
+
+    return render(request, 'guias_despacho/ver_guia_despacho.html', context)
 
