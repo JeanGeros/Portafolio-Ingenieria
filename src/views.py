@@ -2586,7 +2586,7 @@ def Listar_despacho(request):
     else: 
         tipo_usuario = None
 
-    despachos = Despacho.objects.all()
+    despachos = Despacho.objects.all().order_by('despachoid')
 
     if request.method == 'POST':
 
@@ -2617,6 +2617,13 @@ def Ver_despacho(request):
     despacho = Despacho.objects.get(despachoid = ver_despacho['VerDespacho'])
     productos_despacho = Detalleventa.objects.filter(nroventa = despacho.nroventa.nroventa)
 
+    if request.method == 'POST':
+
+        despachoId = request.POST.get('despacho_id')
+        estado = request.POST.get('estado_id')
+        print(despachoId)
+        Cambiar_estado_despacho(despachoId,estado)
+
     context = {
         'despacho': despacho,
         'tipo_usuario': tipo_usuario,
@@ -2625,11 +2632,14 @@ def Ver_despacho(request):
 
     return render(request, 'despacho/ver_despacho.html', context)
 
-def Cambiar_estado_despacho(despachoId):
-    despacho = Despacho.objects.get(nrodespacho=despachoId)
+def Cambiar_estado_despacho(despachoId,estado):
+    despacho = Despacho.objects.get(despachoid=despachoId)
 
     if despacho.estadoid.descripcion == 'Activo':
-        despacho.estadoid = Estado.objects.get(descripcion="Inactivo")
+        despacho.estadoid = Estado.objects.get(descripcion="Despachado")
+        despacho.save()
+    elif estado == 'Despachado':
+        despacho.estadoid = Estado.objects.get(descripcion="Despachado")
         despacho.save()
     else:
         despacho.estadoid = Estado.objects.get(descripcion="Activo")
