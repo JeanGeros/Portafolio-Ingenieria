@@ -1,0 +1,62 @@
+{% extends 'layout.html' %}
+{% load widget_tweaks %}
+{% load static %}
+
+{% block content %}
+
+    <link rel="stylesheet" href="{% static 'css/registro_clientes.css' %}">
+    <div class="container text-end caja rounded mt-5">
+        <h1 class="text-center p-3" >Detalles del despacho</h1>
+
+        <table class="table table-striped table-hover" style="background-color: white; margin-bottom: 35px;">
+            <thead class="table-dark" style="text-align:center">
+                <tr>
+                    <th>Nro Despacho</th>
+                    <th>Fecha Solicitud</th>
+                    <th>Fecha Despacho</th>
+                    <th>Nro Venta</th>
+                    <th>Estado</th>
+                </tr>
+            </thead>
+            <tbody style="text-align:center">
+                <tr>
+                    <td>{{ despacho.despachoid }}</td>
+                    <td>{{ despacho.fechasolicitud }}</td>
+                    <td>{{ despacho.fechadespacho }}</td>
+                    <td>{{ despacho.nroventa }}</td>
+                    <td>{{ despacho.estadoid.descripcion }}</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <table class="table table-striped table-hover" style="background-color: white">
+            <thead class="table-dark" style="text-align:center">
+                <tr>
+                    <th>Codigo</th>
+                    <th>Producto</th>
+                    <th>Cantidad</th>
+                    <th></th>
+
+                </tr>
+            </thead>
+            <tbody style="text-align:center">
+                {% for detventa in productos_despacho %}
+                    <tr>
+                        <td>{{ detventa.productoid.codigo }}</td>
+                        <td>{{ detventa.productoid.nombre }}</td>
+                        <td>{{ detventa.cantidad }}</td>
+                        <td class="center"><input type="checkbox" name="checkbox" id=""></td>
+					
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        
+        <a href="{% url 'listar_despacho' %}" type="submit" class="btn btn_aceptar border border-secondary text-black">Volver</a>
+        <button type="submit" id="boton_aceptar" class="btn btn_aceptar">Aceptar</button>
+
+        
+    </div>
+    
+
+{% endblock %}

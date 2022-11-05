@@ -2561,6 +2561,7 @@ def Ver_boleta(request):
     return render(request, 'boletas/ver_boleta.html', context)
 
 def Cambiar_estado_boleta(id_boleta):
+
     boleta = Boleta.objects.get(nroboleta=id_boleta)
 
     if boleta.estadoid.descripcion == 'Activo':
@@ -2569,6 +2570,71 @@ def Cambiar_estado_boleta(id_boleta):
     else:
         boleta.estadoid = Estado.objects.get(descripcion="Activo")
         boleta.save()
+
+
+#****************************Despacho*******************************************************
+
+def Listar_despacho(request):
+
+    if request.POST.get('VerPerfil') is not None:
+        request.session['_ver_perfil'] = request.POST
+        return redirect('ver_perfil')
+
+    if Usuario.objects.filter(nombreusuario=request.user).exists():
+        tipo_usuario = Usuario.objects.get(nombreusuario=request.user)
+        tipo_usuario = tipo_usuario.rolid.descripcion
+    else: 
+        tipo_usuario = None
+
+    despachos = Despacho.objects.all()
+
+    if request.method == 'POST':
+
+        if request.POST.get('VerDespacho') is not None:
+            request.session['_ver_despacho'] = request.POST
+            return HttpResponseRedirect('ver_despacho')
+
+    context = {
+        'despachos': despachos,
+        'tipo_usuario': tipo_usuario,
+    }
+
+    return render(request, 'despacho/listar_despacho.html', context)
+
+def Ver_despacho(request):
+
+    if request.POST.get('VerPerfil') is not None:
+        request.session['_ver_perfil'] = request.POST
+        return redirect('ver_perfil')
+
+    if Usuario.objects.filter(nombreusuario=request.user).exists():
+        tipo_usuario = Usuario.objects.get(nombreusuario=request.user)
+        tipo_usuario = tipo_usuario.rolid.descripcion
+    else: 
+        tipo_usuario = None
+
+    ver_despacho = request.session.get('_ver_despacho')
+    despacho = Despacho.objects.get(despachoid = ver_despacho['VerDespacho'])
+    productos_despacho = Detalleventa.objects.filter(nroventa = despacho.nroventa.nroventa)
+
+    context = {
+        'despacho': despacho,
+        'tipo_usuario': tipo_usuario,
+        'productos_despacho': productos_despacho
+    }
+
+    return render(request, 'despacho/ver_despacho.html', context)
+
+def Cambiar_estado_despacho(despachoId):
+    despacho = Despacho.objects.get(nrodespacho=despachoId)
+
+    if despacho.estadoid.descripcion == 'Activo':
+        despacho.estadoid = Estado.objects.get(descripcion="Inactivo")
+        despacho.save()
+    else:
+        despacho.estadoid = Estado.objects.get(descripcion="Activo")
+        despacho.save()
+
 
 #****************************Creacion de archivos******************************************
 

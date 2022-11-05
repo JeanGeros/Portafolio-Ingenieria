@@ -83,6 +83,10 @@ urlpatterns = [
     path('facturas/ver_factura', views.ver_factura, name="ver_factura"),
 
     
+    path('despacho/', views.Listar_despacho, name="listar_despacho"),
+    path('despacho/ver_despacho', views.Ver_despacho, name="ver_despacho"),
+    
+    
 
 
 
