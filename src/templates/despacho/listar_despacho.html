@@ -11,6 +11,20 @@
             Buscar despachos <input id="searchTerm" type="text" onkeyup="doSearch()" /><br><br>
         </form>
 
+        <form>
+            
+            Estado:  <select name="select" id="estados" >
+                <option value="1" selected>Activo</option>
+                <option value="4" >Despachado</option>
+                <option value="5">Entregado</option>
+              </select>
+            
+              <div class="btn-group">
+                <button  id="" name="AplicaEstado"  value="cod" onclick="ShowSelected();" class="">Aplicar</button>
+                
+            </div>
+        </form>
+
         <table id="datos" class="table table-striped table-hover" style="background-color: white">
             <h3 class="titulo-cliente text-center p-2 mb-0">Despacho</h3>
             <thead class="table-dark" style="text-align:center">
@@ -37,7 +51,7 @@
                                 {% csrf_token %}
                                 <div class="btn-group">
                                     <button  id="" name="VerDespacho" value="{{despacho.despachoid}}" class="btn btn_aceptar border border-secondary">Ver</button>
-                                    
+                                    <input type="hidden" name="estado" value="cod">
                                 </div>
                             </form>
                         </td>
@@ -50,6 +64,20 @@
         </table>
   
     </div>
+    <script type="text/javascript">
+        function ShowSelected()
+        {
+            /* Para obtener el valor */
+            var cod = document.getElementById("estados").value;
+            
+            console.log(cod);
+            /* Para obtener el texto */
+            var combo = document.getElementById("estados");
+            var selected = combo.options[combo.selectedIndex].text;
+            
+            console.log(selected);
+        }
+        </script>
     <script src="{% static 'js/buscador_tabla.js' %}"></script>
 
 {% endblock %}

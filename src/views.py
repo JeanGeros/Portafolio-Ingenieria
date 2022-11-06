@@ -2586,13 +2586,17 @@ def Listar_despacho(request):
     else: 
         tipo_usuario = None
 
-    despachos = Despacho.objects.all().order_by('despachoid')
+
 
     if request.method == 'POST':
 
         if request.POST.get('VerDespacho') is not None:
             request.session['_ver_despacho'] = request.POST
             return HttpResponseRedirect('ver_despacho')
+        
+    
+    despachos = Despacho.objects.all().order_by('despachoid')
+
 
     context = {
         'despachos': despachos,
