@@ -2586,16 +2586,20 @@ def Listar_despacho(request):
     else: 
         tipo_usuario = None
 
-
+    despachos = Despacho.objects.all().order_by('despachoid')
 
     if request.method == 'POST':
 
         if request.POST.get('VerDespacho') is not None:
             request.session['_ver_despacho'] = request.POST
             return HttpResponseRedirect('ver_despacho')
-        
+
+        estado_id = request.POST.get('AplicaEstado')
+        # print(estado_id)
+        # estado1 = Estado.objects.get(estadoid = estado_id)
+        print(estado_id)
+        despachos = Despacho.objects.all().order_by('despachoid').filter(estadoid = estado_id)
     
-    despachos = Despacho.objects.all().order_by('despachoid')
 
 
     context = {
