@@ -2965,21 +2965,24 @@ def listar_facturas(request):
     return render(request, 'facturas/listar_facturas.html', context)
 
 from reportlab.lib.units import inch
+from reportlab.pdfbase.pdfmetrics import registerFont
+from reportlab.pdfbase.ttfonts import TTFont
+registerFont(TTFont('Arial','ARIAL.ttf'))
 
-def my_temp(c, nro_venta):
+def my_temp(c, factura, direccion_cliente, giro):
     c.translate(inch,inch)
-# define a large font
+    # define a large font
     c.setFont("Helvetica", 14)
-# choose some colors
+    # choose some colors
     c.setStrokeColorRGB(0.1,0.8,0.1)
     c.setFillColorRGB(0,0,1) # font colour
 
     c.drawImage('src\static\images\Ferme-logo.jpg',0*inch,8.7*inch, width=70, height=70)
 
     c.setFillColorRGB(255,0,0) # font colour
-    c.setFont("Times-Bold", 18)
+    c.setFont("Arial", 18)
     c.drawString(1.2*inch, 9.3*inch, "FERME SPA")
-    c.setFont("Times-Bold", 13)
+    c.setFont("Arial", 13)
     c.setFillColorRGB(0,0,255) # font colour
     c.drawString(1.2*inch, 9.1*inch, "Giro: Ferreteria ")
     c.drawString(1.2*inch, 8.9*inch, "San Bernardo - Santiago")
@@ -2998,39 +3001,43 @@ def my_temp(c, nro_venta):
 
     #info dentro de cuadrado
     c.setFillColorRGB(1,0,0) # font colour
-    c.setFont("Times-Bold", 14)
+    c.setFont("Arial", 14)
     c.drawString(4.6*inch,9.5*inch,'RUT: 99.999.999-9')
     c.drawString(4.2*inch,9.1*inch,'FACTURA ELECTRONICA')
-    c.drawString(5*inch,8.7*inch,f'NRO° {nro_venta}')
+    c.drawString(5*inch,8.7*inch,f'NRO° {factura.numerofactura}')
 
-    c.setFont("Helvetica", 12)
+    c.setFont("Arial", 12)
     c.drawString(4.2*inch,8.1*inch,f'Fecha Emision:  {dt}')
 
     #BAJO EL LOGO
     c.setStrokeColorCMYK(0,0,0,1) # Color linea 
-    c.line(0*inch,8.5*inch,0*inch,7.5*inch)# linea vertical 
-    c.line(4*inch,8.5*inch,4*inch,7.5*inch)# linea vertical 
+    c.line(0*inch,8.5*inch,0*inch,7.4*inch)# linea vertical 
+    c.line(4*inch,8.5*inch,4*inch,7.4*inch)# linea vertical 
     c.line(0*inch,8.5*inch,4*inch,8.5*inch)# linea horizontal  
 
-    c.setFont("Times-Bold", 11)
+    c.setFont("Arial", 11)
     c.setFillColorRGB(0,0,255) # font colour
     c.drawString(0.1*inch, 8.3*inch, "SEÑOR(ES):")
     c.drawString(0.1*inch, 8.1*inch, "GIRO:")
     c.drawString(0.1*inch, 7.9*inch, "DIRECCION:")
     c.drawString(0.1*inch, 7.7*inch, "COMUNA:")
     c.drawString(0.1*inch, 7.5*inch, "CONTACTO:")
-
-
-    c.drawString(1.2*inch, 8.9*inch, "San Bernardo - Santiago")
+    
+    c.setFillColorRGB(0,0,0) # font colour
+    c.drawString(1.05*inch, 8.3*inch, f"{str(factura.nroventa.clienteid).lower().capitalize()}")
+    c.drawString(0.6*inch, 8.1*inch, f"{giro.lower().capitalize()}")
+    c.drawString(1.1*inch, 7.9*inch, f"{str(direccion_cliente.direccionid).lower().capitalize()}")
+    c.drawString(0.9*inch, 7.7*inch, f"{str(direccion_cliente.direccionid.comunaid).lower().capitalize()}")
+    c.drawString(1.1*inch, 7.5*inch, f"{str(factura.nroventa.clienteid.personaid.telefono)}")
 
     # c.rotate(45) # rotate by 45 degree 
     # c.setFillColorCMYK(0,0,0,0.08) # font colour CYAN, MAGENTA, YELLOW and BLACK
-    # c.setFont("Helvetica", 140) # font style and size
+    # c.setFont("Arial", 140) # font style and size
     # c.drawString(2*inch, 1*inch, "FERME") # String written 
 
     # c.rotate(-45) # restore the rotation 
     c.setFillColorRGB(0,0,0) # font colour
-    c.setFont("Times-Roman", 16)
+    c.setFont("Arial", 16)
     c.drawString(0.5*inch,7.2*inch,'Descripcion')
     c.drawString(4*inch,7.2*inch,'Precio')
     c.drawString(4.9*inch,7.2*inch,'Cantidad')
@@ -3038,27 +3045,60 @@ def my_temp(c, nro_venta):
 
     # TABLA PRODUCTOS
     c.setStrokeColorCMYK(0,0,0,1) # vertical line colour 
-    c.line(0,7.5*inch,6.8*inch,7.5*inch)
+    c.line(0,7.4*inch,6.8*inch,7.4*inch)
     c.line(0,7.1*inch,6.8*inch,7.1*inch)
-    c.line(0*inch,7.5*inch,0*inch,2.5*inch)# first vertical line
-    c.line(3.9*inch,7.5*inch,3.9*inch,2.5*inch)# second vertical line
-    c.line(4.8*inch,7.5*inch,4.8*inch,2.5*inch)# third vertical line
-    c.line(5.9*inch,7.5*inch,5.9*inch,2.5*inch)# fourty vertical line
-    c.line(6.8*inch,7.5*inch,6.8*inch,2.5*inch)# fifty vertical line
+
+    c.line(0*inch,7.4*inch,0*inch,2.5*inch)# first vertical line
+    c.line(3.9*inch,7.4*inch,3.9*inch,2.5*inch)# second vertical line
+    c.line(4.8*inch,7.4*inch,4.8*inch,2.5*inch)# third vertical line
+    c.line(5.9*inch,7.4*inch,5.9*inch,2.5*inch)# fourty vertical line
+    c.line(6.8*inch,7.4*inch,6.8*inch,2.5*inch)# fifty vertical line
     c.line(0.01*inch,2.5*inch,6.8*inch,2.5*inch)# horizontal line total
 
-    c.drawString(1*inch,1.8*inch,'Discount')
-    c.drawString(1*inch,1.2*inch,'Tax')
-    c.setFont("Times-Bold", 22)
-    c.drawString(2*inch,0.8*inch,'Total')
-    c.setFont("Times-Roman", 22)
-    c.drawString(5.6*inch,-0.1*inch,'Signature')
+    #CAJA MONTOS    
+    c.setStrokeColorCMYK(0,0,0,1) # Color linea 
+    c.line(4*inch,1*inch,4*inch,2*inch)# linea vertical 
+    c.line(6.8*inch,1*inch,6.8*inch,2*inch)# linea vertical 
+    c.line(6.8*inch,1*inch,4*inch,1*inch)# linea horizontal  
+    c.line(6.8*inch,2*inch,4*inch,2*inch)# linea horizontal  
 
-    c.setStrokeColorRGB(0.1,0.8,0.1) # Bottom Line colour 
-    c.line(0,-0.7*inch,6.8*inch,-0.7*inch)
-    c.setFont("Helvetica", 8) # font size
+    c.setFillColorRGB(0,0,0) # font colour
+    c.setFont("Arial", 13)
+    c.drawRightString(5.5*inch,1.7*inch,'Monto Neto $') # Total 
+    c.drawRightString(5.5*inch,1.5*inch,'I.V.A 19% $') # Total 
+    c.drawRightString(5.5*inch,1.3*inch,'TOTAL $') # Total 
+
+    c.drawRightString(6.5*inch,1.7*inch,f'{str(factura.neto)}') # Total 
+    c.drawRightString(6.5*inch,1.5*inch,f'{str(factura.iva)}') # Total 
+    c.drawRightString(6.5*inch,1.3*inch,f'{str(factura.totalfactura)}') # Total 
+
+    c.setStrokeColorRGB(0,0,0) # Bottom Line colour 
+
+    c.line(0*inch,0.5*inch,0*inch,-0.6*inch)# first vertical line
+    c.line(6.8*inch,0.5*inch,6.8*inch,-0.6*inch)# fifty vertical line
+
+    c.line(0,-0.6*inch,6.8*inch,-0.6*inch)
+    c.line(0, 0.5*inch,6.8*inch,0.5*inch)
+
+    c.setFillColorRGB(0,0,0) # font colour
+    c.setFont("Arial", 10)
+    c.drawRightString(0.7*inch,0.2*inch,'NOMBRE:') # Total 
+    c.drawRightString(2.5*inch,0.2*inch,'RUT:') # Total 
+    c.drawRightString(4*inch,0.2*inch,'FECHA:') # Total 
+    c.drawRightString(6*inch,0.2*inch,'RECINTO:') # Total 
+
+    c.drawRightString(0.7*inch,0.0*inch,'FIRMA: ') # Total 
+
+    c.setFont("Arial", 7.8)
+    c.drawRightString(6.7*inch,-0.2*inch,'"El acuso de recibo que se desidira en este acto, de acuerdo a lo dispuesto en la letra b) de Art 4°, y la letra c) del Art 5° de la ley 19.983,') # Total 
+    c.drawRightString(4.3*inch,-0.35*inch,'acredita que la entrega de marcadores o servicio(s) prestado(s) ha(s) sido recibido(s)"') # Total 
+
+
+    #PIE DE PAGINA
+    c.setFont("Arial", 8) # font size
     c.setFillColorRGB(1,0,0) # font colour
-    c.drawString(0, -0.9*inch," www.ferme.cl")
+    c.drawString(0, -0.9*inch,"www.ferme.cl")
+    c.drawRightString(6.85*inch, -0.9*inch,"CEDIBLE")
     
     return c
 
@@ -3127,9 +3167,6 @@ def ver_factura(request):
 
                 #sales table keeps the product id and quantity sold 
                 my_sale={1:2,3:2,7:1,4:3,6:5,5:3,2:1,9:1,10:3} # product id and quanity
-                discount_rate=10 # 10% discount 
-                tax_rate=12 # tax rate  in percentage 
-
 
                 from reportlab.pdfgen import canvas
                 from reportlab.lib.units import inch
@@ -3138,7 +3175,12 @@ def ver_factura(request):
                 #my_prod={1:['Hard Disk',80,1],2:['RAM',90,2],3:['Monitor',75,2]}
                 c = canvas.Canvas(buff, pagesize=letter)
                 print(factura)
-                c=my_temp(c,factura.numerofactura) # run the template
+
+                direccion_cliente = Direccioncliente.objects.get(clienteid=factura.nroventa.clienteid)
+
+                giro = "persona natural"
+
+                c= my_temp(c, factura, direccion_cliente, giro)
 
                 c.setFillColorRGB(0,0,1) # font colour
                 c.setFont("Helvetica", 13)
@@ -3155,22 +3197,13 @@ def ver_factura(request):
                     total=round(total+sub_total,1)
                     line_y=line_y-row_gap
                     
-                c.drawRightString(7*inch,2.1*inch,str(float(total))) # Total 
-                discount=round((discount_rate/100) * total,1)
-                c.drawRightString(4*inch,1.8*inch,str(discount_rate)+'%') # discount
-                c.drawRightString(7*inch,1.8*inch,'-'+str(discount)) # discount
-                tax=round((tax_rate/100) * (total-discount),1)
-                c.drawRightString(4*inch,1.2*inch,str(tax_rate)+'%') # tax 
-                c.drawRightString(7*inch,1.2*inch,str(tax)) # tax 
-                total_final=total-discount+tax
-                c.setFont("Times-Bold", 22)
+
+                c.setFont("Arial", 22)
                 c.setFillColorRGB(1,0,0) # font colour
-                c.drawRightString(7*inch,0.8*inch,str(total_final)) # tax 
                 c.showPage()
                 c.save()
 
                 response.write(buff.getvalue())   
-
                 buff.seek(0)
 
                 return FileResponse(buff, as_attachment=False, filename=f'factura.pdf')
