@@ -61,10 +61,10 @@ from src.forms import (
 )
 
 from .models import (
-     Detalleorden, Estadoorden, Guiadespacho, Ordencompra, Persona, Direccion, Usuario, Cliente, Estado, Comuna, Tipobarrio, Despacho,
+    Detalleorden, Estadoorden, Guiadespacho, Ordencompra, Persona, Direccion, Usuario, Cliente, Estado, Comuna, Tipobarrio, Despacho,
     Tipovivienda, Rolusuario, Direccioncliente, Empresa, Proveedor, Tipoproducto, Producto, Familiaproducto, Tipopago,
-    Empleado, Cargo, Tiporubro, Recepcion, Productoproveedor, Bodega, Boleta, Factura, Venta, Tipodocumento, Detalleventa, Boleta
-
+    Empleado, Cargo, Tiporubro, Recepcion, Productoproveedor, Bodega, Boleta, Factura, Venta, Tipodocumento, Detalleventa, Boleta,
+    Notacredito
 )
 
 from django.utils.encoding import smart_str
@@ -2801,6 +2801,8 @@ def creacion_doc(lista, nombre_archivo):
 
     return response
 
+#************************************Ventas**************************************
+
 @login_required(login_url="ingreso")
 def crear_venta(request):
 
@@ -3004,6 +3006,8 @@ def ver_venta(request):
     }
 
     return render(request, 'ventas/ver_venta.html', context)
+
+#************************************Facturas**************************************
 
 @login_required(login_url="ingreso")
 def listar_facturas(request):
@@ -3305,3 +3309,277 @@ def ver_factura(request):
 
     return render(request, 'facturas/ver_factura.html', context)
 
+#************************************Notas de credito**************************************
+
+# @login_required(login_url="ingreso")
+def Listar_notas_credito(request):
+
+    if request.POST.get('VerPerfil') is not None:
+        request.session['_ver_perfil'] = request.POST
+        return redirect('ver_perfil')
+
+    if Usuario.objects.filter(nombreusuario=request.user).exists():
+        tipo_usuario = Usuario.objects.get(nombreusuario=request.user)
+        tipo_usuario = tipo_usuario.rolid.descripcion
+    else: 
+        tipo_usuario = None
+
+    notas_credito = Notacredito.objects.all()
+
+    if request.method == 'POST':
+
+        if request.POST.get('VerNotaCredito') is not None:
+            request.session['_ver_nota_credito'] = request.POST
+            return HttpResponseRedirect('ver_nota_credito')
+
+    context = {
+        'notas_credito': notas_credito,
+        'tipo_usuario': tipo_usuario,
+    }
+
+    return render(request, 'notas de credito/listar_notas_credito.html', context)
+
+# @login_required(login_url="ingreso")
+def Ver_nota_credito(request):
+
+    if request.POST.get('VerPerfil') is not None:
+        request.session['_ver_perfil'] = request.POST
+        return redirect('ver_perfil')
+
+    if Usuario.objects.filter(nombreusuario=request.user).exists():
+        tipo_usuario = Usuario.objects.get(nombreusuario=request.user)
+        tipo_usuario = tipo_usuario.rolid.descripcion
+    else: 
+        tipo_usuario = None
+
+    id_nota_credito = request.session.get('_ver_nota_credito')
+    nota_credito = Notacredito.objects.get(nronota = id_nota_credito['VerNotaCredito'])
+
+    lista = []
+    lista.append(["Numero","Fecha","Total","Estado"])    
+    val = Notacredito.objects.filter(nronota = id_nota_credito['VerNotaCredito']).values_list('nronota','fechanota','total','estadoid__descripcion')
+    
+    if request.method == 'POST':
+
+        if request.POST.get('CambiarEstado') is not None:
+            id_nota_credito = request.POST.get('CambiarEstado')
+            Cambiar_estado_nota_credito(id_nota_credito)
+            notacredito = Notacredito.objects.get(nronota=id_nota_credito)
+            sweetify.success(request,
+                f'La nota de credito {id_nota_credito} ha quedado {notacredito.estadoid.descripcion} correctamente')
+            return redirect('listar_notas_credito')
+
+        tipoInforme = request.POST.get('informeCheck')
+        descargarInforme = request.POST.get('descargarInforme')
+        
+        if tipoInforme is not None and descargarInforme is not None:
+
+            for valores in val:
+
+                lista.append(list(valores))
+
+            if tipoInforme == "informeExcel":
+
+                nombre_archivo = "Compras"
+                tipo_doc = 'ms-excel'
+                extension = 'xlsx'
+                
+                return  creacion_excel(nombre_archivo, lista, tipo_doc, extension)
+
+            if tipoInforme == "informePdf":
+                
+                tipo_doc = 'pdf'
+                extension = 'pdf'
+                nombre = 'Compras'
+                
+                return creacion_pdf(lista,tipo_doc,A4,nombre,extension, valor=False)
+
+            if tipoInforme == "informeWord":
+
+                nombre_archivo = "Compras"
+                return  creacion_doc(lista, nombre_archivo)
+
+    context = {
+        'tipo_usuario': tipo_usuario,
+        'nota_credito': nota_credito
+    }
+
+    return render(request, 'notas de credito/ver_nota_credito.html', context)
+
+def Cambiar_estado_nota_credito(id_nota_credito):
+    notacredito = Notacredito.objects.get(nronota=id_nota_credito)
+
+    if notacredito.estadoid.descripcion == 'Activo':
+        notacredito.estadoid = Estado.objects.get(descripcion="Inactivo")
+        notacredito.save()
+    else:
+        notacredito.estadoid = Estado.objects.get(descripcion="Activo")
+        notacredito.save()
+
+# @login_required(login_url="ingreso")
+def Seleccion_documento(request):
+
+    if request.POST.get('VerPerfil') is not None:
+        request.session['_ver_perfil'] = request.POST
+        return redirect('ver_perfil')
+
+    if Usuario.objects.filter(nombreusuario=request.user).exists():
+        tipo_usuario = Usuario.objects.get(nombreusuario=request.user)
+        tipo_usuario = tipo_usuario.rolid.descripcion
+    else: 
+        tipo_usuario = None
+
+    if request.method == 'POST':
+
+        if request.POST.get('boleta') is not None:
+            request.session['_documento'] = request.POST
+            return HttpResponseRedirect('listar_documentos')
+
+        else:
+            request.session['_documento'] = request.POST
+            return HttpResponseRedirect('listar_documentos')
+
+    context = {
+        'tipo_usuario': tipo_usuario,
+    }
+
+    return render(request, 'notas de credito/seleccion_documento.html', context)
+
+# @login_required(login_url="ingreso")
+def Listar_documentos(request):
+
+    if request.POST.get('VerPerfil') is not None:
+        request.session['_ver_perfil'] = request.POST
+        return redirect('ver_perfil')
+
+    if Usuario.objects.filter(nombreusuario=request.user).exists():
+        tipo_usuario = Usuario.objects.get(nombreusuario=request.user)
+        tipo_usuario = tipo_usuario.rolid.descripcion
+    else: 
+        tipo_usuario = None
+
+    documento = request.session.get('_documento')
+
+    if documento['documento'] == 'boleta':
+        boletas = Boleta.objects.filter(estadoid__descripcion = 'Activo')
+    else:
+        boletas = None
+
+    if documento['documento'] == 'factura':
+        facturas = Factura.objects.filter(estadoid__descripcion = 'Activo')
+    else:
+        facturas = None
+
+    if request.method == 'POST':
+
+        if request.POST.get('CrearNotaCredito') is not None:
+            request.session['_crear_nota_credito'] = request.POST
+            return HttpResponseRedirect('crear_nota_credito')
+
+    context = {
+        'boletas': boletas,
+        'facturas': facturas,
+        'tipo_usuario': tipo_usuario,
+    }
+
+    return render(request, 'notas de credito/listar_documentos.html', context)
+
+# @login_required(login_url="ingreso")
+def Crear_nota_credito(request):
+
+    if request.POST.get('VerPerfil') is not None:
+        request.session['_ver_perfil'] = request.POST
+        return redirect('ver_perfil')
+
+    if Usuario.objects.filter(nombreusuario=request.user).exists():
+        tipo_usuario = Usuario.objects.get(nombreusuario=request.user)
+        tipo_usuario = tipo_usuario.rolid.descripcion
+    else: 
+        tipo_usuario = None
+
+    documento = request.session.get('_crear_nota_credito')
+
+    if documento['documento'] == 'boleta':
+        detalles = Boleta.objects.filter(nroboleta = documento['id']).values('nroventa')
+        detalles = Detalleventa.objects.filter(nroventa = detalles[0]['nroventa']).values('detalleventaid','productoid__nombre', 'productoid__precio')
+    else:
+        detalles = Factura.objects.filter(numerofactura = documento['id']).values('nroventa')
+        detalles = Detalleventa.objects.filter(nroventa = detalles[0]['nroventa']).values('detalleventaid','productoid__nombre', 'productoid__precio')
+
+    if request.method == 'POST':
+
+        cont = 0
+        suma2 = 0
+        arreglo = []
+        sumaPrecios = 0
+        for key,value in request.POST.items():
+            arreglo.append({key:value})
+
+            cont += 1
+            if cont > 2:
+                suma2 += int(key)
+
+        if arreglo[1]['TipoNotaCredito'] == 'completa':
+            suma = 0 
+
+            for x in detalles:
+                suma += x['productoid__precio']
+
+            from datetime import datetime
+            now = datetime.now()
+
+            if documento['documento'] == 'boleta':
+                
+                Notacredito.objects.create(
+                    fechanota = now,
+                    total = suma,
+                    estadoid = Estado.objects.get(descripcion='Activo'),
+                    nroboleta = documento['id']
+                )
+                sweetify.success(request, "Nota de credito creado correctamente")
+                return redirect('listar_notas_credito')
+            else:
+                
+                Notacredito.objects.create(
+                    fechanota = now,
+                    total = suma,
+                    estadoid = Estado.objects.get(descripcion='Activo'),
+                    numerofactura = Factura.objects.get(numerofactura = documento['id'])
+                )
+                sweetify.success(request, "Nota de credito creado correctamente")
+                return redirect('listar_notas_credito')
+
+        if arreglo[1]['TipoNotaCredito'] == 'parcial':
+            
+            from datetime import datetime
+            now = datetime.now()
+
+            if documento['documento'] == 'boleta':
+                
+                Notacredito.objects.create(
+                    fechanota = now,
+                    total = suma2,
+                    estadoid = Estado.objects.get(descripcion='Activo'),
+                    nroboleta = documento['id']
+                )
+                sweetify.success(request, "Nota de credito creado correctamente")
+                return redirect('listar_notas_credito')
+            else:
+                
+                Notacredito.objects.create(
+                    fechanota = now,
+                    total = suma2,
+                    estadoid = Estado.objects.get(descripcion='Activo'),
+                    numerofactura = Factura.objects.get(numerofactura = documento['id']) 
+                )
+                sweetify.success(request, "Nota de credito creada correctamente")
+                return redirect('listar_notas_credito')
+    else:
+        sweetify.warning(request, "No es posible crear la nota de credito en este momento")
+
+    context = {
+        'detalles': detalles,
+        'tipo_usuario': tipo_usuario,
+    }
+
+    return render(request, 'notas de credito/crear_nota_credito.html', context)

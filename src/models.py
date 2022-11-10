@@ -348,6 +348,9 @@ class Factura(models.Model):
     nroventa = models.ForeignKey('Venta', models.DO_NOTHING, db_column='nroventa')
     estadoid = models.ForeignKey(Estado, models.DO_NOTHING, db_column='estadoid')
 
+    def __str__(self):
+        return f"{self.numerofactura}"
+
     class Meta:
         managed = False
         db_table = 'factura'

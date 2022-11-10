@@ -82,9 +82,11 @@ urlpatterns = [
     path('facturas/', views.listar_facturas, name="listar_facturas"),
     path('facturas/ver_factura', views.ver_factura, name="ver_factura"),
 
-    
-
-
+    path('notas_credito/', views.Listar_notas_credito, name="listar_notas_credito"),
+    path('notas_credito/ver_nota_credito', views.Ver_nota_credito, name="ver_nota_credito"),
+    path('notas_credito/seleccion_documento', views.Seleccion_documento, name="seleccion_documento"),
+    path('notas_credito/crear_nota_credito', views.Crear_nota_credito, name="crear_nota_credito"),
+    path('notas_credito/listar_documentos', views.Listar_documentos, name="listar_documentos"),
 
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 

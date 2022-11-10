@@ -1,0 +1,38 @@
+{% extends 'layout.html' %}
+{% load static %}
+
+{% block content %}
+    <link rel="stylesheet" href="{% static 'css/seleccion_registro.css' %}">
+    
+    <div class="container text-end caja rounded mt-5 mb-5">
+        
+        <h1 class="text-center">Seleccione el tipo de documento <br> para la nota de credito</h1>
+
+        <div class="seleccion">
+            <form method="POST" action="">
+                {% csrf_token %}
+                <button type="" name="documento" value="boleta" class="btn link m-5 p-3">
+                    <div class="border-dark mb-3" style="max-width: 18rem;">
+                        <div class="card-body text-dark">
+                            <h5 class="card-title">Boleta</h5>
+                        </div>
+                    </div>
+                </button>
+            </form>
+            <form method="POST" action="">
+                {% csrf_token %}
+                <button type="" name="documento" value="factura" class="btn link m-5 p-3">
+                    <div class="border-dark mb-3" style="max-width: 18rem;">
+                        <div class="card-body text-dark">
+                            <h5 class="card-title">Factura</h5>
+                        </div>
+                    </div>
+                </button>
+            </form>
+        </div>
+        <a href="{% url 'listar_notas_credito' %}" type="submit" class="btn">Volver</a>
+    </div>
+    
+    <!-- <script src="{% static 'js/registro_clientes.js' %}"></script> -->
+
+{% endblock %}
