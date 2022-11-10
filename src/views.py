@@ -45,6 +45,12 @@ from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib.enums import TA_JUSTIFY, TA_LEFT, TA_CENTER 
 from reportlab.lib import colors
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, NextPageTemplate
+
+from reportlab.pdfbase.pdfmetrics import registerFont
+from reportlab.pdfbase.ttfonts import TTFont
+from  datetime import date
+from reportlab.lib.units import inch
+
 from io import BytesIO
 import re
 from docx.oxml.ns import nsdecls
@@ -2300,8 +2306,12 @@ def Ver_boleta(request):
         tipo_usuario = None
 
     ver_boleta = request.session.get('_ver_boleta')
+
     boleta = Boleta.objects.get(nroboleta = ver_boleta['VerBoleta'])
-    productos_boleta = Detalleventa.objects.filter(nroventa = boleta.nroventa.nroventa)
+    productos_boleta = Detalleventa.objects.filter(nroventa = boleta.nroboleta)
+    venta = Venta.objects.get(nroventa = boleta.nroventa.nroventa)
+    direccion_cliente = Direccioncliente.objects.get(clienteid=venta.clienteid)
+    giro = "persona natural"
 
     if request.method == 'POST':
 
@@ -2349,91 +2359,18 @@ def Ver_boleta(request):
 
             if tipoInforme == "informePdf":
                 
-                tipo_doc = 'pdf'
-                extension = 'pdf'
-                nombre = 'Detalle boleta'
-                
-                # return creacion_pdf(lista,tipo_doc,A4,nombre,extension, valor=False)
-                response = HttpResponse(content_type=f'application/{tipo_doc}')  
-
+                response = HttpResponse(content_type=f'application/pdf')  
                 buff = BytesIO()  
 
-                doc = SimpleDocTemplate(buff,  
-                    pagesize=A4,  
-                    rightMargin=40,  
-                    leftMargin=40,  
-                    topMargin=60,  
-                    bottomMargin=18,  
-                ) 
-                
-                data = []  
-                styles = getSampleStyleSheet()  
-                styles = styles['Heading1']
-                styles.alignment = TA_CENTER 
+                c = canvas.Canvas(buff, pagesize=letter)
+                c= generar_factura(c, venta, boleta, productos_boleta, direccion_cliente, giro, 0)
+                c.showPage()
+                c.save()
 
-                header = Paragraph(f"{nombre}", styles)  
-                
-                data.append(header)  
-
-                t = Table(lista1)  
-
-                t.setStyle(TableStyle(  
-                    [  
-                    ('GRID', (0, 0), (12, -1), 1, colors.dodgerblue),  
-                    ('LINEBELOW', (0, 0), (-1, 0), 3, colors.darkblue),  
-                    ('BACKGROUND', (0, 0), (-1, 0), colors.dodgerblue)  
-                    ]  
-                ))  
-                
-                data.append(t)
-
-                styles = getSampleStyleSheet()  
-                styles.pageBreakBefore = 2
-                styles = styles['Heading1']
-                styles.alignment = TA_CENTER  
-                header = Paragraph("", styles) 
-                data.append(header)  
-                header = Paragraph("", styles) 
-                data.append(header)  
-
-                t = Table(lista2)  
-
-                t.setStyle(TableStyle(  
-                    [  
-                    ('GRID', (0, 0), (12, -1), 1, colors.dodgerblue),  
-                    ('LINEBELOW', (0, 0), (-1, 0), 3, colors.darkblue),  
-                    ('BACKGROUND', (0, 0), (-1, 0), colors.dodgerblue)  
-                    ]  
-                ))  
-                
-                data.append(t)
-
-                styles = getSampleStyleSheet()  
-                styles.pageBreakBefore = 3
-                styles = styles['Heading1']
-                styles.alignment = TA_CENTER 
-                header = Paragraph("", styles) 
-                data.append(header)  
-                header = Paragraph("", styles) 
-                data.append(header)  
-
-                t = Table(lista3)  
-
-                t.setStyle(TableStyle(  
-                    [  
-                    ('GRID', (0, 0), (12, -1), 1, colors.dodgerblue),  
-                    ('LINEBELOW', (0, 0), (-1, 0), 3, colors.darkblue),  
-                    ('BACKGROUND', (0, 0), (-1, 0), colors.dodgerblue)  
-                    ]  
-                ))  
-                
-                data.append(t)
-
-                doc.build(data)  
                 response.write(buff.getvalue())   
-
                 buff.seek(0)
-                return FileResponse(buff, as_attachment=False, filename=f'{nombre}.{extension}')
+
+                return FileResponse(buff, as_attachment=False, filename=f'factura.pdf')
 
             if tipoInforme == "informeWord":
 
@@ -2657,10 +2594,6 @@ def creacion_guia(lista,tipo_doc,tamaño_pagina, nombre, extension, valor = None
     discount_rate=10 # 10% discount 
     tax_rate=12 # tax rate  in percentage 
 
-
-    from reportlab.pdfgen import canvas
-    from reportlab.lib.units import inch
-    from reportlab.lib.pagesizes import letter, A4
     from temp_invoice import my_temp # import the template
 
     #my_prod={1:['Hard Disk',80,1],2:['RAM',90,2],3:['Monitor',75,2]}
@@ -2698,7 +2631,6 @@ def creacion_guia(lista,tipo_doc,tamaño_pagina, nombre, extension, valor = None
     respuesta = FileResponse(buff, as_attachment=valor, filename=f'{nombre}.{extension}')
 
     return respuesta
-
 
 def creacion_doc(lista, nombre_archivo):
     document = Document()
@@ -2739,8 +2671,6 @@ def creacion_doc(lista, nombre_archivo):
     document.save(response)
 
     return response
-
-
 
 
 @login_required(login_url="ingreso")
@@ -2964,12 +2894,12 @@ def listar_facturas(request):
 
     return render(request, 'facturas/listar_facturas.html', context)
 
-from reportlab.lib.units import inch
-from reportlab.pdfbase.pdfmetrics import registerFont
-from reportlab.pdfbase.ttfonts import TTFont
 registerFont(TTFont('Arial','ARIAL.ttf'))
 
-def my_temp(c, factura, direccion_cliente, giro):
+
+# tipo_tributario=0 BOLETA
+# tipo_tributario=1 FACTURA
+def generar_factura(c, venta, documento, detalle_venta, direccion_cliente, giro, tipo_tributario='1'):
     c.translate(inch,inch)
     # define a large font
     c.setFont("Helvetica", 14)
@@ -2989,7 +2919,6 @@ def my_temp(c, factura, direccion_cliente, giro):
     #linea verde
     c.setStrokeColorCMYK(0,0,0,1) # vertical line colour 
     
-    from  datetime import date
     dt = date.today().strftime('%d-%b-%Y')
 
     #cuadrado arriba - derecha
@@ -3002,10 +2931,8 @@ def my_temp(c, factura, direccion_cliente, giro):
     #info dentro de cuadrado
     c.setFillColorRGB(1,0,0) # font colour
     c.setFont("Arial", 14)
-    c.drawString(4.6*inch,9.5*inch,'RUT: 99.999.999-9')
-    c.drawString(4.2*inch,9.1*inch,'FACTURA ELECTRONICA')
-    c.drawString(5*inch,8.7*inch,f'NRO° {factura.numerofactura}')
-
+    c.drawString(4.6*inch,9.5*inch,'RUT: 69.736.194-2')
+   
     c.setFont("Arial", 12)
     c.drawString(4.2*inch,8.1*inch,f'Fecha Emision:  {dt}')
 
@@ -3022,18 +2949,44 @@ def my_temp(c, factura, direccion_cliente, giro):
     c.drawString(0.1*inch, 7.9*inch, "DIRECCION:")
     c.drawString(0.1*inch, 7.7*inch, "COMUNA:")
     c.drawString(0.1*inch, 7.5*inch, "CONTACTO:")
-    
-    c.setFillColorRGB(0,0,0) # font colour
-    c.drawString(1.05*inch, 8.3*inch, f"{str(factura.nroventa.clienteid).lower().capitalize()}")
+    if tipo_tributario == 0: #BOLETA
+
+        c.setFillColorRGB(1,0,0) # font colour
+        c.setFont("Arial", 14)
+        c.drawString(4.2*inch,9.1*inch,'BOLETA ELECTRONICA')
+        c.drawString(5*inch,8.7*inch,f'NRO° {documento.nroboleta}')
+
+        c.setFillColorRGB(0,0,0) # font colour
+        c.setFont("Arial", 11)
+        c.drawString(1.1*inch, 7.5*inch, f"{str(venta.clienteid.personaid.telefono)}")
+        c.drawString(1.05*inch, 8.3*inch, f"{str(venta.clienteid).lower().capitalize()}")
+        
+        neto = str(int(documento.totalboleta)-(int(documento.totalboleta)*0.19))
+        iva = str(int(documento.totalboleta)*0.19)
+
+        c.drawRightString(6.5*inch,1.7*inch,f'{neto}') #  
+        c.drawRightString(6.5*inch,1.5*inch,f'{iva}') # Total 
+        c.drawRightString(6.5*inch,1.3*inch,f'{str(documento.totalboleta)}') # Total 
+
+
+    elif tipo_tributario == 1: #FACTURA
+        c.setFillColorRGB(1,0,0) # font colour
+        c.setFont("Arial", 14)
+        c.drawString(4.2*inch,9.1*inch,'FACTURA ELECTRONICA')
+        c.drawString(5*inch,8.7*inch,f'NRO° {documento.numerofactura}')
+
+        c.setFillColorRGB(0,0,0) # font colour
+        c.setFont("Arial", 11)
+        c.drawString(1.1*inch, 7.5*inch, f"{str(venta.clienteid.personaid.telefono)}")
+        c.drawString(1.05*inch, 8.3*inch, f"{str(venta.clienteid).lower().capitalize()}")
+
+        c.drawRightString(6.5*inch,1.7*inch,f'{str(documento.neto)}') # Total 
+        c.drawRightString(6.5*inch,1.5*inch,f'{str(documento.iva)}') # Total 
+        c.drawRightString(6.5*inch,1.3*inch,f'{str(documento.totalfactura)}') # Total 
+
     c.drawString(0.6*inch, 8.1*inch, f"{giro.lower().capitalize()}")
     c.drawString(1.1*inch, 7.9*inch, f"{str(direccion_cliente.direccionid).lower().capitalize()}")
     c.drawString(0.9*inch, 7.7*inch, f"{str(direccion_cliente.direccionid.comunaid).lower().capitalize()}")
-    c.drawString(1.1*inch, 7.5*inch, f"{str(factura.nroventa.clienteid.personaid.telefono)}")
-
-    # c.rotate(45) # rotate by 45 degree 
-    # c.setFillColorCMYK(0,0,0,0.08) # font colour CYAN, MAGENTA, YELLOW and BLACK
-    # c.setFont("Arial", 140) # font style and size
-    # c.drawString(2*inch, 1*inch, "FERME") # String written 
 
     # c.rotate(-45) # restore the rotation 
     c.setFillColorRGB(0,0,0) # font colour
@@ -3068,15 +3021,10 @@ def my_temp(c, factura, direccion_cliente, giro):
     c.drawRightString(5.5*inch,1.5*inch,'I.V.A 19% $') # Total 
     c.drawRightString(5.5*inch,1.3*inch,'TOTAL $') # Total 
 
-    c.drawRightString(6.5*inch,1.7*inch,f'{str(factura.neto)}') # Total 
-    c.drawRightString(6.5*inch,1.5*inch,f'{str(factura.iva)}') # Total 
-    c.drawRightString(6.5*inch,1.3*inch,f'{str(factura.totalfactura)}') # Total 
-
     c.setStrokeColorRGB(0,0,0) # Bottom Line colour 
 
     c.line(0*inch,0.5*inch,0*inch,-0.6*inch)# first vertical line
     c.line(6.8*inch,0.5*inch,6.8*inch,-0.6*inch)# fifty vertical line
-
     c.line(0,-0.6*inch,6.8*inch,-0.6*inch)
     c.line(0, 0.5*inch,6.8*inch,0.5*inch)
 
@@ -3093,13 +3041,30 @@ def my_temp(c, factura, direccion_cliente, giro):
     c.drawRightString(6.7*inch,-0.2*inch,'"El acuso de recibo que se desidira en este acto, de acuerdo a lo dispuesto en la letra b) de Art 4°, y la letra c) del Art 5° de la ley 19.983,') # Total 
     c.drawRightString(4.3*inch,-0.35*inch,'acredita que la entrega de marcadores o servicio(s) prestado(s) ha(s) sido recibido(s)"') # Total 
 
-
     #PIE DE PAGINA
     c.setFont("Arial", 8) # font size
     c.setFillColorRGB(1,0,0) # font colour
     c.drawString(0, -0.9*inch,"www.ferme.cl")
     c.drawRightString(6.85*inch, -0.9*inch,"CEDIBLE")
-    
+
+    c.setFillColorRGB(0,0,1) # font colour
+    c.setFont("Helvetica", 13)
+    row_gap=0.2
+    line_y=6.8 
+
+    c.setFillColorRGB(0,0,0) # font colour
+    c.setFont("Arial", 11) # font size
+
+    for producto in detalle_venta:
+        print(producto)
+        print(producto.productoid)
+        print(producto.productoid.nombre)
+        c.drawString(0.1*inch,line_y*inch,str(producto.productoid).lower().capitalize()) # p Name
+        c.drawRightString(4.5*inch,line_y*inch,f'${str(producto.productoid.precio)}') # p Price
+        c.drawRightString(5.5*inch,line_y*inch,str(producto.cantidad)) # p Qunt 
+        c.drawRightString(6.5*inch,line_y*inch,f'${str(producto.subtotal)}') # Sub Total 
+        line_y=line_y-row_gap
+
     return c
 
 def ver_factura(request):
@@ -3116,7 +3081,10 @@ def ver_factura(request):
     old_post = request.session.get('_old_post')
 
     factura = Factura.objects.get(numerofactura=old_post['VerFactura'])
+    venta = Venta.objects.get(nroventa = factura.nroventa.nroventa)
     detalle_venta = Detalleventa.objects.filter(nroventa = factura.nroventa)
+    direccion_cliente = Direccioncliente.objects.get(clienteid=factura.nroventa.clienteid)
+    giro = "persona natural"
 
     if request.method == 'POST':
 
@@ -3159,47 +3127,10 @@ def ver_factura(request):
 
             if tipoInforme == "informePdf":
                 response = HttpResponse(content_type=f'application/pdf')  
-                
                 buff = BytesIO()  
 
-                #Data setting for invoice , Can be generated from Database or Excel ##
-                my_prod = {1:['Hard Disk',80], 2:['RAM',90], 3:['Monitor',75], 4:['CPU',55], 5:['Keyboard',20], 6:['Mouse',10], 7:['Mother board',50],8:['Power Sypply',20], 9:['Speaker',50],10:['Microphone',45]}
-
-                #sales table keeps the product id and quantity sold 
-                my_sale={1:2,3:2,7:1,4:3,6:5,5:3,2:1,9:1,10:3} # product id and quanity
-
-                from reportlab.pdfgen import canvas
-                from reportlab.lib.units import inch
-                from reportlab.lib.pagesizes import letter, A4
-
-                #my_prod={1:['Hard Disk',80,1],2:['RAM',90,2],3:['Monitor',75,2]}
                 c = canvas.Canvas(buff, pagesize=letter)
-                print(factura)
-
-                direccion_cliente = Direccioncliente.objects.get(clienteid=factura.nroventa.clienteid)
-
-                giro = "persona natural"
-
-                c= my_temp(c, factura, direccion_cliente, giro)
-
-                c.setFillColorRGB(0,0,1) # font colour
-                c.setFont("Helvetica", 13)
-                row_gap=0.2 # gap between each row
-                line_y=6.8 # location of fist Y position 
-                total=0
-
-                for items in my_sale:
-                    c.drawString(0.1*inch,line_y*inch,str(my_prod[items][0])) # p Name
-                    c.drawRightString(4.5*inch,line_y*inch,str(my_prod[items][1])) # p Price
-                    c.drawRightString(5.5*inch,line_y*inch,str(my_sale[items])) # p Qunt 
-                    sub_total=my_prod[items][1]*my_sale[items]
-                    c.drawRightString(6.5*inch,line_y*inch,str(sub_total)) # Sub Total 
-                    total=round(total+sub_total,1)
-                    line_y=line_y-row_gap
-                    
-
-                c.setFont("Arial", 22)
-                c.setFillColorRGB(1,0,0) # font colour
+                c= generar_factura(c, venta, factura, detalle_venta, direccion_cliente, giro, 1)
                 c.showPage()
                 c.save()
 
