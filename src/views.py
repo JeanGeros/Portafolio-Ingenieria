@@ -2595,9 +2595,8 @@ def Listar_despacho(request):
             return HttpResponseRedirect('ver_despacho')
 
         estado_id = request.POST.get('AplicaEstado')
-        # print(estado_id)
-        # estado1 = Estado.objects.get(estadoid = estado_id)
         print(estado_id)
+        estado1 = Estado.objects.get(estadoid = estado_id)
         despachos = Despacho.objects.all().order_by('despachoid').filter(estadoid = estado_id)
     
 
@@ -2628,9 +2627,10 @@ def Ver_despacho(request):
     if request.method == 'POST':
 
         despachoId = request.POST.get('despacho_id')
-        estado = request.POST.get('estado_id')
-        print(despachoId)
-        Cambiar_estado_despacho(despachoId,estado)
+        estado_id = request.POST.get('estado_id')
+        estado = request.POST.get('btnAccion')
+        Cambiar_estado_despacho(despachoId,estado_id,estado)
+        return redirect('listar_despacho')
 
     context = {
         'despacho': despacho,
@@ -2640,18 +2640,25 @@ def Ver_despacho(request):
 
     return render(request, 'despacho/ver_despacho.html', context)
 
-def Cambiar_estado_despacho(despachoId,estado):
+def Cambiar_estado_despacho(despachoId,estado_id,estado):
     despacho = Despacho.objects.get(despachoid=despachoId)
+    if estado == 'Cancelar':
+        estadoActual = 'Inactivo'
+    else:
+        estadoActual = 'Despachado'
 
+    print(estadoActual)
     if despacho.estadoid.descripcion == 'Activo':
-        despacho.estadoid = Estado.objects.get(descripcion="Despachado")
+        despacho.estadoid = Estado.objects.get(descripcion=estadoActual)
         despacho.save()
-    elif estado == 'Despachado':
-        despacho.estadoid = Estado.objects.get(descripcion="Despachado")
-        despacho.save()
+    # elif estado == 'Despachado':
+    #     despacho.estadoid = Estado.objects.get(descripcion="Despachado")
+    #     despacho.save()
     else:
         despacho.estadoid = Estado.objects.get(descripcion="Activo")
         despacho.save()
+
+    
 
 
 #****************************Creacion de archivos******************************************

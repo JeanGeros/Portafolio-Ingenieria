@@ -17,10 +17,19 @@
                 
                 <option value="1" selected>Activo</option>
                 <option value="4" >Despachado</option>
-                <option value="5">Entregado</option>
+                <option value="5">Inactivo</option>
               </select>
                 <div class="btn-group">
-                    <button  type="submit" id="" name="AplicaEstado" value="" >Aplicar</button>
+                    {% if SelectEstado == 4 %}
+                        <button  type="submit" id="" name="AplicaEstado" value="4" onclick="ShowSelected();" >Aplicar</button>   
+                        
+                    {% elif SelectEstado.value == 5 %}
+                        <button  type="submit" id="" name="AplicaEstado" value="5" onclick="ShowSelected();" >Aplicar</button>   
+                    {% else %}
+                        <button  type="submit" id="" name="AplicaEstado" value="1" onclick="ShowSelected();" >Aplicar</button>
+                            
+                    {% endif %}
+                    <!-- <button  type="submit" id="" name="AplicaEstado" value="" onclick="ShowSelected();" >Aplicar</button> -->
                 </div>
         </form>
 
@@ -76,6 +85,8 @@
             
             console.log(selected);
             cod.submit();
+
+            return cod
       }
         
         </script>
