@@ -78,7 +78,9 @@
                                 <li class="nav-item">
                                     <a href="/ventas" class="nav-link fw-bolder text-black">Ventas</a>
                                 </li>
-                                
+                                <li class="nav-item">
+                                    <a href="/notas_credito" class="nav-link fw-bolder text-black">Notas de <br> credito</a>
+                                </li>
                             {% endif %}  
                             {% if tipo_usuario == 'Vendedor' and tipo_usuario != None %}
                                 <li class="nav-item">
@@ -103,6 +105,9 @@
                                 </li> 
                                 <li class="nav-item">
                                     <a href="/ventas" class="nav-link fw-bolder text-black">Ventas</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="/notas_credito" class="nav-link fw-bolder text-black">Notas de <br> credito</a>
                                 </li>
                             {% endif %}
                             {% if tipo_usuario == 'Empleado' and tipo_usuario != None %}
@@ -139,7 +144,7 @@
                             </li>
                             <li class="nav-item">
                                 <a href="#" class="nav-link fw-bolder text-black">Compra <br> con nosotros</a>
-                        </li>
+                            </li>                            
                         {% endif %}
                     </ul>
                     
