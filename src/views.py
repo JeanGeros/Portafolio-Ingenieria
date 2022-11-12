@@ -2595,8 +2595,13 @@ def Listar_despacho(request):
             return HttpResponseRedirect('ver_despacho')
         
     
-    despachos = Despacho.objects.all().order_by('despachoid')
+    if request.method == 'POST':
+        estado = request.POST.get('estados')
+        print(estado)
 
+        
+
+    despachos = 'wena wena weon'
 
     context = {
         'despachos': despachos,
