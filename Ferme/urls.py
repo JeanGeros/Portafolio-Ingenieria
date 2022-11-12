@@ -81,8 +81,8 @@ urlpatterns = [
     path('facturas/', views.listar_facturas, name="listar_facturas"),
     path('facturas/ver_factura', views.ver_factura, name="ver_factura"),
 
-    path('guias_despacho/', views.listar_guias_despacho, name="listar_guias_despacho"),
-    path('guias_despacho/ver_guia_despacho', views.ver_guia_despacho, name="ver_guia_despacho"),
+    path('despacho/', views.Listar_despacho, name="listar_despacho"),
+    path('despacho/ver_despacho', views.Ver_despacho, name="ver_despacho"),
 
     path('notas_credito/', views.Listar_notas_credito, name="listar_notas_credito"),
     path('notas_credito/ver_nota_credito', views.Ver_nota_credito, name="ver_nota_credito"),
