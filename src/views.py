@@ -2595,17 +2595,10 @@ def Listar_despacho(request):
             request.session['_ver_despacho'] = request.POST
             return HttpResponseRedirect('ver_despacho')
         
-        estado_id = request.POST.get('AplicaEstado')
-        print(estado_id)
-        estado1 = Estado.objects.get(estadoid = estado_id)
-        despachos = Despacho.objects.all().order_by('despachoid').filter(estadoid = estado_id)
-    
 
     if request.method == 'POST':
         estado = request.POST.get('estados')
-    print(estado)
-    print(esta_id)
-        
+       
 
 
     context = {
@@ -2647,7 +2640,7 @@ def Ver_despacho(request):
 
     return render(request, 'despacho/ver_despacho.html', context)
 
-def Cambiar_estado_despacho(despachoId,estado):
+def Cambiar_estado_despacho(despachoId,estado_id,estado):
     despacho = Despacho.objects.get(despachoid=despachoId)
     if estado == 'Cancelar':
         estadoActual = 'Inactivo'
