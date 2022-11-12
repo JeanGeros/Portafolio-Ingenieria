@@ -45,6 +45,12 @@ from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib.enums import TA_JUSTIFY, TA_LEFT, TA_CENTER 
 from reportlab.lib import colors
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, NextPageTemplate
+
+from reportlab.pdfbase.pdfmetrics import registerFont
+from reportlab.pdfbase.ttfonts import TTFont
+from  datetime import date
+from reportlab.lib.units import inch
+
 from io import BytesIO
 import re
 from docx.oxml.ns import nsdecls
@@ -2420,8 +2426,12 @@ def Ver_boleta(request):
         tipo_usuario = None
 
     ver_boleta = request.session.get('_ver_boleta')
+
     boleta = Boleta.objects.get(nroboleta = ver_boleta['VerBoleta'])
-    productos_boleta = Detalleventa.objects.filter(nroventa = boleta.nroventa.nroventa)
+    productos_boleta = Detalleventa.objects.filter(nroventa = boleta.nroboleta)
+    venta = Venta.objects.get(nroventa = boleta.nroventa.nroventa)
+    direccion_cliente = Direccioncliente.objects.get(clienteid=venta.clienteid)
+    giro = "persona natural"
 
     if request.method == 'POST':
 
@@ -2469,91 +2479,18 @@ def Ver_boleta(request):
 
             if tipoInforme == "informePdf":
                 
-                tipo_doc = 'pdf'
-                extension = 'pdf'
-                nombre = 'Detalle boleta'
-                
-                # return creacion_pdf(lista,tipo_doc,A4,nombre,extension, valor=False)
-                response = HttpResponse(content_type=f'application/{tipo_doc}')  
-
+                response = HttpResponse(content_type=f'application/pdf')  
                 buff = BytesIO()  
 
-                doc = SimpleDocTemplate(buff,  
-                    pagesize=A4,  
-                    rightMargin=40,  
-                    leftMargin=40,  
-                    topMargin=60,  
-                    bottomMargin=18,  
-                ) 
-                
-                data = []  
-                styles = getSampleStyleSheet()  
-                styles = styles['Heading1']
-                styles.alignment = TA_CENTER 
+                c = canvas.Canvas(buff, pagesize=letter)
+                c= generar_factura(c, venta, boleta, productos_boleta, direccion_cliente, giro, 0)
+                c.showPage()
+                c.save()
 
-                header = Paragraph(f"{nombre}", styles)  
-                
-                data.append(header)  
-
-                t = Table(lista1)  
-
-                t.setStyle(TableStyle(  
-                    [  
-                    ('GRID', (0, 0), (12, -1), 1, colors.dodgerblue),  
-                    ('LINEBELOW', (0, 0), (-1, 0), 3, colors.darkblue),  
-                    ('BACKGROUND', (0, 0), (-1, 0), colors.dodgerblue)  
-                    ]  
-                ))  
-                
-                data.append(t)
-
-                styles = getSampleStyleSheet()  
-                styles.pageBreakBefore = 2
-                styles = styles['Heading1']
-                styles.alignment = TA_CENTER  
-                header = Paragraph("", styles) 
-                data.append(header)  
-                header = Paragraph("", styles) 
-                data.append(header)  
-
-                t = Table(lista2)  
-
-                t.setStyle(TableStyle(  
-                    [  
-                    ('GRID', (0, 0), (12, -1), 1, colors.dodgerblue),  
-                    ('LINEBELOW', (0, 0), (-1, 0), 3, colors.darkblue),  
-                    ('BACKGROUND', (0, 0), (-1, 0), colors.dodgerblue)  
-                    ]  
-                ))  
-                
-                data.append(t)
-
-                styles = getSampleStyleSheet()  
-                styles.pageBreakBefore = 3
-                styles = styles['Heading1']
-                styles.alignment = TA_CENTER 
-                header = Paragraph("", styles) 
-                data.append(header)  
-                header = Paragraph("", styles) 
-                data.append(header)  
-
-                t = Table(lista3)  
-
-                t.setStyle(TableStyle(  
-                    [  
-                    ('GRID', (0, 0), (12, -1), 1, colors.dodgerblue),  
-                    ('LINEBELOW', (0, 0), (-1, 0), 3, colors.darkblue),  
-                    ('BACKGROUND', (0, 0), (-1, 0), colors.dodgerblue)  
-                    ]  
-                ))  
-                
-                data.append(t)
-
-                doc.build(data)  
                 response.write(buff.getvalue())   
-
                 buff.seek(0)
-                return FileResponse(buff, as_attachment=False, filename=f'{nombre}.{extension}')
+
+                return FileResponse(buff, as_attachment=False, filename=f'factura.pdf')
 
             if tipoInforme == "informeWord":
 
@@ -2747,7 +2684,7 @@ def creacion_pdf(lista,tipo_doc,tamaño_pagina, nombre, extension, valor = None)
         ('GRID', (0, 0), (12, -1), 1, colors.dodgerblue),  
         ('LINEBELOW', (0, 0), (-1, 0), 3, colors.darkblue),  
         ('BACKGROUND', (0, 0), (-1, 0), colors.dodgerblue)  
-        ]  
+        ]   
     ))  
     
     data.append(t)
@@ -2801,6 +2738,203 @@ def creacion_doc(lista, nombre_archivo):
 
     return response
 
+registerFont(TTFont('Arial','ARIAL.ttf'))
+# tipo_tributario=0 BOLETA
+# tipo_tributario=1 FACTURA
+def generar_factura(c, venta, documento, detalle_venta, direccion_cliente, giro, tipo_tributario='1'):
+    c.translate(inch,inch)
+    # define a large font
+    c.setFont("Helvetica", 14)
+    # choose some colors
+    c.setStrokeColorRGB(0.1,0.8,0.1)
+    c.setFillColorRGB(0,0,1) # font colour
+
+    c.drawImage('src\static\images\Ferme-logo.jpg',0*inch,8.7*inch, width=70, height=70)
+
+    c.setFillColorRGB(255,0,0) # font colour
+    c.setFont("Arial", 18)
+    c.drawString(1.2*inch, 9.3*inch, "FERME SPA")
+    c.setFont("Arial", 13)
+    c.setFillColorRGB(0,0,255) # font colour
+    c.drawString(1.2*inch, 9.1*inch, "Giro: Ferreteria ")
+    c.drawString(1.2*inch, 8.9*inch, "San Bernardo - Santiago")
+    #linea verde
+    c.setStrokeColorCMYK(0,0,0,1) # vertical line colour 
+    
+    dt = date.today().strftime('%d-%b-%Y')
+
+    #cuadrado arriba - derecha
+    c.setStrokeColorCMYK(0,0,0,1) # Color linea 
+    c.line(4*inch,9.8*inch,4*inch,8.6*inch)# linea vertical 
+    c.line(6.8*inch,9.8*inch,6.8*inch,8.6*inch)# linea vertical 
+    c.line(6.8*inch,9.8*inch,4*inch,9.8*inch)# linea horizontal  
+    c.line(6.8*inch,8.6*inch,4*inch,8.6*inch)# linea horizontal  
+
+    #info dentro de cuadrado
+    c.setFillColorRGB(1,0,0) # font colour
+    c.setFont("Arial", 14)
+    c.drawString(4.6*inch,9.5*inch,'RUT: 69.736.194-2')
+   
+    c.setFont("Arial", 12)
+    c.drawString(4.2*inch,8.1*inch,f'Fecha Emision:  {dt}')
+
+    #BAJO EL LOGO
+    c.setStrokeColorCMYK(0,0,0,1) # Color linea 
+    c.line(0*inch,8.5*inch,0*inch,7.4*inch)# linea vertical 
+    c.line(4*inch,8.5*inch,4*inch,7.4*inch)# linea vertical 
+    c.line(0*inch,8.5*inch,4*inch,8.5*inch)# linea horizontal  
+
+    c.setFont("Arial", 11)
+    c.setFillColorRGB(0,0,255) # font colour
+    c.drawString(0.1*inch, 8.3*inch, "SEÑOR(ES):")
+    c.drawString(0.1*inch, 8.1*inch, "GIRO:")
+    c.drawString(0.1*inch, 7.9*inch, "DIRECCION:")
+    c.drawString(0.1*inch, 7.7*inch, "COMUNA:")
+    c.drawString(0.1*inch, 7.5*inch, "CONTACTO:")
+    if tipo_tributario == 0: #BOLETA
+
+        c.setFillColorRGB(1,0,0) # font colour
+        c.setFont("Arial", 14)
+        c.drawString(4.2*inch,9.1*inch,'BOLETA ELECTRONICA')
+        c.drawString(5*inch,8.7*inch,f'NRO° {documento.nroboleta}')
+
+        c.setFillColorRGB(0,0,0) # font colour
+        c.setFont("Arial", 11)
+        c.drawString(1.1*inch, 7.5*inch, f"{str(venta.clienteid.personaid.telefono)}")
+        c.drawString(1.05*inch, 8.3*inch, f"{str(venta.clienteid).lower().capitalize()}")
+        
+        neto = str(int(documento.totalboleta)-(int(documento.totalboleta)*0.19))
+        iva = str(int(documento.totalboleta)*0.19)
+
+        c.drawRightString(6.5*inch,1.7*inch,f'{neto}') #  
+        c.drawRightString(6.5*inch,1.5*inch,f'{iva}') # Total 
+        c.drawRightString(6.5*inch,1.3*inch,f'{str(documento.totalboleta)}') # Total 
+
+    elif tipo_tributario == 1: #FACTURA
+        c.setFillColorRGB(1,0,0) # font colour
+        c.setFont("Arial", 14)
+        c.drawString(4.2*inch,9.1*inch,'FACTURA ELECTRONICA')
+        c.drawString(5*inch,8.7*inch,f'NRO° {documento.numerofactura}')
+
+        c.setFillColorRGB(0,0,0) # font colour
+        c.setFont("Arial", 11)
+        c.drawString(1.1*inch, 7.5*inch, f"{str(venta.clienteid.personaid.telefono)}")
+        c.drawString(1.05*inch, 8.3*inch, f"{str(venta.clienteid).lower().capitalize()}")
+
+        c.drawRightString(6.5*inch,1.7*inch,f'{str(documento.neto)}') # Total 
+        c.drawRightString(6.5*inch,1.5*inch,f'{str(documento.iva)}') # Total 
+        c.drawRightString(6.5*inch,1.3*inch,f'{str(documento.totalfactura)}') # Total 
+
+    elif tipo_tributario == 2: #GUIA
+        c.setFillColorRGB(1,0,0) # font colour
+        c.setFont("Arial", 14)
+        c.drawString(4.2*inch,9.1*inch,'   GUIA DESPACHO')
+        c.drawString(5*inch,8.7*inch,f'NRO° {documento.nroguia}')
+
+        c.setFillColorRGB(0,0,0) # font colour
+        c.setFont("Arial", 11)
+        c.drawString(1.1*inch, 7.5*inch, f"{str(venta.clienteid.personaid.telefono)}")
+        c.drawString(1.05*inch, 8.3*inch, f"{str(venta.clienteid).lower().capitalize()}")
+
+        try:
+            documento_venta = Factura.objects.get(nroventa=venta.nroventa)
+            c.drawRightString(6.5*inch,1.7*inch,f'{str(documento_venta.neto)}') # Total 
+            c.drawRightString(6.5*inch,1.5*inch,f'{str(documento_venta.iva)}') # Total 
+            c.drawRightString(6.5*inch,1.3*inch,f'{str(documento_venta.totalfactura)}') # Total 
+        except Factura.DoesNotExist:
+            documento_venta = Boleta.objects.get(nroventa=venta.nroventa)
+
+            neto = str(int(documento_venta.totalboleta)-(int(documento_venta.totalboleta)*0.19))
+            iva = str(int(documento_venta.totalboleta)*0.19)
+
+            c.drawRightString(6.5*inch,1.7*inch,f'{neto}') #  
+            c.drawRightString(6.5*inch,1.5*inch,f'{iva}') # Total 
+            c.drawRightString(6.5*inch,1.3*inch,f'{str(documento_venta.totalboleta)}') # Total 
+
+    c.drawString(0.6*inch, 8.1*inch, f"{giro.lower().capitalize()}")
+    c.drawString(1.1*inch, 7.9*inch, f"{str(direccion_cliente.direccionid).lower().capitalize()}")
+    c.drawString(0.9*inch, 7.7*inch, f"{str(direccion_cliente.direccionid.comunaid).lower().capitalize()}")
+
+    # c.rotate(-45) # restore the rotation 
+    c.setFillColorRGB(0,0,0) # font colour
+    c.setFont("Arial", 16)
+    c.drawString(0.5*inch,7.2*inch,'Descripcion')
+    c.drawString(4*inch,7.2*inch,'Precio')
+    c.drawString(4.9*inch,7.2*inch,'Cantidad')
+    c.drawString(6*inch,7.2*inch,'Total')
+
+    # TABLA PRODUCTOS
+    c.setStrokeColorCMYK(0,0,0,1) # vertical line colour 
+    c.line(0,7.4*inch,6.8*inch,7.4*inch)
+    c.line(0,7.1*inch,6.8*inch,7.1*inch)
+
+    c.line(0*inch,7.4*inch,0*inch,2.5*inch)# first vertical line
+    c.line(3.9*inch,7.4*inch,3.9*inch,2.5*inch)# second vertical line
+    c.line(4.8*inch,7.4*inch,4.8*inch,2.5*inch)# third vertical line
+    c.line(5.9*inch,7.4*inch,5.9*inch,2.5*inch)# fourty vertical line
+    c.line(6.8*inch,7.4*inch,6.8*inch,2.5*inch)# fifty vertical line
+    c.line(0.01*inch,2.5*inch,6.8*inch,2.5*inch)# horizontal line total
+
+    #CAJA MONTOS    
+    c.setStrokeColorCMYK(0,0,0,1) # Color linea 
+    c.line(4*inch,1*inch,4*inch,2*inch)# linea vertical 
+    c.line(6.8*inch,1*inch,6.8*inch,2*inch)# linea vertical 
+    c.line(6.8*inch,1*inch,4*inch,1*inch)# linea horizontal  
+    c.line(6.8*inch,2*inch,4*inch,2*inch)# linea horizontal  
+
+    c.setFillColorRGB(0,0,0) # font colour
+    c.setFont("Arial", 13)
+    c.drawRightString(5.5*inch,1.7*inch,'Monto Neto $') # Total 
+    c.drawRightString(5.5*inch,1.5*inch,'I.V.A 19% $') # Total 
+    c.drawRightString(5.5*inch,1.3*inch,'TOTAL $') # Total 
+
+    c.setStrokeColorRGB(0,0,0) # Bottom Line colour 
+
+    c.line(0*inch,0.5*inch,0*inch,-0.6*inch)# first vertical line
+    c.line(6.8*inch,0.5*inch,6.8*inch,-0.6*inch)# fifty vertical line
+    c.line(0,-0.6*inch,6.8*inch,-0.6*inch)
+    c.line(0, 0.5*inch,6.8*inch,0.5*inch)
+
+    c.setFillColorRGB(0,0,0) # font colour
+    c.setFont("Arial", 10)
+    c.drawRightString(0.7*inch,0.2*inch,'NOMBRE:') # Total 
+    c.drawRightString(2.5*inch,0.2*inch,'RUT:') # Total 
+    c.drawRightString(4*inch,0.2*inch,'FECHA:') # Total 
+    c.drawRightString(6*inch,0.2*inch,'RECINTO:') # Total 
+
+    c.drawRightString(0.7*inch,0.0*inch,'FIRMA: ') # Total 
+
+    c.setFont("Arial", 7.8)
+    c.drawRightString(6.7*inch,-0.2*inch,'"El acuso de recibo que se desidira en este acto, de acuerdo a lo dispuesto en la letra b) de Art 4°, y la letra c) del Art 5° de la ley 19.983,') # Total 
+    c.drawRightString(4.3*inch,-0.35*inch,'acredita que la entrega de marcadores o servicio(s) prestado(s) ha(s) sido recibido(s)"') # Total 
+
+    #PIE DE PAGINA
+    c.setFont("Arial", 8) # font size
+    c.setFillColorRGB(1,0,0) # font colour
+    c.drawString(0, -0.9*inch,"www.ferme.cl")
+    c.drawRightString(6.85*inch, -0.9*inch,"CEDIBLE")
+
+    c.setFillColorRGB(0,0,1) # font colour
+    c.setFont("Helvetica", 13)
+    row_gap=0.2
+    line_y=6.8 
+
+    c.setFillColorRGB(0,0,0) # font colour
+    c.setFont("Arial", 11) # font size
+
+    for producto in detalle_venta:
+        print(producto)
+        print(producto.productoid)
+        print(producto.productoid.nombre)
+        c.drawString(0.1*inch,line_y*inch,str(producto.productoid).lower().capitalize()) # p Name
+        c.drawRightString(4.5*inch,line_y*inch,f'${str(producto.productoid.precio)}') # p Price
+        c.drawRightString(5.5*inch,line_y*inch,str(producto.cantidad)) # p Qunt 
+        c.drawRightString(6.5*inch,line_y*inch,f'${str(producto.subtotal)}') # Sub Total 
+        line_y=line_y-row_gap
+
+    return c
+
+
 #************************************Ventas**************************************
 
 @login_required(login_url="ingreso")
@@ -2825,7 +2959,7 @@ def crear_venta(request):
     if request.method == 'POST':
         productos_venta = []
         for key, value in request.POST.items():
-            print(f"key: {key}  value  {value}")
+            # print(f"key: {key}  value  {value}")
             if key == "total" and value == "":
                 sweetify.warning(request, "Porfavor ingrese productos")
             elif value == "":
@@ -2848,7 +2982,7 @@ def crear_venta(request):
                         producto = Producto.objects.get(productoid=int(key))
                     except Producto.DoesNotExist:
                         sweetify.warning(request, "Ocurrio un Problema")
-                        print(error)
+                        # print(error)
                         return render(request, 'index.html')
                 except Exception as error:
                     if "cantidad" in key:
@@ -2869,7 +3003,6 @@ def crear_venta(request):
             )
 
             ultima_ventas = Venta.objects.order_by('nroventa').last()
-            
             for producto in productos_venta:
                 Detalleventa.objects.create(
                     cantidad = producto[1],
@@ -2891,6 +3024,12 @@ def crear_venta(request):
                     nroventa = ultima_ventas,
                     estadoid = Estado.objects.get(descripcion="Activo")
                 )
+
+                ultima_factura = Factura.objects.order_by('numerofactura').last()
+                detalle_venta = Detalleventa.objects.filter(nroventa = ultima_factura.nroventa)
+                direccion_cliente = Direccioncliente.objects.get(clienteid=ultima_ventas.clienteid)
+                giro = "persona natural"
+
                 if int(tipo_entrega) == 1:
                     Despacho.objects.create(
                         fechasolicitud = datetime.now().date(),
@@ -2909,7 +3048,20 @@ def crear_venta(request):
                     )  
                 messages.warning(request, 'Venta realizada con exito')
                 productos_venta.insert(0 , ["Nombre Producto", "Cantidad", "Total"]) 
-                return creacion_pdf(productos_venta,'pdf',A4,'Factura','pdf', valor=False)
+
+                response = HttpResponse(content_type=f'application/pdf')  
+                buff = BytesIO()  
+
+                c = canvas.Canvas(buff, pagesize=letter)
+                c= generar_factura(c, ultima_ventas, ultima_factura, detalle_venta, direccion_cliente, giro, 1)
+                c.showPage()
+                c.save()
+
+                response.write(buff.getvalue())   
+                buff.seek(0)
+
+                return FileResponse(buff, as_attachment=False, filename=f'boleta.pdf')
+
 
             elif documento_venta.tipodocumentoid == 1:
                 if int(tipo_entrega) == 1:
@@ -2928,18 +3080,34 @@ def crear_venta(request):
                         despachoid = ultimo_despacho,
                         iddircliente = direccion_cliente
                     )  
-
+           
                 Boleta.objects.create(
                     fechaboleta = datetime.now().date(),
                     totalboleta = total_venta,
                     nroventa = ultima_ventas,
                     estadoid = Estado.objects.get(descripcion="Activo")
                 )
+
                 messages.warning(request, 'Venta realizada con exito')
                 productos_venta.insert(0 , ["Nombre Producto", "Cantidad", "Total"]) 
-                return creacion_pdf(productos_venta,'pdf',A4,'Boleta','pdf', valor=False)
 
- 
+                ultima_boleta = Boleta.objects.order_by('nroboleta').last()
+                detalle_venta = Detalleventa.objects.filter(nroventa = ultima_boleta.nroboleta)
+                direccion_cliente = Direccioncliente.objects.get(clienteid=ultima_ventas.clienteid)
+                giro = "persona natural"
+
+                response = HttpResponse(content_type=f'application/pdf')  
+                buff = BytesIO()  
+                c = canvas.Canvas(buff, pagesize=letter)
+                c= generar_factura(c, ultima_ventas, ultima_boleta, detalle_venta, direccion_cliente, giro, 0)
+                c.showPage()
+                c.save()
+
+                response.write(buff.getvalue())   
+                buff.seek(0)
+
+                return FileResponse(buff, as_attachment=False, filename=f'boleta.pdf')
+
         else:
             messages.warning(request, 'Ocurrio un error en la venta')
 
@@ -3041,7 +3209,6 @@ def listar_facturas(request):
 
 @login_required(login_url="ingreso")
 def ver_factura(request):
-
     if request.POST.get('VerPerfil') is not None:
         request.session['_ver_perfil'] = request.POST
         return redirect('ver_perfil')
@@ -3055,7 +3222,10 @@ def ver_factura(request):
     old_post = request.session.get('_old_post')
 
     factura = Factura.objects.get(numerofactura=old_post['VerFactura'])
+    venta = Venta.objects.get(nroventa = factura.nroventa.nroventa)
     detalle_venta = Detalleventa.objects.filter(nroventa = factura.nroventa)
+    direccion_cliente = Direccioncliente.objects.get(clienteid=factura.nroventa.clienteid)
+    giro = "persona natural"
 
     if request.method == 'POST':
 
@@ -3097,92 +3267,18 @@ def ver_factura(request):
                 return  creacion_excel(nombre_archivo, lista, tipo_doc, extension)
 
             if tipoInforme == "informePdf":
-                
-                tipo_doc = 'pdf'
-                extension = 'pdf'
-                nombre = 'Detalle Factura'
-                
-                # return creacion_pdf(lista,tipo_doc,A4,nombre,extension, valor=False)
-                response = HttpResponse(content_type=f'application/{tipo_doc}')  
-
+                response = HttpResponse(content_type=f'application/pdf')  
                 buff = BytesIO()  
 
-                doc = SimpleDocTemplate(buff,  
-                    pagesize=A4,  
-                    rightMargin=40,  
-                    leftMargin=40,  
-                    topMargin=60,  
-                    bottomMargin=18,  
-                ) 
-                
-                data = []  
-                styles = getSampleStyleSheet()  
-                styles = styles['Heading1']
-                styles.alignment = TA_CENTER 
+                c = canvas.Canvas(buff, pagesize=letter)
+                c= generar_factura(c, venta, factura, detalle_venta, direccion_cliente, giro, 1)
+                c.showPage()
+                c.save()
 
-                header = Paragraph(f"{nombre}", styles)  
-                
-                data.append(header)  
-
-                t = Table(lista1)  
-
-                t.setStyle(TableStyle(  
-                    [  
-                    ('GRID', (0, 0), (12, -1), 1, colors.dodgerblue),  
-                    ('LINEBELOW', (0, 0), (-1, 0), 3, colors.darkblue),  
-                    ('BACKGROUND', (0, 0), (-1, 0), colors.dodgerblue)  
-                    ]  
-                ))  
-                
-                data.append(t)
-
-                styles = getSampleStyleSheet()  
-                styles.pageBreakBefore = 2
-                styles = styles['Heading1']
-                styles.alignment = TA_CENTER  
-                header = Paragraph("", styles) 
-                data.append(header)  
-                header = Paragraph("", styles) 
-                data.append(header)  
-
-                t = Table(lista2)  
-
-                t.setStyle(TableStyle(  
-                    [  
-                    ('GRID', (0, 0), (12, -1), 1, colors.dodgerblue),  
-                    ('LINEBELOW', (0, 0), (-1, 0), 3, colors.darkblue),  
-                    ('BACKGROUND', (0, 0), (-1, 0), colors.dodgerblue)  
-                    ]  
-                ))  
-                
-                data.append(t)
-
-                styles = getSampleStyleSheet()  
-                styles.pageBreakBefore = 3
-                styles = styles['Heading1']
-                styles.alignment = TA_CENTER 
-                header = Paragraph("", styles) 
-                data.append(header)  
-                header = Paragraph("", styles) 
-                data.append(header)  
-
-                t = Table(lista3)  
-
-                t.setStyle(TableStyle(  
-                    [  
-                    ('GRID', (0, 0), (12, -1), 1, colors.dodgerblue),  
-                    ('LINEBELOW', (0, 0), (-1, 0), 3, colors.darkblue),  
-                    ('BACKGROUND', (0, 0), (-1, 0), colors.dodgerblue)  
-                    ]  
-                ))  
-                
-                data.append(t)
-
-                doc.build(data)  
                 response.write(buff.getvalue())   
-
                 buff.seek(0)
-                return FileResponse(buff, as_attachment=False, filename=f'{nombre}.{extension}')
+
+                return FileResponse(buff, as_attachment=False, filename=f'factura.pdf')
 
             if tipoInforme == "informeWord":
 
@@ -3301,6 +3397,7 @@ def ver_factura(request):
 
                 return response
 
+
     context = {
         'factura': factura,
         'tipo_usuario': tipo_usuario,
@@ -3308,6 +3405,228 @@ def ver_factura(request):
     }
 
     return render(request, 'facturas/ver_factura.html', context)
+
+@login_required(login_url="ingreso")
+def listar_guias_despacho(request):
+    
+    if request.POST.get('VerPerfil') is not None:
+        request.session['_ver_perfil'] = request.POST
+        return redirect('ver_perfil')
+
+    if Usuario.objects.filter(nombreusuario=request.user).exists():
+        tipo_usuario = Usuario.objects.get(nombreusuario=request.user)
+        tipo_usuario = tipo_usuario.rolid.descripcion
+    else: 
+        tipo_usuario = None
+
+    guias_despacho = Guiadespacho.objects.all()
+
+    if request.method == 'POST':
+        if request.POST.get('VerGuiaDespacho') is not None:
+            request.session['_old_post'] = request.POST
+            return HttpResponseRedirect('ver_guia_despacho')
+    #     elif request.POST.get('DescargarFactura') is not None:
+    #         request.session['_old_post'] = request.POST
+    #         return HttpResponseRedirect('ver_factura')
+
+    context = {
+        'guias_despacho': guias_despacho
+    }
+
+    return render(request, 'guias_despacho/listar_guias_despacho.html', context)
+
+def ver_guia_despacho(request):
+
+    if request.POST.get('VerPerfil') is not None:
+        request.session['_ver_perfil'] = request.POST
+        return redirect('ver_perfil')
+
+    if Usuario.objects.filter(nombreusuario=request.user).exists():
+        tipo_usuario = Usuario.objects.get(nombreusuario=request.user)
+        tipo_usuario = tipo_usuario.rolid.descripcion
+    else: 
+        tipo_usuario = None
+
+    old_post = request.session.get('_old_post')
+
+    guia = Guiadespacho.objects.get(nroguia=old_post['VerGuiaDespacho'])
+
+    venta = Venta.objects.get(nroventa = guia.despachoid.nroventa.nroventa)
+    detalle_venta = Detalleventa.objects.filter(nroventa = venta.nroventa)
+    direccion_cliente = Direccioncliente.objects.get(iddircliente=guia.iddircliente.iddircliente)
+    giro = "persona natural"
+
+    if request.method == 'POST':
+
+        tipoInforme = request.POST.get('informeCheck')
+        descargarInforme = request.POST.get('descargarInforme')
+        
+        if tipoInforme is not None and descargarInforme is not None:
+
+            lista1 = []
+            lista2 = []
+            lista3 = []
+            lista1.append(["Nro Guia","Fecha","Direccion"])  
+            val = Guiadespacho.objects.filter(nroguia = old_post['VerGuiaDespacho']).values_list('nroguia','fechaguia','iddircliente__direccionid')
+
+            for valores in val:
+                lista1.append(list(valores)) 
+            lista2.append(["Nro Venta","Tipo pago","Run cliente","DV"])  
+            val = Guiadespacho.objects.filter(nroguia = old_post['VerGuiaDespacho']).values_list('despachoid__nroventa__nroventa','despachoid__nroventa__tipodocumentoid__descripcion','despachoid__nroventa__clienteid__personaid__runcuerpo','despachoid__nroventa__clienteid__personaid__dv')
+
+            for valores in val:
+                lista3.append(list(valores))
+
+            if tipoInforme == "informeExcel":
+
+                nombre_archivo = "Detalle Guia Despacho"
+                tipo_doc = 'ms-excel'
+                extension = 'xlsx'
+                
+                lista1.append("")
+                lista2.append("")
+
+                lista = lista1 + lista2 + lista3
+                
+                return  creacion_excel(nombre_archivo, lista, tipo_doc, extension)
+
+            if tipoInforme == "informePdf":
+                response = HttpResponse(content_type=f'application/pdf')  
+                buff = BytesIO()  
+
+                c = canvas.Canvas(buff, pagesize=letter)
+                c= generar_factura(c, venta, guia, detalle_venta, direccion_cliente, giro, 2)
+                c.showPage()
+                c.save()
+
+                response.write(buff.getvalue())   
+                buff.seek(0)
+
+                return FileResponse(buff, as_attachment=False, filename=f'guia_despacho.pdf')
+
+            if tipoInforme == "informeWord":
+
+                nombre_archivo = "Detalle Guia Despacho"
+                # return  creacion_doc(lista1, nombre_archivo)
+                document = Document()
+                document.add_heading('Detalle Guia Despacho', 0)
+
+                filas = 0
+                for x in lista1:
+                    columnas = len(x)
+                    filas += 1
+
+                # add grid table
+                table = document.add_table(rows=filas, cols=columnas, style="Table Grid")
+
+                for x in range(columnas):
+                    table.rows[0].cells[x]._tc.get_or_add_tcPr().append(parse_xml(r'<w:shd {} w:fill="D9D9D9"/>'.format(nsdecls('w'))))
+                
+                # access first row's cells
+                heading_row = table.rows[0].cells
+
+                # add headings
+                cont = 0
+                for value in lista1[0]:
+                    heading_row[cont].text = value
+                    cont += 1
+
+                lista1.pop(0)
+                cont = 0
+                cont2 = 0
+
+                for value in lista1:
+                    cont += 1
+                    data_row = table.rows[cont].cells
+
+                    for x in value:
+                        data_row[cont2].text = f'{x}'
+                        cont2 += 1
+                    cont2 = 0
+
+                document.add_paragraph("")
+
+                # parrafo.add_run().add_break()
+                filas = 0
+                for x in lista2:
+                    columnas = len(x)
+                    filas += 1
+
+                # add grid table
+                table2 = document.add_table(rows=filas, cols=columnas, style="Table Grid")
+
+                for x in range(columnas):
+                    table2.rows[0].cells[x]._tc.get_or_add_tcPr().append(parse_xml(r'<w:shd {} w:fill="D9D9D9"/>'.format(nsdecls('w'))))
+
+                # access first row's cells
+                heading_row = table2.rows[0].cells
+
+                # add headings
+                cont = 0
+                for value in lista2[0]:
+                    heading_row[cont].text = value
+                    cont += 1
+
+                lista2.pop(0)
+                cont = 0
+                cont2 = 0
+
+                for value in lista2:
+                    cont += 1
+                    data_row = table2.rows[cont].cells
+
+                    for x in value:
+                        data_row[cont2].text = f'{x}'
+                        cont2 += 1
+                    cont2 = 0 
+
+                document.add_paragraph("")
+
+                filas = 0
+                for x in lista3:
+                    columnas = len(x)
+                    filas += 1
+
+                # add grid table
+                table3 = document.add_table(rows=filas, cols=columnas, style="Table Grid")
+
+                for x in range(columnas):
+                    table3.rows[0].cells[x]._tc.get_or_add_tcPr().append(parse_xml(r'<w:shd {} w:fill="D9D9D9"/>'.format(nsdecls('w'))))
+
+                # access first row's cells
+                heading_row = table3.rows[0].cells
+
+                # add headings
+                cont = 0
+                for value in lista3[0]:
+                    heading_row[cont].text = value
+                    cont += 1
+
+                lista3.pop(0)
+                cont = 0
+                cont2 = 0
+
+                for value in lista3:
+                    cont += 1
+                    data_row = table3.rows[cont].cells
+
+                    for x in value:
+                        data_row[cont2].text = f'{x}'
+                        cont2 += 1
+                    cont2 = 0  
+
+                response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document')
+                response['Content-Disposition'] = f'attachment; filename={nombre_archivo}.docx'
+                document.save(response)
+
+                return response
+
+    context = {
+        'guia': guia,
+        'tipo_usuario': tipo_usuario,
+    }
+
+    return render(request, 'guias_despacho/ver_guia_despacho.html', context)
 
 #************************************Notas de credito**************************************
 
