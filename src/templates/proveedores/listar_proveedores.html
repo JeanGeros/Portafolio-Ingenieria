@@ -61,9 +61,9 @@
                                     <button  id="" name="VerProveedor" value="{{prov.proveedorid}}" class="btn btn_aceptar border border-secondary">Ver</button>
                                     <button  id="" name="EditarProveedor" value="{{prov.proveedorid}}" class="btn btn_aceptar border border-secondary">Editar</button>
                                     {% if prov.estadoid.descripcion == 'Activo' %}
-                                        <button type="submit" id="" name="CambiarEstado" value="{{prov.proveedorid}}" class="btn btn_aceptar border border-secondary">Desactivar Producto</button>
+                                        <button type="submit" id="" name="CambiarEstado" value="{{prov.proveedorid}}" class="btn btn_aceptar border border-secondary">Desactivar Proveedor</button>
                                     {% else %}
-                                        <button type="submit" id="" name="CambiarEstado" value="{{prov.proveedorid}}" class="btn btn_aceptar border border-secondary">Activar Producto</button>
+                                        <button type="submit" id="" name="CambiarEstado" value="{{prov.proveedorid}}" class="btn btn_aceptar border border-secondary">Activar Proveedor</button>
                                     {% endif %}
                                 </div>
                             </form>
