@@ -90,6 +90,8 @@ urlpatterns = [
     path('notas_credito/crear_nota_credito', views.Crear_nota_credito, name="crear_nota_credito"),
     path('notas_credito/listar_documentos', views.Listar_documentos, name="listar_documentos"),
 
+    path('guias_despacho/', views.listar_guias_despacho, name="listar_guias_despacho"),
+    path('guias_despacho/ver_guia_despacho', views.ver_guia_despacho, name="ver_guia_despacho"),
 
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 

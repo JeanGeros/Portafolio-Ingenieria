@@ -2457,8 +2457,6 @@ def Ver_boleta(request):
 
                 lista2.append(list(valores))
 
-            lista3.append(["Producto","Cantidad","Subtotal"])  
-            val = Detalleventa.objects.filter(nroventa = boleta.nroventa.nroventa).values_list('productoid__nombre','cantidad','subtotal')
 
             for valores in val:
 
@@ -3319,19 +3317,19 @@ def ver_factura(request):
             lista1 = []
             lista2 = []
             lista3 = []
+
             lista1.append(["Nro Factura","Fecha","Neto","IVA","Total","Estado"])  
             val = Factura.objects.filter(numerofactura = old_post['VerFactura']).values_list('numerofactura','fechafactura','neto','iva','totalfactura','estadoid__descripcion')
-
             for valores in val:
                 lista1.append(list(valores)) 
+
             lista2.append(["Nro Venta","Tipo pago","Run cliente","DV"])  
             val = Factura.objects.filter(numerofactura = old_post['VerFactura']).values_list('nroventa__nroventa','nroventa__tipodocumentoid__descripcion','nroventa__clienteid__personaid__runcuerpo','nroventa__clienteid__personaid__dv')
-
             for valores in val:
                 lista2.append(list(valores))
+
             lista3.append(["Producto","Cantidad","Subtotal"])  
             val = Detalleventa.objects.filter(nroventa = factura.nroventa.nroventa).values_list('productoid__nombre','cantidad','subtotal')
-
             for valores in val:
                 lista3.append(list(valores))
 
@@ -3762,3 +3760,192 @@ def Crear_nota_credito(request):
     }
 
     return render(request, 'notas de credito/crear_nota_credito.html', context)
+
+    
+@login_required(login_url="ingreso")
+def listar_guias_despacho(request):
+    
+    if request.POST.get('VerPerfil') is not None:
+        request.session['_ver_perfil'] = request.POST
+        return redirect('ver_perfil')
+
+    if Usuario.objects.filter(nombreusuario=request.user).exists():
+        tipo_usuario = Usuario.objects.get(nombreusuario=request.user)
+        tipo_usuario = tipo_usuario.rolid.descripcion
+    else: 
+        tipo_usuario = None
+
+    guias_despacho = Guiadespacho.objects.all()
+
+    if request.method == 'POST':
+        if request.POST.get('VerGuiaDespacho') is not None:
+            request.session['_old_post'] = request.POST
+            return HttpResponseRedirect('ver_guia_despacho')
+
+    context = {
+        'guias_despacho': guias_despacho
+    }
+
+    return render(request, 'guias_despacho/listar_guias_despacho.html', context)
+
+def ver_guia_despacho(request):
+
+    if request.POST.get('VerPerfil') is not None:
+        request.session['_ver_perfil'] = request.POST
+        return redirect('ver_perfil')
+
+    if Usuario.objects.filter(nombreusuario=request.user).exists():
+        tipo_usuario = Usuario.objects.get(nombreusuario=request.user)
+        tipo_usuario = tipo_usuario.rolid.descripcion
+    else: 
+        tipo_usuario = None
+
+    old_post = request.session.get('_old_post')
+
+    guia = Guiadespacho.objects.get(nroguia=old_post['VerGuiaDespacho'])
+
+    venta = Venta.objects.get(nroventa = guia.despachoid.nroventa.nroventa)
+    detalle_venta = Detalleventa.objects.filter(nroventa = venta.nroventa)
+    direccion_cliente = Direccioncliente.objects.get(iddircliente=guia.iddircliente.iddircliente)
+    giro = "persona natural"
+
+    if request.method == 'POST':
+
+        tipoInforme = request.POST.get('informeCheck')
+        descargarInforme = request.POST.get('descargarInforme')
+        
+        if tipoInforme is not None and descargarInforme is not None:
+
+            lista1 = []
+            lista2 = []
+
+            lista1.append(["Folio Documento","Fecha","Direccion"])  
+            val = Guiadespacho.objects.filter(nroguia = old_post['VerGuiaDespacho']).values_list('nroguia','fechaguia','iddircliente__direccionid')
+            print(val)
+            for valores in val:
+                lista1.append(list(valores)) 
+            
+            lista2.append(["Nro Venta","Tipo pago","Run cliente","DV"])  
+            val = Guiadespacho.objects.filter(nroguia = old_post['VerGuiaDespacho']).values_list('despachoid__nroventa__nroventa','despachoid__nroventa__tipodocumentoid__descripcion','despachoid__nroventa__clienteid__personaid__runcuerpo','despachoid__nroventa__clienteid__personaid__dv')
+            for valores in val:
+                lista2.append(list(valores))
+                
+            if tipoInforme == "informeExcel":
+
+                nombre_archivo = "Detalle Guia Despacho"
+                tipo_doc = 'ms-excel'
+                extension = 'xlsx'
+                
+                lista1.append("")
+                lista2.append("")
+
+                lista = lista1 + lista2 
+                
+                return  creacion_excel(nombre_archivo, lista, tipo_doc, extension)
+
+            if tipoInforme == "informePdf":
+                response = HttpResponse(content_type=f'application/pdf')  
+                buff = BytesIO()  
+
+                c = canvas.Canvas(buff, pagesize=letter)
+                c= generar_factura(c, venta, guia, detalle_venta, direccion_cliente, giro, 2)
+                c.showPage()
+                c.save()
+
+                response.write(buff.getvalue())   
+                buff.seek(0)
+
+                return FileResponse(buff, as_attachment=False, filename=f'guia_despacho.pdf')
+
+            if tipoInforme == "informeWord":
+
+                nombre_archivo = "Detalle Guia Despacho"
+                document = Document()
+                document.add_heading('Detalle Guia Despacho', 0)
+
+                filas = 0
+                for x in lista1:
+                    columnas = len(x)
+                    filas += 1
+
+                # add grid table
+                table = document.add_table(rows=filas, cols=columnas, style="Table Grid")
+
+                for x in range(columnas):
+                    table.rows[0].cells[x]._tc.get_or_add_tcPr().append(parse_xml(r'<w:shd {} w:fill="D9D9D9"/>'.format(nsdecls('w'))))
+                
+                # access first row's cells
+                heading_row = table.rows[0].cells
+
+                # add headings
+                cont = 0
+                for value in lista1[0]:
+                    heading_row[cont].text = value
+                    cont += 1
+
+                lista1.pop(0)
+                cont = 0
+                cont2 = 0
+
+                for value in lista1:
+                    cont += 1
+                    data_row = table.rows[cont].cells
+
+                    for x in value:
+                        data_row[cont2].text = f'{x}'
+                        cont2 += 1
+                    cont2 = 0
+
+                document.add_paragraph("")
+
+                # parrafo.add_run().add_break()
+                filas = 0
+                for x in lista2:
+                    columnas = len(x)
+                    filas += 1
+
+                # add grid table
+                table2 = document.add_table(rows=filas, cols=columnas, style="Table Grid")
+
+                for x in range(columnas):
+                    table2.rows[0].cells[x]._tc.get_or_add_tcPr().append(parse_xml(r'<w:shd {} w:fill="D9D9D9"/>'.format(nsdecls('w'))))
+
+                # access first row's cells
+                heading_row = table2.rows[0].cells
+
+                # add headings
+                cont = 0
+                for value in lista2[0]:
+                    heading_row[cont].text = value
+                    cont += 1
+
+                lista2.pop(0)
+                cont = 0
+                cont2 = 0
+
+                for value in lista2:
+                    cont += 1
+                    data_row = table2.rows[cont].cells
+
+                    for x in value:
+                        data_row[cont2].text = f'{x}'
+                        cont2 += 1
+                    cont2 = 0 
+
+                document.add_paragraph("")
+
+                filas = 0
+
+                response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document')
+                response['Content-Disposition'] = f'attachment; filename={nombre_archivo}.docx'
+                document.save(response)
+
+                return response
+
+
+    context = {
+        'guia': guia,
+        'tipo_usuario': tipo_usuario,
+    }
+
+    return render(request, 'guias_despacho/ver_guia_despacho.html', context)
