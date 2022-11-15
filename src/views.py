@@ -2431,7 +2431,10 @@ def Ver_boleta(request):
     productos_boleta = Detalleventa.objects.filter(nroventa = boleta.nroboleta)
     venta = Venta.objects.get(nroventa = boleta.nroventa.nroventa)
     direccion_cliente = Direccioncliente.objects.get(clienteid=venta.clienteid)
-    giro = "persona natural"
+    if venta.clienteid.personaid != None:
+        giro = "persona Natural"
+    else:
+        giro = "Distribuidor Ferreteria"
 
     if request.method == 'POST':
 
@@ -2934,6 +2937,24 @@ def generar_factura(c, venta, documento, detalle_venta, direccion_cliente, giro,
             c.drawRightString(6.5*inch,1.5*inch,f'{iva}') # Total 
             c.drawRightString(6.5*inch,1.3*inch,f'{str(documento_venta.totalboleta)}') # Total 
 
+    elif tipo_tributario == 3: #NOTA CREDITO
+        c.setFillColorRGB(1,0,0) # font colour
+        c.setFont("Arial", 14)
+        c.drawString(4.5*inch,9.1*inch,'NOTA DE CREDITO')
+        c.drawString(5*inch,8.7*inch,f'NRO° {documento.nronota}')
+
+        c.setFillColorRGB(0,0,0) # font colour
+        c.setFont("Arial", 11)
+        c.drawString(1.1*inch, 7.5*inch, f"{str(venta.clienteid.personaid.telefono)}")
+        c.drawString(1.05*inch, 8.3*inch, f"{str(venta.clienteid).lower().capitalize()}")
+
+        neto = str(int(documento.total)-(int(documento.total)*0.19))
+        iva = str(int(documento.total)*0.19)
+
+        c.drawRightString(6.5*inch,1.7*inch,f'{neto}') #  
+        c.drawRightString(6.5*inch,1.5*inch,f'{iva}') # Total 
+        c.drawRightString(6.5*inch,1.3*inch,f'{str(documento.total)}') # Total 
+
     c.drawString(0.6*inch, 8.1*inch, f"{giro.lower().capitalize()}")
     c.drawString(1.1*inch, 7.9*inch, f"{str(direccion_cliente.direccionid).lower().capitalize()}")
     c.drawString(0.9*inch, 7.7*inch, f"{str(direccion_cliente.direccionid.comunaid).lower().capitalize()}")
@@ -3111,7 +3132,10 @@ def crear_venta(request):
                 ultima_factura = Factura.objects.order_by('numerofactura').last()
                 detalle_venta = Detalleventa.objects.filter(nroventa = ultima_factura.nroventa)
                 direccion_cliente = Direccioncliente.objects.get(clienteid=ultima_ventas.clienteid)
-                giro = "persona natural"
+                if ultima_ventas.clienteid.personaid != None:
+                    giro = "persona natural"
+                else:
+                    giro = "Distribuidor Ferreteria"
 
                 if int(tipo_entrega) == 1:
                     Despacho.objects.create(
@@ -3177,7 +3201,10 @@ def crear_venta(request):
                 ultima_boleta = Boleta.objects.order_by('nroboleta').last()
                 detalle_venta = Detalleventa.objects.filter(nroventa = ultima_boleta.nroboleta)
                 direccion_cliente = Direccioncliente.objects.get(clienteid=ultima_ventas.clienteid)
-                giro = "persona natural"
+                if ultima_ventas.clienteid.personaid != None:
+                    giro = "persona natural"
+                else:
+                    giro = "Distribuidor Ferreteria"
 
                 response = HttpResponse(content_type=f'application/pdf')  
                 buff = BytesIO()  
@@ -3305,7 +3332,10 @@ def ver_factura(request):
     venta = Venta.objects.get(nroventa = factura.nroventa.nroventa)
     detalle_venta = Detalleventa.objects.filter(nroventa = factura.nroventa)
     direccion_cliente = Direccioncliente.objects.get(clienteid=factura.nroventa.clienteid)
-    giro = "persona natural"
+    if venta.clienteid.personaid != None:
+        giro = "persona natural"
+    else:
+        giro = "Distribuidor Ferreteria"
 
     if request.method == 'POST':
 
@@ -3564,12 +3594,35 @@ def Ver_nota_credito(request):
                 return  creacion_excel(nombre_archivo, lista, tipo_doc, extension)
 
             if tipoInforme == "informePdf":
-                
-                tipo_doc = 'pdf'
-                extension = 'pdf'
-                nombre = 'Compras'
-                
-                return creacion_pdf(lista,tipo_doc,A4,nombre,extension, valor=False)
+
+                response = HttpResponse(content_type=f'application/pdf')  
+                buff = BytesIO()  
+
+                if nota_credito.nroboleta != None:
+                    documento_venta = Boleta.objects.get(nroboleta=nota_credito.nroboleta)
+                else:
+                    documento_venta = Factura.objects.get(numerofactura=nota_credito.numerofactura)
+
+                venta = Venta.objects.get(nroventa = documento_venta.nroventa.nroventa)
+                if venta.clienteid.personaid != None:
+                    giro = "persona Natural"
+                else:
+                    giro = "Distribuidor Ferreteria"
+
+                detalle_venta = []
+                direccion_cliente = Direccioncliente.objects.get(clienteid=documento_venta.nroventa.clienteid)
+
+
+                c = canvas.Canvas(buff, pagesize=letter)
+                c= generar_factura(c, venta, nota_credito, detalle_venta, direccion_cliente, giro, 3)
+                c.showPage()
+                c.save()
+
+                response.write(buff.getvalue())   
+                buff.seek(0)
+
+                return FileResponse(buff, as_attachment=False, filename=f'nota_credito.pdf')
+
 
             if tipoInforme == "informeWord":
 
@@ -3761,7 +3814,6 @@ def Crear_nota_credito(request):
 
     return render(request, 'notas de credito/crear_nota_credito.html', context)
 
-    
 @login_required(login_url="ingreso")
 def listar_guias_despacho(request):
     
@@ -3807,7 +3859,10 @@ def ver_guia_despacho(request):
     venta = Venta.objects.get(nroventa = guia.despachoid.nroventa.nroventa)
     detalle_venta = Detalleventa.objects.filter(nroventa = venta.nroventa)
     direccion_cliente = Direccioncliente.objects.get(iddircliente=guia.iddircliente.iddircliente)
-    giro = "persona natural"
+    if venta.clienteid.personaid != None:
+        giro = "persona natural"
+    else:
+        giro = "Distribuidor Ferreteria"
 
     if request.method == 'POST':
 
