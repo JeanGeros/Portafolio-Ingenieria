@@ -133,7 +133,7 @@
                             {% if tipo_usuario == 'Proveedor' and tipo_usuario != None %}
                                 
                                 <li class="nav-item">
-                                    <a href="#" class="nav-link fw-bolder text-black">Ordenes de compras</a>
+                                    <a href="{% url 'orden_compra' %}" class="nav-link fw-bolder text-black">Mis ordenes de compra</a>
                                 </li>
                             {% endif %}
                         {% else %}
