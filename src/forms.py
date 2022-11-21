@@ -56,8 +56,8 @@ class FormProveedor(forms.ModelForm):
     class Meta:
         model = Proveedor
         fields = '__all__'
-class FormVendedorPersona(forms.ModelForm):
 
+class FormVendedorPersona(forms.ModelForm):
     class Meta:
         model = Persona
         fields = ("runcuerpo", "dv", "apellidopaterno", "apellidomaterno", "nombres", "telefono")

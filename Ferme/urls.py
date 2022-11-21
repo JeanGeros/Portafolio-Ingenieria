@@ -93,6 +93,10 @@ urlpatterns = [
     path('guias_despacho/', views.listar_guias_despacho, name="listar_guias_despacho"),
     path('guias_despacho/ver_guia_despacho', views.ver_guia_despacho, name="ver_guia_despacho"),
 
+
+    path('informes/', views.generar_informes, name="informes"),
+
+
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 if settings.DEBUG:

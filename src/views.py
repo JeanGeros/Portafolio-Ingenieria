@@ -10,7 +10,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.views.decorators.csrf import csrf_exempt
 from django.db import connection
 import cx_Oracle
-
+import pandas as pd
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 import sweetify
@@ -4004,3 +4004,646 @@ def ver_guia_despacho(request):
     }
 
     return render(request, 'guias_despacho/ver_guia_despacho.html', context)
+
+def generar_informes(request):
+    
+    if request.method == 'POST':
+        vistaPrevia = request.POST.get('vistaPrevia')
+        descargarInforme = request.POST.get('descargarInforme')
+        productos = request.POST.get('productos')
+        precio = request.POST.get('precio')
+        descripcion = request.POST.get('descripcion')
+        nombre = request.POST.get('nombre')
+        precioCompra = request.POST.get('precioCompra')
+        stockCritico = request.POST.get('stockCritico')
+        fechaVencimiento = request.POST.get('fechaVencimiento')
+        codigoBarra = request.POST.get('codigoBarra')
+        stock_producto = request.POST.get('stock')
+        stockCheck = request.POST.get('stockCheck')
+        estado = request.POST.get('estado')
+        estadoCheck = request.POST.get('estadoCheck')
+
+        familiaProducto = request.POST.get('familiaProducto')
+        familiaProductoCheck = request.POST.get('familiaProductoCheck')
+        nomFamiliaProducto = request.POST.get('familia_producto')
+        tipoProducto = request.POST.get('tipoProducto')
+        nomTipoProducto = request.POST.get('tipo_producto')
+        tipoProductoCheck = request.POST.get('tipoProductoCheck')
+        
+        print("-----VALORES PRODUCTOS-----")
+        print(f"vistaPrevia: {vistaPrevia}" )
+        print(f"descargarInforme: {descargarInforme}" )
+        print(f"productos: {productos}" )
+        print(f"precio: {precio}" )
+        print(f"descripcion: {descripcion}" )
+        print(f"nombre: {nombre}" )
+        print(f"precioCompra: {precioCompra}" )
+        print(f"stockCritico: {stockCritico}" )
+        print(f"fechaVencimiento: {fechaVencimiento}" )
+        print(f"codigoBarra: {codigoBarra}" )
+        print(f"stock: {stock_producto}" )
+        print(f"stockCheck: {stockCheck}" )
+        print("----------------------")
+        print(f"estado: {estado}" )
+        print(f"estadoCheck: {estadoCheck}" )
+        print("----------------------")
+        print(f"familiaProducto: {familiaProducto}" )
+        print(f"familiaProductoCheck: {familiaProductoCheck}" )
+        print("----------------------")
+        print(f"nomFamiliaProducto: {nomFamiliaProducto}" )
+        print(f"tipoProducto: {tipoProducto}" )
+        print("----------------------")
+        print(f"nomTipoProducto: {nomTipoProducto}" )
+        print(f"tipoProductoCheck: {tipoProductoCheck}" )
+        
+        nomFamiliaProducto = Familiaproducto.objects.filter(familiaproid = nomFamiliaProducto)
+        for fam in nomFamiliaProducto:
+            nomFamiliaProducto = fam.descripcion
+        
+        nomTipoProducto = Tipoproducto.objects.filter(tipoproductoid = nomTipoProducto)
+        for tip in nomTipoProducto:
+            nomTipoProducto = tip.descripcion
+
+        lista = []
+        visitas = []
+
+        tipoInforme = request.POST.get('informeCheck')
+        
+        np_array = []
+        np_array = np.array(lista)
+        np_arrayProd = np.array(lista)
+
+        if productos == "on":
+            productos = Producto.objects.all().values_list("productoid","nombre","precio","stock","stockcritico","fechavencimiento","codigo","familiaproid__descripcion","tipoproductoid__descripcion","estadoid__descripcion","bodegaid").order_by("productoid")
+
+            if stockCheck == "conStock":
+                productos = Producto.objects.filter(stock__gt=0).values_list("productoid","nombre","precio","stock","stockcritico","fechavencimiento","codigo","familiaproid__descripcion","tipoproductoid__descripcion","estadoid__descripcion","bodegaid").order_by("productoid")
+            if stockCheck == "sinStock":
+                productos = Producto.objects.filter(stock__lt=0).values_list("productoid","nombre","precio","stock","stockcritico","fechavencimiento","codigo","familiaproid__descripcion","tipoproductoid__descripcion","estadoid__descripcion","bodegaid").order_by("productoid")
+            if estadoCheck == "disponible":
+                productos = Producto.objects.filter(estadoid_estadoid=1).values_list("productoid","nombre","precio","stock","stockcritico","fechavencimiento","codigo","familiaproid__descripcion","tipoproductoid__descripcion","estadoid__descripcion","bodegaid").order_by("productoid")
+            if estadoCheck == "noDisponible":
+                productos = Producto.objects.filter(estadoid_estadoid=2).values_list("productoid","nombre","precio","stock","stockcritico","fechavencimiento","codigo","familiaproid__descripcion","tipoproductoid__descripcion","estadoid__descripcion","bodegaid").order_by("productoid")
+            if familiaProductoCheck == "porNombreF":
+                productos = Producto.objects.all().values_list("productoid","nombre","precio","stock","stockcritico","fechavencimiento","codigo","familiaproid__descripcion","tipoproductoid__descripcion","estadoid__descripcion","bodegaid").order_by("productoid")
+            if tipoProductoCheck == "porNombreT":
+                productos = Producto.objects.all().values_list("productoid","nombre","precio","stock","stockcritico","fechavencimiento","codigo","familiaproid__descripcion","tipoproductoid__descripcion","estadoid__descripcion","bodegaid").order_by("productoid")
+
+            productos = Producto.objects.all().values_list("productoid","nombre","precio","stock","stockcritico","fechavencimiento","codigo","familiaproid__descripcion","tipoproductoid__descripcion","estadoid__descripcion","bodegaid").order_by("productoid")
+            if stockCheck == "conStock":
+                productos.filter(stock_gt= 0)
+            if stockCheck == "sinStock":
+                productos.filter(stock__lt= 0)
+            if estadoCheck == "disponible":
+                productos.filter(estadoid = 1)
+            if estadoCheck == "noDisponible":
+                productos.filter(estadoid = 2)
+            if familiaProductoCheck == "porNombreF":
+                productos.order_by("familiaproid__descripcion")
+            if tipoProductoCheck == "porNombreT":
+                productos.order_by("tipoproductoid__descripcion")
+
+
+            columnas = (["Producto id","Nombre","Precio","Stock","Stock_Critico","Fechavencimiento","Codigo","Familia_Producto","Tipo_Producto","Estado","Bodegaid"])
+ 
+            np_array = np.array(productos)
+            df = pd.DataFrame(np_array, columns = columnas)
+            print(df)
+
+            if nombre == None:
+                df = df.drop(['Nombre'], axis=1)
+                print(df)
+            if precio == None:
+                df = df.drop(['Precio'], axis=1)
+                print(df)
+
+            if stock_producto == None:
+                df = df.drop(['Stock'], axis=1)
+                print(df)
+
+            if stockCritico == None:
+                df = df.drop(['Stock_Critico'], axis=1)
+                print(df)
+
+            if estado == None:
+                df = df.drop(['Estado'], axis=1)
+                print(df)
+
+            if fechaVencimiento == None:
+                df = df.drop(['Fechavencimiento'], axis=1)
+                print(df)
+
+            if codigoBarra == None:
+                df = df.drop(['Codigo'], axis=1)
+                print(df)
+
+            if familiaProducto == None:
+                df = df.drop(['Familia_Producto'], axis=1)
+                print(df)
+
+            if tipoProducto == None:
+                df = df.drop(['Tipo_Producto'], axis=1)
+                print(df)
+
+            lista_productos = df.values.tolist() 
+            lista_productos.insert(0, columnas)
+            if tipoInforme == "informeExcel":
+                
+                nombre_archivo = "Productos"
+                if visitas == []:
+                    return  creacion_excel(nombre_archivo, lista)
+                else:
+                    return  creacion_excel(nombre_archivo, lista, visitas)
+                
+
+            if tipoInforme == "informePdf":
+
+                tipo_doc = 'pdf'
+                extension = 'pdf'
+                nombre = 'Informe Productos'
+                
+                return creacion_pdf(lista_productos,tipo_doc,A4,nombre,extension, valor=False)
+
+            if tipoInforme == "informeWord": 
+
+                tipo_doc = 'ms-word'
+                extension = 'docx'
+                
+                nombre = 'Productos'
+                if vistaPrevia:
+                    if visitas == []:
+                        return creacion_doc(lista,tipo_doc,A2,nombre,extension, valor=False)
+                    else:
+                        return creacion_doc(lista,tipo_doc,A2,nombre,extension, valor=False, visitas=visitas)
+                else:
+                    if visitas == []:
+                        return creacion_doc(lista,tipo_doc,A2,nombre,extension, valor=True)
+                    else:
+                        return creacion_doc(lista,tipo_doc,A2,nombre,extension, valor=True, visitas=visitas)
+
+    context = {
+
+    }
+
+    return render(request, 'informes/generar_informes.html', context)
+
+
+# @login_required(login_url="login")
+# def CreacionInformesProductos(request):
+
+#     usuario = request.user
+#     usuario = User.objects.get(username=usuario)
+
+#     seguimientoPag = SEGUIMIENTO_PAGINA.objects.create(
+#         pagina_visitada = "Crear informe de productos",
+#         usuario = usuario
+#     )
+#     seguimientoPag.save()
+
+#     formP = FormProducto()
+#     formT = FormFamiliaProd()
+#     formU = FormBoleta()
+#     formC = FormClientesParaVenta()
+#     formCliente = FormClientesInforme()
+#     formProveedor = FormProductoProv()
+#     formCatProv = FormProveedor()
+#     formProveeOrden = FormInformeOrdenPedido()
+#     FormSeg = FormSeguimientoPagina()
+
+#     if request.method == 'POST':
+
+#         vistaPrevia = request.POST.get('vistaPrevia')
+#         descargarInforme = request.POST.get('descargarInforme')
+ 
+#         productos = request.POST.get('productos')
+#         precio = request.POST.get('precio')
+#         descripcion = request.POST.get('descripcion')
+#         nombre = request.POST.get('nombre')
+#         precioCompra = request.POST.get('precioCompra')
+#         stockCritico = request.POST.get('stockCritico')
+    
+#         fechaVencimiento = request.POST.get('fechaVencimiento')
+#         codigoBarra = request.POST.get('codigoBarra')
+
+#         stock = request.POST.get('stock')
+#         stockCheck = request.POST.get('stockCheck')
+
+#         estado = request.POST.get('estado')
+#         estadoCheck = request.POST.get('estadoCheck')
+
+#         familiaProducto = request.POST.get('familiaProducto')
+#         familiaProductoCheck = request.POST.get('familiaProductoCheck')
+#         nomFamiliaProducto = request.POST.get('familia_producto')
+#         nomFamiliaProducto = FAMILIA_PRODUCTO.objects.filter(id = nomFamiliaProducto)
+#         for fam in nomFamiliaProducto:
+#             nomFamiliaProducto = fam.descripcion
+        
+#         tipoProducto = request.POST.get('tipoProducto')
+#         tipoProductoCheck = request.POST.get('tipoProductoCheck')
+#         nomTipoProducto = request.POST.get('tipo_producto')
+#         nomTipoProducto = TIPO_PRODUCTO.objects.filter(id = nomTipoProducto)
+#         for tip in nomTipoProducto:
+#             nomTipoProducto = tip.descripcion
+
+#         visitasPagina = request.POST.get('visitas')
+
+#         lista = []
+#         visitas = []
+
+#         tipoInforme = request.POST.get('informeCheck')
+
+#         if productos == "on":
+#             val = PRODUCTO.objects.all().values_list("id","nombre","precio","descripcion","precio_compra","stock", "stock_critico","estado","fecha_vencimiento","codigo_barra","familia_producto__descripcion","familia_producto__tipo_producto__descripcion").order_by("id")
+#             lista.append(["id","nombre","precio","descripcion","precio_compra","stock", "stock_critico","estado","fecha_vencimiento","codigo_barra","familia_producto","tipo_producto"])
+
+#             for valores in val:
+
+#                 lista.append(list(valores))
+
+#             if nombre == None:
+#                 np_array = np.array(lista)
+#                 val = np.where(np_array == "nombre")
+#                 val = int(val[1])
+
+#                 for valor in lista:
+
+#                     valor.pop(val)
+
+
+#             if descripcion == None:
+
+#                 np_array = np.array(lista)
+#                 val = np.where(np_array == "descripcion")
+#                 val = int(val[1])
+
+#                 for valor in lista:
+
+#                     valor.pop(val)
+
+#             if precio == None:
+
+#                 np_array = np.array(lista)
+#                 val = np.where(np_array == "precio")
+#                 val = int(val[1])
+
+#                 for valor in lista:
+
+#                     valor.pop(val)
+
+
+#             if precioCompra == None:
+
+#                 np_array = np.array(lista)
+#                 val = np.where(np_array == "precio_compra")
+#                 val = int(val[1])
+
+#                 for valor in lista:
+
+#                     valor.pop(val)
+
+#             if stockCritico == None:
+#                 np_array = np.array(lista)
+#                 val = np.where(np_array == "stock_critico")
+#                 val = int(val[1])
+                
+#                 for valor in lista:
+
+#                     valor.pop(val)
+
+#             if estado == None:
+#                 np_array = np.array(lista)
+#                 val = np.where(np_array == "estado")
+#                 val = int(val[1])
+                
+#                 for valor in lista:
+
+#                     valor.pop(val)
+
+#             if fechaVencimiento == None:
+
+#                 np_array = np.array(lista)
+#                 val = np.where(np_array == "fecha_vencimiento")
+#                 val = int(val[1])
+
+#                 for valor in lista:
+
+#                     valor.pop(val)
+
+#             if codigoBarra == None:
+
+#                 np_array = np.array(lista)
+#                 val = np.where(np_array == "codigo_barra")
+#                 val = int(val[1])
+
+#                 for valor in lista:
+
+#                     valor.pop(val)
+
+#             if stock == None:
+#                 np_array = np.array(lista)
+#                 val = np.where(np_array == "stock")
+#                 val = int(val[1])
+#                 for valor in lista:
+
+#                     valor.pop(val)
+
+#             if familiaProducto == None:
+
+#                 np_array = np.array(lista)
+#                 val = np.where(np_array == "familia_producto")
+#                 val = int(val[1])
+
+#                 for valor in lista:
+
+#                     valor.pop(val)
+
+#             if tipoProducto == None:
+
+#                 np_array = np.array(lista)
+#                 val = np.where(np_array == "tipo_producto")
+#                 val = int(val[1])
+
+#                 for valor in lista:
+
+#                     valor.pop(val)
+
+#             np_array = []
+#             np_array = np.array(lista)
+#             np_arrayProd = np.array(lista)
+
+#             if stockCheck == "conStock":
+#                 np_array = np.array(lista)
+#                 val = np.where(np_array == "stock")
+#                 val = int(val[1])
+#                 cont = 0
+
+#                 for valores in lista:
+#                     numero = np_arrayProd[cont][val]
+#                     print(numero)
+#                     if cont > 0:
+
+#                         if int(numero) < 1:
+                           
+#                             np_arrayProd = np.delete(np_arrayProd, cont, axis=0)
+#                             cont = cont - 1
+                            
+#                     cont += 1
+
+#             lista = []
+#             np_array = []
+#             lista = np_arrayProd.tolist()
+#             np_arrayProd = np.array(lista)
+#             np_array = np.array(lista)
+
+#             if stockCheck == "sinStock":
+#                 np_array = np.array(lista)
+#                 val = np.where(np_array == "stock")
+#                 val = int(val[1])
+#                 cont = 0
+                
+#                 for valores in lista:
+                    
+#                     numero = np_arrayProd[cont][val]
+                    
+#                     if cont > 0:
+
+#                         if int(numero) > 0:
+                            
+#                             np_arrayProd = np.delete(np_arrayProd, cont, axis=0)
+#                             cont = cont - 1 
+                            
+#                     cont += 1
+                            
+#             lista = []
+#             np_array = []
+#             lista = np_arrayProd.tolist()
+#             np_arrayProd = np.array(lista)
+
+#             if estadoCheck == "disponible":
+#                 np_array = np.array(lista)
+#                 val = np.where(np_array == "estado")
+#                 val = int(val[1])
+#                 cont = 0
+
+#                 for valores in lista:
+                    
+#                     numero = np_arrayProd[cont][val]
+                    
+#                     if cont > 0:
+
+#                         if int(numero) < 1:
+                            
+#                             np_arrayProd = np.delete(np_arrayProd, cont, axis=0)
+#                             cont = cont - 1 
+                            
+#                     cont += 1
+                            
+#             lista = []
+#             np_array = []
+#             lista = np_arrayProd.tolist()
+#             np_arrayProd = np.array(lista)
+
+#             if estadoCheck == "noDisponible":
+#                 np_array = np.array(lista)
+#                 val = np.where(np_array == "estado")
+#                 val = int(val[1])
+#                 cont = 0
+
+#                 for valores in lista:
+                    
+#                     numero = np_arrayProd[cont][val]
+                    
+#                     if cont > 0:
+
+#                         if int(numero) > 0:
+                            
+#                             np_arrayProd = np.delete(np_arrayProd, cont, axis=0)
+#                             cont = cont - 1 
+                            
+#                     cont += 1
+                            
+#             lista = []
+#             np_array = []
+#             lista = np_arrayProd.tolist()
+#             np_arrayProd = np.array(lista)
+
+#             if familiaProductoCheck == "porNombreF":
+#                 np_array = np.array(lista)
+#                 val = np.where(np_array == "familia_producto")
+#                 val = int(val[1])
+#                 cont = 0
+
+#                 for valores in lista:
+                    
+#                     nombre = np_arrayProd[cont][val]
+                    
+#                     if cont > 0:
+
+#                         if nombre != nomFamiliaProducto:
+                            
+#                             np_arrayProd = np.delete(np_arrayProd, cont, axis=0)
+#                             cont = cont - 1 
+                            
+#                     cont += 1
+                            
+#             lista = []
+#             np_array = []
+#             lista = np_arrayProd.tolist()
+#             np_arrayProd = np.array(lista)
+
+#             if tipoProductoCheck == "porNombreT":
+#                 np_array = np.array(lista)
+#                 val = np.where(np_array == "tipo_producto")
+#                 val = int(val[1])
+#                 cont = 0
+
+#                 for valores in lista:
+                    
+#                     nombre = np_arrayProd[cont][val]
+                    
+#                     if cont > 0:
+
+#                         if nombre != nomTipoProducto:
+                            
+#                             np_arrayProd = np.delete(np_arrayProd, cont, axis=0)
+#                             cont = cont - 1 
+                            
+#                     cont += 1
+                            
+#             lista = []
+#             np_array = []
+#             lista = np_arrayProd.tolist()
+#             np_arrayProd = np.array(lista)
+
+#         if visitasPagina == "on":
+            
+#             paginaVisitada = request.POST.get('paginaVisitada')
+#             fechaVisitasP = request.POST.get('fechaVisitasP')
+
+#             usuarioVisitasPagina = request.POST.get('usuarioPaginaVisitada')
+#             usuarioVisitas = request.POST.get('usuarioVisitasPaginasCheck')
+#             nomUsuario = request.POST.get('usuario')
+#             nomUsuario = User.objects.filter(id = nomUsuario)
+#             for us in nomUsuario:
+#                 nomUsuario = us.username
+
+#             val = SEGUIMIENTO_PAGINA.objects.all().values_list("id","pagina_visitada","fecha_ingreso","usuario__username").order_by("id")
+#             visitas.append(["id","pagina_visitada","fecha_ingreso","usuario"])
+            
+#             for valores in val:
+
+#                 visitas.append(list(valores))
+
+#             if paginaVisitada == None:
+#                 np_array = np.array(visitas)
+#                 val = np.where(np_array == "pagina_visitada")
+#                 val = int(val[1])
+
+#                 for valor in visitas:
+
+#                     valor.pop(val)
+
+#             if fechaVisitasP == None:
+#                 np_array = np.array(visitas)
+#                 val = np.where(np_array == "fecha_ingreso")
+#                 val = int(val[1])
+
+#                 for valor in visitas:
+
+#                     valor.pop(val)
+
+#             if usuarioVisitasPagina == None:
+#                 np_array = np.array(visitas)
+#                 val = np.where(np_array == "usuario")
+#                 val = int(val[1])
+
+#                 for valor in visitas:
+
+#                     valor.pop(val)
+
+#             np_array = []
+#             np_array = np.array(visitas)
+#             np_arrayProd = np.array(visitas)
+            
+#             if usuarioVisitas == "porNombreVisitasP":
+#                 np_array = np.array(visitas)
+#                 val = np.where(np_array == "usuario")
+#                 val = int(val[1])
+#                 cont = 0
+
+#                 for valores in visitas:
+                    
+#                     nombre = np_arrayProd[cont][val]
+                    
+#                     if cont > 0:
+
+#                         if nombre != nomUsuario:
+                            
+#                             np_arrayProd = np.delete(np_arrayProd, cont, axis=0)
+#                             cont = cont - 1 
+                            
+#                     cont += 1
+
+#             visitas = []
+#             np_array = []
+#             visitas = np_arrayProd.tolist()
+#             np_arrayProd = np.array(visitas)
+
+#         if tipoInforme == "informeExcel":
+            
+#             nombre_archivo = "Productos"
+#             if visitas == []:
+#                 return  creacion_excel(nombre_archivo, lista)
+#             else:
+#                 return  creacion_excel(nombre_archivo, lista, visitas)
+            
+
+#         if tipoInforme == "informePdf":
+
+#             tipo_doc = 'pdf'
+#             extension = 'pdf'
+            
+#             nombre = 'Productos'
+            
+#             if vistaPrevia:
+#                 if visitas == []:
+#                     return creacion_doc(lista,tipo_doc,A2,nombre,extension, valor=False)
+#                 else:
+#                     return creacion_doc(lista,tipo_doc,A2,nombre,extension, valor=False, visitas=visitas)
+#             else:
+#                 if visitas == []:
+#                     return creacion_doc(lista,tipo_doc,A2,nombre,extension, valor=True)
+#                 else:
+#                     return creacion_doc(lista,tipo_doc,A2,nombre,extension, valor=True, visitas=visitas)
+ 
+#         if tipoInforme == "informeWord": 
+
+#             tipo_doc = 'ms-word'
+#             extension = 'docx'
+            
+#             nombre = 'Productos'
+#             if vistaPrevia:
+#                 if visitas == []:
+#                     return creacion_doc(lista,tipo_doc,A2,nombre,extension, valor=False)
+#                 else:
+#                     return creacion_doc(lista,tipo_doc,A2,nombre,extension, valor=False, visitas=visitas)
+#             else:
+#                 if visitas == []:
+#                     return creacion_doc(lista,tipo_doc,A2,nombre,extension, valor=True)
+#                 else:
+#                     return creacion_doc(lista,tipo_doc,A2,nombre,extension, valor=True, visitas=visitas)
+
+#     context = {
+#         'formP':formP,
+#         'formT':formT,
+#         'formU':formU,
+#         'formC':formC,
+#         'formCliente':formCliente,
+#         'formProveedor':formProveedor,
+#         'formCatProv':formCatProv,
+#         'formProveeOrden':formProveeOrden,
+        
+#         'FormSeg':FormSeg,
+
+#     }
+#     return render(request, 'informes/informe_productos.html', context)
