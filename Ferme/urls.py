@@ -94,7 +94,10 @@ urlpatterns = [
     path('guias_despacho/ver_guia_despacho', views.ver_guia_despacho, name="ver_guia_despacho"),
 
 
-    path('informes/', views.generar_informes, name="informes"),
+    path('informes/productos', views.informe_productos, name="informe_productos"),
+    path('informes/proveedores', views.informe_proveedores, name="informe_proveedores"),
+    path('informes/pedidos', views.informe_pedidos, name="informe_pedidos"),
+    # path('informes/ventas', views.generar_informes, name="informe_productos"),
 
 
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
