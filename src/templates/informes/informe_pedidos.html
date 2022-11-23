@@ -4,7 +4,7 @@
 
 {% block content %}
 <link rel="stylesheet" href="{% static 'css/informes.css' %}">
-<h1 class="text-center p-3">Crear Informe de productos</h1>
+<h1 class="text-center p-3">Crear Informe de Pedidos</h1>
 
 
 <form method="post" action="" class="">
@@ -31,6 +31,7 @@
             
             <div class="col border border-primary rounded">
                 <label for="productos" class="p-2">Estado recepcion:</label>
+
                 <input type="checkbox" class="estadoRecepcionO" name="estadoRecepcionO" id="estadoRecepcionO" onclick="checkeado(this.form)"/></br></br>
                 <div class="inputFilter" id="estadoRecepcionSelect" style="display:none;">
                     <select class="form-select" type="text" name="estadoOrdenPCheck" aria-label="Default select example">
@@ -40,6 +41,8 @@
                         <option value="recepcionadoOrden">Recepcionado</option>
                         </select>
                 </div>
+                {% render_field form1.estadoordenid class="form-control input border border-secondary" name="ordenid" id="ordenid" %}
+
             </div>
 
             <div class="col border border-primary rounded">
@@ -132,14 +135,15 @@
 <script language="JavaScript">
 
     document.getElementById("fechaOrdenP").disabled=true;
-    document.getElementById("fechaLlegadaOrdenP").disabled=true;
-    document.getElementById("fechaRecepOrdenP").disabled=true;
-    document.getElementById("horaRecepOrdenP").disabled=true;
+    // document.getElementById("fechaLlegadaOrdenP").disabled=true;
+    // document.getElementById("fechaRecepOrdenP").disabled=true;
+    // document.getElementById("horaRecepOrdenP").disabled=true;
     document.getElementById("estadoRecepcionO").disabled=true;
     document.getElementById("razonSocialOrdenP").disabled=true;
     document.getElementById("detalleOrdenP").disabled=true;
     document.getElementById("cantidadOrdenP").disabled=true;
     document.getElementById("productoOrdenP").disabled=true;
+    // document.getElementById("id_familia_producto").disabled=true;
     
     // document.getElementById("usuarioPaginaVisitada").disabled=true;
     // document.getElementById("usuarioVisitasPaginaCheck1").disabled=true;

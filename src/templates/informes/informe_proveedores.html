@@ -12,9 +12,17 @@
     <div class="container border border-primary rounded">
         <label for="productos" class="p-2">Proveedores:</label>
         <input type="checkbox" class="proveedores" name="proveedores" id="proveedores" onclick="checkeado(this.form)"/></br>
-        <div class="row row-cols-4">
+        <div class="row row-cols-3">
             <div class="col border border-primary rounded">
                 </br>
+
+
+                <label for="productos" class="p-2">Razon Social:</label>
+                <input type="checkbox" class="razonP" name="razonP" id="razonP"/></br>
+
+                <label for="productos" class="p-2">RUT:</label>
+                <input type="checkbox" class="rutP" name="rutP" id="rutP"/></br>
+
                 <label for="productos" class="p-2">Telefono:</label>
                 <input type="checkbox" class="telefonoP" name="telefonoP" id="telefonoP"/></br>
 
@@ -36,35 +44,25 @@
             </div>
 
             <div class="col border border-primary rounded">
-                <label for="productos" class="p-2">Razon social:</label>
-                <input type="checkbox" class="razonSocialP" name="razonSocialP" id="razonSocialP" onclick="checkeado(this.form)"/></br></br>
-                <div class="inputFilter" id="razonSocialSelect" style="display:none;">
-                    <select class="form-select" type="text" name="razonSocialPCheck" aria-label="Default select example">
-                        <option selected>----------</option>
-                        <option value="todosP">Todos</option>
-                        <option value="porRazonSocialP">Por Razon Social</option>
-                        </select>
-                </div>
-            </div>
-
-            
-            <div class="col border border-primary rounded">
-                <label for="productos" class="p-2">Categoria proveedor:</label>
+                <label for="productos" class="p-2">Tipo Rubro:</label>
                 <input type="checkbox" class="categoriaP" name="categoriaP" id="categoriaP" onclick="checkeado(this.form)"/></br></br>
                 <div class="inputFilter" id="categoriaSelect" style="display:none;">
-                    <select class="form-select" type="text" name="categoriaProvCheck" aria-label="Default select example">
+                    <select class="form-select" type="text"  id="categoriaPCheck" name="categoriaPCheck" aria-label="Default select example" onchange="showDivAttid2('categoriaPCheck','rubroid', 'porcategoriaP')">
                         <option selected>----------</option>
                         <option value="todosP">Todos</option>
-                        <option value="porCategoriaP">Por categoria</option>
+                        <option value="porcategoriaP">Por Rubro</option>
                         </select>
                 </div>
+                <br>
+                    {% render_field form1.rubroid class="form-control input border border-secondary"  disabled="disabled" name="rubroid" id="rubroid" style="opacity:0"%}
             </div>
+
         </div>
     </div>
     
     <!-- seguimiento pagina -->
 
-    <div class="container border border-primary rounded mt-3">
+    <!-- <div class="container border border-primary rounded mt-3">
         <label for="productos" class="p-2">Visitas a paginas:</label>
         <input type="checkbox" class="visitas" name="visitas" id="visitas" onclick="checkeado(this.form)"/></br>
         
@@ -90,7 +88,7 @@
     
         </div>
     
-    </div>
+    </div>-->
 
     <div class="container p-3">
         <div class="row">
@@ -113,7 +111,7 @@
             <div class="col-md-2">
             </div>
         </div>
-    </div> 
+    </div>  
 
 </form>
 
@@ -121,14 +119,26 @@
     function showDivAttid(value , status){
         status === true ? document.getElementById(`${value}`).style.display = 'inline' :  document.getElementById(`${value}`).style.display = 'none'
     }
+
+    function showDivAttid2(value, idshow, field){
+        console.log(document.getElementById(`${value}`).value)
+        if(document.getElementById(`${value}`).value === field){
+            document.getElementById(`${idshow}`).disabled = false
+            document.getElementById(`${idshow}`).style.opacity = '1'
+        }else{
+            document.getElementById(`${idshow}`).disabled = true
+            document.getElementById(`${idshow}`).style.opacity = '0'
+        }
+    }
 </script>
 
 <script language="JavaScript">
    
+    document.getElementById("razonP").disabled=true;
+    document.getElementById("rutP").disabled=true;
     document.getElementById("telefonoP").disabled=true;
     document.getElementById("direccionP").disabled=true;
     document.getElementById("estadoP").disabled=true;
-    document.getElementById("razonSocialP").disabled=true;
     document.getElementById("categoriaP").disabled=true;
 
     // document.getElementById("usuarioPaginaVisitada").disabled=true;
@@ -152,8 +162,9 @@
             form.telefonoP.disabled = false;
             form.direccionP.disabled = false;
             form.estadoP.disabled = false;
-            form.razonSocialP.disabled = false;
             form.categoriaP.disabled = false;
+            form.razonP.disabled = false
+            form.rutP.disabled = false
             form.informeCheck1.disabled = false;
             form.informeCheck2.disabled = false;
             form.informeCheck3.disabled = false;
@@ -163,8 +174,9 @@
             form.telefonoP.disabled = true;
             form.direccionP.disabled = true;
             form.estadoP.disabled = true;
-            form.razonSocialP.disabled = true;
             form.categoriaP.disabled = true;
+            form.razonP.disabled = true
+            form.rutP.disabled = true
             form.informeCheck1.disabled = true;
             form.informeCheck2.disabled = true;
             form.informeCheck3.disabled = true;
@@ -178,13 +190,13 @@
             showDivAttid('estadoSelect', false)
         }
         
-        if (form.razonSocialP.checked == true){
-            showDivAttid('razonSocialSelect', true)
-        }
+        // if (form.razonSocialP.checked == true){
+        //     showDivAttid('razonSocialSelect', true)
+        // }
 
-        if (form.razonSocialP.checked == false || form.razonSocialP.disabled == true){
-            showDivAttid('razonSocialSelect', false)
-        }
+        // if (form.razonSocialP.checked == false || form.razonSocialP.disabled == true){
+        //     showDivAttid('razonSocialSelect', false)
+        // }
 
         if (form.categoriaP.checked == true){
             showDivAttid('categoriaSelect', true)
