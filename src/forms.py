@@ -57,6 +57,18 @@ class FormProveedor(forms.ModelForm):
         model = Proveedor
         fields = '__all__'
 
+class FormProveedorUsuario(forms.ModelForm):
+
+    class Meta:
+        model = Usuario
+        fields = ("email", "nombreusuario","password")
+
+class FormDireProvee(forms.ModelForm):
+
+    class Meta:
+        model = Direccion
+        fields = ("calle", "numero", "comunaid", "tipoviviendaid", "tipobarrioid","nombresector")
+
 class FormVendedorPersona(forms.ModelForm):
     class Meta:
         model = Persona
@@ -98,6 +110,7 @@ class FormProductoproveedor(forms.ModelForm):
         model = Productoproveedor
         fields = '__all__'
     
+
 
 class FormBodega(forms.ModelForm):
     class Meta:

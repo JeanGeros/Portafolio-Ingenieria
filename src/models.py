@@ -605,6 +605,7 @@ class Usuario(models.Model):
     nombreusuario = models.CharField(max_length=50)
     empresaid = models.ForeignKey(Empresa, models.DO_NOTHING, db_column='empresaid', blank=True, null=True)
     personaid = models.ForeignKey(Persona, models.DO_NOTHING, db_column='personaid', blank=True, null=True)
+    proveedorid = models.ForeignKey(Proveedor, models.DO_NOTHING, db_column='proveedorid', blank=True, null=True)
     rolid = models.ForeignKey(Rolusuario, models.DO_NOTHING, db_column='rolid')
 																										   
     def __str__(self):
