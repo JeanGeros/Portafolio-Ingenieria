@@ -2714,6 +2714,74 @@ def Cambiar_estado_despacho(despachoId,estado_id,estado):
         despacho.estadoid = Estado.objects.get(descripcion="Activo")
         despacho.save()
 
+#****************************Orden Proveedor******************************************
+def Listar_Ordenes(request):
+
+    if request.POST.get('VerPerfil') is not None:
+        request.session['_ver_perfil'] = request.POST
+        return redirect('ver_perfil')
+
+    if Usuario.objects.filter(nombreusuario=request.user).exists():
+        tipo_usuario = Usuario.objects.get(nombreusuario=request.user)
+        tipo_usuario = tipo_usuario.rolid.descripcion
+    else: 
+        tipo_usuario = None
+
+    ordenes = Ordencompra.objects.all()
+    #ordenes = Ordencompra.objects.filter(proveedorid = tipo_usuario.usurioid)
+
+
+    if request.method == 'POST':
+
+        if request.POST.get('ver_orden') is not None:
+            request.session['_ver_orden'] = request.POST
+            return HttpResponseRedirect('ver_orden')
+        
+
+    if request.method == 'POST':
+        estado = request.POST.get('estados')
+       
+
+
+    context = {
+        'despachos': ordenes,
+        'tipo_usuario': tipo_usuario,
+    }
+
+    return render(request, 'Vistaproveedor/listar_ordenes.html', context)
+
+def Ver_Orden(request):
+
+    if request.POST.get('VerPerfil') is not None:
+        request.session['_ver_perfil'] = request.POST
+        return redirect('ver_perfil')
+
+    if Usuario.objects.filter(nombreusuario=request.user).exists():
+        tipo_usuario = Usuario.objects.get(nombreusuario=request.user)
+        tipo_usuario = tipo_usuario.rolid.descripcion
+    else: 
+        tipo_usuario = None
+
+    ver_despacho = request.session.get('_ver_despacho')
+    despacho = Despacho.objects.get(despachoid = ver_despacho['VerDespacho'])
+    productos_despacho = Detalleventa.objects.filter(nroventa = despacho.nroventa.nroventa)
+
+    if request.method == 'POST':
+
+        despachoId = request.POST.get('despacho_id')
+        estado_id = request.POST.get('estado_id')
+        estado = request.POST.get('btnAccion')
+        Cambiar_estado_despacho(despachoId,estado_id,estado)
+        return redirect('listar_despacho')
+
+    context = {
+        'despacho': despacho,
+        'tipo_usuario': tipo_usuario,
+        'productos_despacho': productos_despacho
+    }
+
+    return render(request, 'proveedor/ver_orden.html', context)
+
 #****************************Creacion de archivos******************************************
 
 def creacion_excel(nombre_archivo, lista, tipo_doc, extension):
