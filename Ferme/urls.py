@@ -90,6 +90,9 @@ urlpatterns = [
     path('notas_credito/crear_nota_credito', views.Crear_nota_credito, name="crear_nota_credito"),
     path('notas_credito/listar_documentos', views.Listar_documentos, name="listar_documentos"),
 
+    path('comprar/', views.Comprar, name="comprar"),
+    path('comprar/procesar_compra', views.Procesar_compra, name="procesar_compra"),
+    
 
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 

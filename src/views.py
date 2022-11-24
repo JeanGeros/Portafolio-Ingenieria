@@ -10,6 +10,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.views.decorators.csrf import csrf_exempt
 from django.db import connection
 import cx_Oracle
+from datetime import datetime
 
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
@@ -3704,7 +3705,7 @@ def Crear_nota_credito(request):
             for x in detalles:
                 suma += x['productoid__precio']
 
-            from datetime import datetime
+            
             now = datetime.now()
 
             if documento['documento'] == 'boleta':
@@ -3762,3 +3763,61 @@ def Crear_nota_credito(request):
     }
 
     return render(request, 'notas de credito/crear_nota_credito.html', context)
+
+def Comprar(request):
+
+    if request.POST.get('VerPerfil') is not None:
+        request.session['_ver_perfil'] = request.POST
+        return redirect('ver_perfil')
+
+    if Usuario.objects.filter(nombreusuario=request.user).exists():
+        tipo_usuario = Usuario.objects.get(nombreusuario=request.user)
+        tipo_usuario = tipo_usuario.rolid.descripcion
+    else: 
+        tipo_usuario = None
+
+    productos = Producto.objects.filter(estadoid__descripcion = 'Activo')
+
+    context = {
+        'tipo_usuario': tipo_usuario,
+        'productos': productos
+    }
+
+    return render(request, 'compras/comprar.html', context)
+
+def Procesar_compra(request):
+
+    if request.method == 'POST': 
+        cont = 0
+        for key,value in request.POST.items():
+            print(key)
+            print(value)
+            print("---------")
+            prodNombre = f'producto_nombre{cont}'
+            prodPrecio = f'producto_precio{cont}'
+            prodCantidad = f'producto_precio{cont}'
+            if key == prodNombre:
+                producto = Producto.objects.get(Nombre = value)
+            if key == prodPrecio:
+                precio += value 
+            if key == prodCantidad:
+                cantidad = value
+
+            now = datetime.now()
+
+            # Venta.objects.create(
+            #     fechaventa = now,
+            #     total venta
+            # )
+            
+            # Detalleventa.objects.create(
+            #     cantidad = cantidad,
+            #     subtotal = precio,
+            #     productoid = producto,
+            #     nroventa = venta
+            # )
+
+        # if request.POST.get('boleta') is not None:
+        #     request.session['_documento'] = request.POST
+        #     return HttpResponseRedirect('listar_documentos')
+    return render(request, 'compras/procesar_compra.html')
