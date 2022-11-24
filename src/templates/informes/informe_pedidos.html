@@ -4,7 +4,7 @@
 
 {% block content %}
 <link rel="stylesheet" href="{% static 'css/informes.css' %}">
-<h1 class="text-center p-3">Crear Informe de Pedidos</h1>
+<h1 class="text-center pb-3">Crear Informe de Pedidos</h1>
 
 
 <form method="post" action="" class="">
@@ -31,17 +31,19 @@
             
             <div class="col border border-primary rounded">
                 <label for="productos" class="p-2">Estado recepcion:</label>
-
                 <input type="checkbox" class="estadoRecepcionO" name="estadoRecepcionO" id="estadoRecepcionO" onclick="checkeado(this.form)"/></br></br>
-                <div class="inputFilter" id="estadoRecepcionSelect" style="display:none;">
+                
+                <!-- <div class="inputFilter" id="estadoRecepcionSelect" style="display:none;">
                     <select class="form-select" type="text" name="estadoOrdenPCheck" aria-label="Default select example">
                         <option selected>----------</option>
                         <option value="todosOrdenP">Todos</option>
                         <option value="enEsperaOrden">En espera</option>
                         <option value="recepcionadoOrden">Recepcionado</option>
                         </select>
-                </div>
-                {% render_field form1.estadoordenid class="form-control input border border-secondary" name="ordenid" id="ordenid" %}
+                </div> -->
+
+                
+                {% render_field form1.estadoordenid class="form-control input border border-secondary" disabled="disabled" name="estadoordenid" id="estadoordenid" style="opacity:0"%}
 
             </div>
 
@@ -130,6 +132,16 @@
         status === true ? document.getElementById(`${value}`).style.display = 'inline' :  document.getElementById(`${value}`).style.display = 'none'
     }
 
+    function showDivAttid2(value, status){
+        if(status === true){
+            document.getElementById(`${value}`).disabled = false
+            document.getElementById(`${value}`).style.opacity = '1'
+        }else{
+            document.getElementById(`${value}`).disabled = true
+            document.getElementById(`${value}`).style.opacity = '0'
+        }
+    }
+
 </script>
 
 <script language="JavaScript">
@@ -191,11 +203,11 @@
         }
         
         if (form.estadoRecepcionO.checked == true){
-            showDivAttid('estadoRecepcionSelect', true)
+            showDivAttid2('estadoordenid', true)
         }
 
         if (form.estadoRecepcionO.checked == false || form.estadoRecepcionO.disabled == true){
-            showDivAttid('estadoRecepcionSelect', false)
+            showDivAttid2('estadoordenid', false)
         }
         
         if (form.detalleOrdenP.checked == true){

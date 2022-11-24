@@ -4,7 +4,7 @@
 
 {% block content %}
 <link rel="stylesheet" href="{% static 'css/informes.css' %}">
-<h1 class="text-center p-3">Crear Informe de Proveedores</h1>
+<h1 class="text-center pb-3 pt-5">Crear Informe de Proveedores</h1>
 
 
 <form method="post" action="" class="">
@@ -54,7 +54,7 @@
                         </select>
                 </div>
                 <br>
-                    {% render_field form1.rubroid class="form-control input border border-secondary"  disabled="disabled" name="rubroid" id="rubroid" style="opacity:0"%}
+                    {% render_field form1.rubroid class="form-control input border border-secondary" disabled="disabled" name="rubroid" id="rubroid" style="opacity:0"%}
             </div>
 
         </div>
@@ -130,6 +130,7 @@
             document.getElementById(`${idshow}`).style.opacity = '0'
         }
     }
+
 </script>
 
 <script language="JavaScript">
