@@ -3,7 +3,7 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 
-from .models import Producto, Persona, Direccion, Proveedor, Usuario, Cliente, Empleado, Productoproveedor, Bodega, Empresa, Tipodocumento, Venta
+from .models import Producto, Persona, Direccion, Proveedor, Usuario, Cliente, Empleado, Productoproveedor, Bodega, Empresa, Tipodocumento, Venta, Familiaproducto, Detalleorden,Estadoorden, Ordencompra
 
 class FormRegistroUsuario(UserCreationForm):
 
@@ -70,7 +70,6 @@ class FormDireProvee(forms.ModelForm):
         fields = ("calle", "numero", "comunaid", "tipoviviendaid", "tipobarrioid","nombresector")
 
 class FormVendedorPersona(forms.ModelForm):
-
     class Meta:
         model = Persona
         fields = ("runcuerpo", "dv", "apellidopaterno", "apellidomaterno", "nombres", "telefono")
@@ -150,3 +149,21 @@ class FormDocu(forms.Form):
             })  
 
     Tipo_documento= forms.ChoiceField(choices = opciones_documentos)
+
+
+class FormFamiliaProduct(forms.ModelForm):
+    class Meta:
+        model = Familiaproducto
+        fields = '__all__'
+
+class FormDetalleorden(forms.ModelForm):
+    class Meta:
+        model = Detalleorden
+        fields = '__all__'
+
+class FormEstadoorden(forms.ModelForm):
+    class Meta:
+        model = Ordencompra
+        fields = '__all__'    
+
+        

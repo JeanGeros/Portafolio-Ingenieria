@@ -84,7 +84,9 @@
                                 <li class="nav-item">
                                     <a href="/ventas" class="nav-link fw-bolder text-black">Ventas</a>
                                 </li>
-                                
+                                <li class="nav-item">
+                                    <a href="/notas_credito" class="nav-link fw-bolder text-black">Notas de <br> credito</a>
+                                </li>
                             {% endif %}  
                             {% if tipo_usuario == 'Vendedor' and tipo_usuario != None %}
                                 <li class="nav-item">
@@ -109,6 +111,9 @@
                                 </li> 
                                 <li class="nav-item">
                                     <a href="/ventas" class="nav-link fw-bolder text-black">Ventas</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="/notas_credito" class="nav-link fw-bolder text-black">Notas de <br> credito</a>
                                 </li>
                             {% endif %}
                             {% if tipo_usuario == 'Empleado' and tipo_usuario != None %}
@@ -145,7 +150,7 @@
                             </li>
                             <li class="nav-item">
                                 <a href="#" class="nav-link fw-bolder text-black">Compra <br> con nosotros</a>
-                        </li>
+                            </li>                            
                         {% endif %}
                     </ul>
                     
@@ -170,6 +175,7 @@
                     {% else %}
                         <a href="{% url 'ingreso' %}" type="button" class="btn ingresar fw-bolder m-1">Ingresar</a>
                     {% endif %}
+                    
                 
                     <a href="{% url 'seleccion_registro' %}" type="button" class="btn registrarme fw-bolder m-1">Registrarme</a>
                     <i class="fa-solid fa-cart-arrow-down text-black fa-2x p-2"></i>

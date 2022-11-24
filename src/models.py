@@ -100,7 +100,6 @@ class Bodega(models.Model):
     casillero = models.CharField(max_length=6)
     def __str__(self):
         return f"Pasillo:{self.pasillo} Estante:{self.estante} casillero:{self.casillero}"
-
     class Meta:
         managed = False
         db_table = 'bodega'
@@ -179,7 +178,7 @@ class Detalleorden(models.Model):
     estadoid = models.ForeignKey('Estado', models.DO_NOTHING, db_column='estadoid', blank=True, null=True)
 
     def __str__(self):
-        return f"{self.detalleid} {self.productoid}"
+        return f"{self.detalleid}"
 
     class Meta:
         managed = False
@@ -194,7 +193,7 @@ class Detalleventa(models.Model):
     nroventa = models.ForeignKey('Venta', models.DO_NOTHING, db_column='nroventa')
 
     def __str__(self):
-        return f"{self.nroventa} {self.productoid}"
+        return f"{self.detalleventaid}"
 
     class Meta:
         managed = False
@@ -348,6 +347,9 @@ class Factura(models.Model):
     nroventa = models.ForeignKey('Venta', models.DO_NOTHING, db_column='nroventa')
     estadoid = models.ForeignKey(Estado, models.DO_NOTHING, db_column='estadoid')
 
+    def __str__(self):
+        return f"{self.numerofactura}"
+
     class Meta:
         managed = False
         db_table = 'factura'
@@ -389,7 +391,7 @@ class Notacredito(models.Model):
     nroboleta = models.BigIntegerField(blank=True, null=True)
 
     def __str__(self):
-        return self.numero
+        return f'{self.nronota}'
 
     class Meta:
         managed = False
@@ -441,7 +443,8 @@ class Producto(models.Model):
     estadoid = models.ForeignKey(Estado, models.DO_NOTHING, db_column='estadoid')
     imagen = models.CharField(max_length=256, blank=True, null=True)
     bodegaid = models.ForeignKey(Bodega, models.DO_NOTHING, db_column='bodegaid', blank=True, null=True)
-
+    
+  
     def __str__(self):
         return f"{self.nombre}"
 
