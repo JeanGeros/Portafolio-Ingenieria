@@ -64,7 +64,7 @@ from src.forms import (
     FormClienteNormal1, FormClienteNormal2, FormClienteNormal3, addproductsForm, FormVendedorPersona,
     FormVendedorUsuario, FormVendedorEmpleado, FormEmpleadoPersona, FormEmpleadoUsuario, FormEmpleadoEmpleado,
     FormProveedor, FormProductoproveedor, FormBodega, FormClienteEmpresa, FormCliente, FormTipodocumento, FormVenta, FormDocu,
-    FormFamiliaProduct, FormDetalleorden, FormEstadoorden
+    FormFamiliaProduct, FormDetalleorden, FormOrdencompra
 )
 
 from .models import (
@@ -4319,7 +4319,7 @@ def informe_proveedores(request):
 
 def informe_pedidos(request):
     
-    form1 = FormEstadoorden(request.POST)
+    form1 = FormOrdencompra(request.POST)
 
     if request.method == 'POST':
         ordenes = request.POST.get('ordenes')
@@ -4329,9 +4329,10 @@ def informe_pedidos(request):
         horaRecepOrdenP = request.POST.get('horaRecepOrdenP')
         cantidadOrdenP = request.POST.get('cantidadOrdenP')
         productoOrdenP = request.POST.get('productoOrdenP')
+        estadoordenid = request.POST.get('estadoordenid')
+        proveedorid = request.POST.get('proveedorid')
 
         estadoRecepcionO = request.POST.get('estadoRecepcionO')
-        estadoOrdenPCheck = request.POST.get('estadoOrdenPCheck')
         razonSocialOrdenP = request.POST.get('razonSocialOrdenP')
         razonSocialOrdenPCheck = request.POST.get('razonSocialOrdenPCheck')
         nomProveedor = request.POST.get('proveedor')
@@ -4347,16 +4348,16 @@ def informe_pedidos(request):
         print(f"horaRecepOrdenP: {horaRecepOrdenP}" )
         print(f"cantidadOrdenP: {cantidadOrdenP}" )
         print(f"productoOrdenP: {productoOrdenP}" )
+
         print(f"estadoRecepcionO: {estadoRecepcionO}" )
-        print(f"estadoOrdenPCheck: {estadoOrdenPCheck}" )
+
         print(f"razonSocialOrdenP: {razonSocialOrdenP}" )
         print(f"razonSocialOrdenPCheck: {razonSocialOrdenPCheck}" )
+        print(f"estadoordenid: {estadoordenid}" )
+        print(f"proveedorid: {proveedorid}" )
+
         print(f"nomProveedor: {nomProveedor}" )
         print(f"tipoInforme: {tipoInforme}" )
-
-        nomProveedor = Proveedor.objects.filter(proveedorid = nomProveedor)
-        for us in nomProveedor:
-            nomProveedor = us.razonsocial
         
         lista = []
         visitas = []
@@ -4368,36 +4369,35 @@ def informe_pedidos(request):
 
         if ordenes == "on":
             ordenes = Detalleorden.objects.all().values_list("ordenid__proveedorid__razonsocial","ordenid__fechapedido","ordenid__estadoordenid__descripcion","productoid__nombre","cantidad").order_by("detalleid")
-            # ("orden_pedido__fecha_llegada","orden_pedido__fecha_recepcion","orden_pedido__hora_recepcion","cantidad").order_by("id")
             columnas = (["Razon Social","Fecha Pedido", "Estado", "Producto", "Cantidad"])
-
-            if estadoOrdenPCheck == "enEsperaOrden":
-                ordenes1 = ordenes.filter(ordenid__estadoordenid__descripcion="Solicitado")
-                ordenes = ordenes.filter(ordenid__estadoordenid__descripcion="Productos Pendientes") 
-                ordenes+=ordenes1
-            if estadoOrdenPCheck == "recepcionadoOrden":
-                ordenes = ordenes.filter(ordenid__estadoordenid__descripcion="Aceptado")
+            if estadoRecepcionO == "on":   
+                ordenes = ordenes.filter(ordenid__estadoordenid = estadoordenid)
             if razonSocialOrdenPCheck == "porRazonSocialOrdenP":
-                ordenes = ordenes.order_by("ordenid__proveedorid__razonsocial")
+                ordenes = ordenes.filter(ordenid__proveedorid = proveedorid)
 
-            np_array = np.array(ordenes)
-            df = pd.DataFrame(np_array, columns = columnas)
-            print(df)
+            if len(ordenes) < 1:
+                sweetify.warning(request, 'No existen registros con los parámetros seleccionados')
+                return redirect('informe_pedidos')
+            else:
+                np_array = np.array(ordenes)
+                df = pd.DataFrame(np_array, columns = columnas)
 
-            if cantidadOrdenP == None:
-                df = df.drop(['Cantidad'], axis=1)
-            if productoOrdenP == None:
-                df = df.drop(['Producto'], axis=1)
+                if cantidadOrdenP == None:
+                    df = df.drop(['Cantidad'], axis=1)
+                if productoOrdenP == None:
+                    df = df.drop(['Producto'], axis=1)
 
-            lista_proveedores = df.values.tolist() 
-            columnas_df = df.columns.values.tolist() 
-            lista_proveedores.insert(0, columnas_df)
+                lista_proveedores = df.values.tolist() 
+                columnas_df = df.columns.values.tolist() 
+                lista_proveedores.insert(0, columnas_df)
+            
             if tipoInforme == "informeExcel":
                 nombre_archivo = "Pedidos"
                 if visitas == []:
                     return  creacion_excel(nombre_archivo, lista_proveedores)
                 else:
                     return  creacion_excel(nombre_archivo, lista_proveedores, visitas)
+
             if tipoInforme == "informePdf":
                 tipo_doc = 'pdf'
                 extension = 'pdf'

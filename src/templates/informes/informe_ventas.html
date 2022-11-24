@@ -16,24 +16,54 @@
         <div class="row row-cols-4">
             <div class="col border border-primary rounded">
                 </br>
-                <label for="productos" class="p-2">Fecha pedido:</label>
-                <input type="checkbox" class="fechaOrdenP" name="fechaOrdenP" id="fechaOrdenP"/></br>
+                <label for="ventas" class="p-2">Fecha Venta:</label>
+                <input type="checkbox" class="fechaVenta" name="fechaVenta" id="fechaVenta"/></br>
 
-                <!-- <label for="productos" class="p-2">Fecha llegada:</label>
-                <input type="checkbox" class="fechaLlegadaOrdenP" name="fechaLlegadaOrdenP" id="fechaLlegadaOrdenP"/></br>
+                <label for="ventas" class="p-2">Monto Total Venta:</label>
+                <input type="checkbox" class="montoTotal" name="montoTotal" id="montoTotal"/></br>
 
-                <label for="productos" class="p-2">Fecha recepcion:</label>
-                <input type="checkbox" class="fechaRecepOrdenP" name="fechaRecepOrdenP" id="fechaRecepOrdenP"/></br>
+                <label for="ventas" class="p-2">Cantidad:</label>
+                <input type="checkbox" class="cantidadVenta" name="cantidadVenta" id="cantidadVenta"/></br>
 
-                <label for="productos" class="p-2">Hora recepcion:</label>
-                <input type="checkbox" class="horaRecepOrdenP" name="horaRecepOrdenP" id="horaRecepOrdenP"/></br> -->
-                
+                <label for="ventas" class="p-2">Valor Sub Total:</label>
+                <input type="checkbox" class="subTotal" name="subTotal" id="subTotal"/></br>
+
+                <label for="ventas" class="p-2">Nombre Producto:</label>
+                <input type="checkbox" class="nombreProducto" name="nombreProducto" id="nombreProducto"/></br>
             </div>
             
+            <!-- <div class="col border border-primary rounded">
+                <label for="productos" class="p-2">Productos Ventas</label>
+                <input type="checkbox" class="detalleOrdenP" name="detalleOrdenP" id="detalleOrdenP" onclick="checkeado(this.form)"/></br></br>
+
+            </div> -->
+            
             <div class="col border border-primary rounded">
-                <label for="productos" class="p-2">Estado recepcion:</label>
-                <input type="checkbox" class="estadoRecepcionO" name="estadoRecepcionO" id="estadoRecepcionO" onclick="checkeado(this.form)"/></br></br>
+
                 {% render_field form1.estadoordenid class="form-control input border border-secondary" disabled="disabled" name="estadoordenid" id="estadoordenid" style="opacity:0"%}
+            </div>
+
+            <div class="col border border-primary rounded">
+                <label for="productos" class="p-2">Tipo Pago:</label>
+                <input type="checkbox" class="tipoPago" name="tipoPago" id="tipoPago" onclick="checkeado(this.form)"/></br></br>
+                {% render_field form1.estadoordenid class="form-control input border border-secondary" disabled="disabled" name="estadoordenid" id="estadoordenid" style="opacity:0"%}
+            </div>
+
+            
+            <div class="col border border-primary rounded">
+                <label for="productos" class="p-2">Tipo Pago:</label>
+                <input type="checkbox" class="tipoPago" name="tipoPago" id="tipoPago" onclick="checkeado(this.form)"/></br></br>
+
+                <div class="inputFilter" id="TipoPagoSelect" style="display:none;">
+                    <select class="form-select" type="text" id="TipoPagoCheck" name="TipoPagoCheck" aria-label="Default select example" onchange="showDivAttid3('TipoPagoCheck','proveedorid', 'porRazonSocialOrdenP')">
+                        <option selected>----------</option>
+                        <option value="todosOrdenP">Todos</option>
+                        <option value="porRazonSocialOrdenP">Por Razon Social</option>
+                        </select>
+                </div>
+                <br>
+                {% render_field form1.proveedorid class="form-control input border border-secondary" disabled="disabled" name="proveedorid" id="proveedorid" style="opacity:0"%}
+                <br>
             </div>
 
             <div class="col border border-primary rounded">
@@ -50,17 +80,9 @@
                 <br>
                 {% render_field form1.proveedorid class="form-control input border border-secondary" disabled="disabled" name="proveedorid" id="proveedorid" style="opacity:0"%}
                 <br>
-
             </div>
 
-            <div class="col border border-primary rounded">
-                <label for="productos" class="p-2">Productos pedido</label>
-                <input type="checkbox" class="detalleOrdenP" name="detalleOrdenP" id="detalleOrdenP" onclick="checkeado(this.form)"/></br></br>
-                <label for="productos" class="p-2">Cantidad:</label>
-                <input type="checkbox" class="cantidadOrdenP" name="cantidadOrdenP" id="cantidadOrdenP"/></br>
-                <label for="productos" class="p-2">Producto:</label>
-                <input type="checkbox" class="productoOrdenP" name="productoOrdenP" id="productoOrdenP"/></br>
-            </div>
+
   
         </div>
     </div>

@@ -148,7 +148,7 @@ class FormDetalleorden(forms.ModelForm):
         model = Detalleorden
         fields = '__all__'
 
-class FormEstadoorden(forms.ModelForm):
+class FormOrdencompra(forms.ModelForm):
     class Meta:
         model = Ordencompra
         fields = '__all__'    
