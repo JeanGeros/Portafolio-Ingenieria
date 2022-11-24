@@ -1,0 +1,101 @@
+{% extends 'layout.html' %}
+{% load widget_tweaks %}
+{% load static %}
+
+{% block content %}
+    <link rel="stylesheet" href="{% static 'css/registro_clientes.css' %}">
+    
+    <div class="container text-end caja rounded mt-5 mb-5">
+        
+        <h1 class="text-center">Crear Nota de credito</h1>
+        
+        <form method="post" action="" class="">
+            {% csrf_token %}        
+
+            <div class="row form-group pb-3 pt-3">
+                <div class="col-md-4"></div>
+                <div class="col-md-4 border border-dark rounded text-center">
+                    <h4>Seleccione como desea crearla:</h4></br>
+                    <input type="radio" name="TipoNotaCredito" value="completa" id="TipoCheck1" onclick="checkeado(this.form)"> Por documento completo</br></br>
+                    <input type="radio" name="TipoNotaCredito" value="parcial" id="TipoCheck2" onclick="checkeado(this.form)"> Por producto</br></br>
+                </div>
+                <div class="col-md-4"></div>
+            </div>
+            
+            <div class="row form-group pb-3 pt-3">
+                <div class="col-md-3"></div>
+                <div class="col-md-6 border border-dark rounded p-3">
+                    
+                    <div class="text-center">
+                        <h4>Seleccione producto:</h4></br>
+                    </div>
+                    <div class="text-start">
+                        {% for detalle in detalles %}
+                            <input type="checkbox" class="m-2 checkbox" id="" onclick="CheckboxSeleccionado(this.form)" value="{{detalle.productoid__precio}}" name="{{detalle.productoid__precio}}">{{detalle.productoid__nombre}}<br>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="col-md-3"></div>
+            </div>
+
+            <button type="submit" id="boton_aceptar" class="btn btn_aceptar border border-secondary text-black" style="margin-right: 10px;">Crear</button>
+            <a href="{% url 'listar_documentos' %}" type="submit" class="btn">Volver</a>
+        </form>
+    </div>
+    
+    <script></script>
+    <script>
+
+        checks = document.getElementsByClassName("checkbox")
+        select = document.getElementById("TipoCheck1")
+        console.log(checks)
+        document.getElementById("TipoCheck1").checked =true;
+
+        for (let item of checks) {
+            item.disabled=true;
+            item.checked=true;
+        }
+        
+        let button = document.getElementById('boton_aceptar')
+
+        function checkeado(form)
+        {
+            if (form.TipoCheck2.checked == true){
+                
+                for (let item of checks) {
+                    item.disabled=false;
+                    item.checked=false;
+                }
+                button.disabled = true;
+            }
+
+            if (form.TipoCheck1.checked == true){
+                for (let item of checks) {
+                    item.disabled=true;
+                    item.checked=true;
+                }
+                button.disabled = false;
+            }
+        }
+
+        function CheckboxSeleccionado(form){
+
+            let cont = 0;
+            checks = document.getElementsByClassName("checkbox")
+
+            for (let item of checks) {
+
+                if (item.checked == true){
+                    cont = cont + 1
+                }
+
+                if (cont >= 1){
+                    button.disabled = false;
+                }
+                else{
+                    button.disabled = true;
+                } 
+            }
+        }
+    </script>
+{% endblock %}

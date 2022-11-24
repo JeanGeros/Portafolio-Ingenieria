@@ -1,0 +1,96 @@
+{% extends 'layout.html' %}
+{% load widget_tweaks %}
+{% load static %}
+
+{% block content %}
+    <link rel="stylesheet" href="{% static 'css/registro_clientes.css' %}">
+    <div class="container text-end caja rounded mt-5">
+        <h1 class="text-center pt-4">Seleccione documento para crear nota de credito</h1>
+
+        <form>
+            Buscar boleta <input id="searchTerm" type="text" onkeyup="doSearch()" /><br><br>
+        </form>
+        {% if boletas != None %}
+            <table id="datos" class="table table-striped table-hover" style="background-color: white">
+                <h3 class="titulo-cliente text-center p-2 mb-0">Boletas</h3>
+                <thead class="table-dark" style="text-align:center">
+                    <tr>
+                        <th>Nro Documento</th>
+                        <th>Fecha</th>
+                        <th>Total</th>
+                        <th>Nro Venta</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody style="text-align:center">
+            
+                    {% for boleta in boletas %}
+                        <tr>
+                            <td>{{ boleta.nroboleta }}</td>
+                            <td>{{ boleta.fechaboleta }}</td>
+                            <td>{{ boleta.totalboleta }}</td>
+                            <td>{{ boleta.nroventa.nroventa }}</td>
+                            <td>{{ boleta.estadoid.descripcion }}</td>
+                            <td>
+                                <form method="POST" action="">
+                                    {% csrf_token %}
+                                    <div class="">
+                                        <input type="hidden" name="id" value="{{boleta.nroboleta}}">
+                                        <input type="hidden" name="documento" value="boleta">
+                                        <button  id="" name="CrearNotaCredito" class="btn btn_aceptar border border-secondary">Seleccionar</button>
+                                    </div>
+                                </form>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    <tr class='noSearch hide'>
+                        <td colspan="5"></td>
+                    </tr>
+                </tbody>
+            </table>
+        {% else %}
+            <table class="table table-striped table-hover "  id="datos" style="background-color: white">
+                <h3 class="titulo-cliente text-center p-2 mb-0">Facturas</h3>
+                <thead  class="table-dark" style="text-align:center">
+                    <tr>
+                        <th>Fecha Creación</th>
+                        <th>Neto</th>
+                        <th>IVA</th>
+                        <th>Total</th>
+                        <th>Nro Venta </th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody style="text-align:center">
+                    {% for factura in facturas %}
+                        <tr>
+                            <td>{{ factura.fechafactura }}</td>
+                            <td>${{ factura.neto }}</td>
+                            <td>${{ factura.iva }}</td>
+                            <td>${{ factura.totalfactura }}</td>
+                            <td>{{ factura.nroventa.nroventa }}</td>
+                            <td>
+                                <form method="POST" action="">
+                                    {% csrf_token %}
+                                    <div class="">
+                                        <input type="hidden" name="id" value="{{factura.numerofactura}}">
+                                        <input type="hidden" name="documento" value="factura">
+                                        <button  id="" name="CrearNotaCredito" class="btn btn_aceptar border border-secondary">Seleccionar</button>
+                                    </div>
+                                </form>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    <tr class='noSearch hide'>
+                        <td colspan="7"></td>
+                    </tr>
+                </tbody>
+            </table>
+        {% endif %}
+        <a href="{% url 'seleccion_documento' %}" type="submit" class="btn">Volver</a>
+  
+    </div>
+    <script src="{% static 'js/buscador_tabla.js' %}"></script>
+
+{% endblock %}

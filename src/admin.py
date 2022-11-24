@@ -3,7 +3,7 @@ from django.contrib import admin
 from .models import (
     Accionpagina, Boleta, Cliente, Comuna, Despacho, Detalleorden, Tipoproducto, Tiporubro,
     Direccion, Empleado, Empresa, Factura, Familiaproducto, Guiadespacho, Notacredito, Direccioncliente,
-    Persona, Producto, Proveedor, Recepcion, Region, Rolusuario, Tipobarrio, Tipodocumento,
+    Persona, Producto, Proveedor, Recepcion, Region, Rolusuario, Tipobarrio, Tipodocumento,Detalleventa, 
     Tipovivienda, Usuario, Venta, Estado, Estadoorden, Ordencompra, Productoproveedor, Bodega, Tipopago
 )
 
@@ -32,6 +32,7 @@ admin.site.register(Proveedor)
 admin.site.register(Recepcion)
 admin.site.register(Region)
 admin.site.register(Rolusuario)
+admin.site.register(Detalleventa)
 admin.site.register(Tipobarrio)
 admin.site.register(Tipodocumento)
 admin.site.register(Tipoproducto)

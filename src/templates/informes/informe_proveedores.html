@@ -1,0 +1,267 @@
+{% extends 'layout.html' %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/informes.css' %}">
+<h1 class="text-center pb-3 pt-5">Crear Informe de Proveedores</h1>
+
+
+<form method="post" action="" class="">
+    {% csrf_token %}
+    <div class="container border border-primary rounded">
+        <label for="productos" class="p-2">Proveedores:</label>
+        <input type="checkbox" class="proveedores" name="proveedores" id="proveedores" onclick="checkeado(this.form)"/></br>
+        <div class="row row-cols-3">
+            <div class="col border border-primary rounded">
+                </br>
+
+
+                <label for="productos" class="p-2">Razon Social:</label>
+                <input type="checkbox" class="razonP" name="razonP" id="razonP"/></br>
+
+                <label for="productos" class="p-2">RUT:</label>
+                <input type="checkbox" class="rutP" name="rutP" id="rutP"/></br>
+
+                <label for="productos" class="p-2">Telefono:</label>
+                <input type="checkbox" class="telefonoP" name="telefonoP" id="telefonoP"/></br>
+
+                <label for="productos" class="p-2">Direccion:</label>
+                <input type="checkbox" class="direccionP" name="direccionP" id="direccionP"/></br>
+            </div>
+
+            <div class="col border border-primary rounded">
+                <label for="productos" class="p-2">Estado proveedor:</label>
+                <input type="checkbox" class="estadoP" name="estadoP" id="estadoP" onclick="checkeado(this.form)"/></br></br>
+                <div class="inputFilter" id="estadoSelect" style="display:none;">
+                    <select class="form-select" type="text" name="estadoProveedorCheck" aria-label="Default select example">
+                        <option selected>----------</option>
+                        <option value="todosP">Todos</option>
+                        <option value="activosP">Activos</option>
+                        <option value="bloqueadosP">Bloqueados</option>
+                        </select>
+                </div>
+            </div>
+
+            <div class="col border border-primary rounded">
+                <label for="productos" class="p-2">Tipo Rubro:</label>
+                <input type="checkbox" class="categoriaP" name="categoriaP" id="categoriaP" onclick="checkeado(this.form)"/></br></br>
+                <div class="inputFilter" id="categoriaSelect" style="display:none;">
+                    <select class="form-select" type="text"  id="categoriaPCheck" name="categoriaPCheck" aria-label="Default select example" onchange="showDivAttid2('categoriaPCheck','rubroid', 'porcategoriaP')">
+                        <option selected>----------</option>
+                        <option value="todosP">Todos</option>
+                        <option value="porcategoriaP">Por Rubro</option>
+                        </select>
+                </div>
+                <br>
+                    {% render_field form1.rubroid class="form-control input border border-secondary" disabled="disabled" name="rubroid" id="rubroid" style="opacity:0"%}
+            </div>
+
+        </div>
+    </div>
+    
+    <!-- seguimiento pagina -->
+
+    <!-- <div class="container border border-primary rounded mt-3">
+        <label for="productos" class="p-2">Visitas a paginas:</label>
+        <input type="checkbox" class="visitas" name="visitas" id="visitas" onclick="checkeado(this.form)"/></br>
+        
+        <div class="row row-cols-2">
+
+            <div class="col border border-primary rounded">
+                <label for="productos" class="p-2">Usuario:</label>
+                <input type="checkbox" class="usuarioPaginaVisitada" name="usuarioPaginaVisitada" id="usuarioPaginaVisitada" onclick="checkeado(this.form)"/></br></br>
+                <input type="radio" name="usuarioVisitasPaginaCheck" value="todosVisitasP" id="usuarioVisitasPaginaCheck1" checked onclick="checkeado(this.form)"> Todos</br></br>
+                <input type="radio" name="usuarioVisitasPaginaCheck" value="porNombreVisitasP" id="usuarioVisitasPaginaCheck2" onclick="checkeado(this.form)"> Por nombre</br>
+                {{ FormSeg.usuario }} 
+                </br></br>
+            </div>
+            
+            <div class="col border border-primary rounded">
+                </br>
+                <label for="productos" class="p-2">Fecha ingreso:</label>
+                <input type="checkbox" class="fechaVisitasP" name="fechaVisitasP" id="fechaVisitasP"/></br>
+
+                <label for="productos" class="p-2">Pagina visitada:</label>
+                <input type="checkbox" class="paginaVisitada" name="paginaVisitada" id="paginaVisitada"/></br>
+            </div>
+    
+        </div>
+    
+    </div>-->
+
+    <div class="container p-3">
+        <div class="row">
+            <div class="col-md-2">
+            </div>
+            <div class="col-md-4 text-center border border-dark rounded">
+                <br>
+                <label for="">Exportar a documento tipo:</label></br></br>
+                <input type="radio" name="informeCheck" value="informeExcel" id="informeCheck1" onclick="checkeado(this.form)"> Excel</br></br>
+                <input type="radio" name="informeCheck" value="informeWord" id="informeCheck2" onclick="checkeado(this.form)"> Word</br></br>
+                <input type="radio" name="informeCheck" value="informePdf" id="informeCheck3" onclick="checkeado(this.form)"> PDF</br><br>
+            </div>
+
+            <div class="col-md-4 text-center border border-dark rounded">
+                <br>
+                <label for="">Para descargar el informe debe seleccionar un formato de documento, para obtener una vista previa del informe solo se puede en formato PDF:</label></br></br>
+                <button type="submit" name="vistaPrevia" value="vistaPrevia" id="vistaPrevia" class="btn btn-primary">Vista previa</button><br><br>
+                <button type="submit" name="descargarInforme" value="descargarInforme" id="descargarInforme" class="btn btn-primary">Descargar</button><br><br>
+            </div>
+            <div class="col-md-2">
+            </div>
+        </div>
+    </div>  
+
+</form>
+
+<script>
+    function showDivAttid(value , status){
+        status === true ? document.getElementById(`${value}`).style.display = 'inline' :  document.getElementById(`${value}`).style.display = 'none'
+    }
+
+    function showDivAttid2(value, idshow, field){
+        console.log(document.getElementById(`${value}`).value)
+        if(document.getElementById(`${value}`).value === field){
+            document.getElementById(`${idshow}`).disabled = false
+            document.getElementById(`${idshow}`).style.opacity = '1'
+        }else{
+            document.getElementById(`${idshow}`).disabled = true
+            document.getElementById(`${idshow}`).style.opacity = '0'
+        }
+    }
+
+</script>
+
+<script language="JavaScript">
+   
+    document.getElementById("razonP").disabled=true;
+    document.getElementById("rutP").disabled=true;
+    document.getElementById("telefonoP").disabled=true;
+    document.getElementById("direccionP").disabled=true;
+    document.getElementById("estadoP").disabled=true;
+    document.getElementById("categoriaP").disabled=true;
+
+    // document.getElementById("usuarioPaginaVisitada").disabled=true;
+    // document.getElementById("usuarioVisitasPaginaCheck1").disabled=true;
+    // document.getElementById("usuarioVisitasPaginaCheck2").disabled=true;
+    // document.getElementById("id_visitas_pagina").disabled=true;
+    // document.getElementById("fechaVisitasP").disabled=true;
+    // document.getElementById("paginaVisitada").disabled=true;
+    
+    // document.getElementById("descargarInforme").disabled=true;
+    // document.getElementById("vistaPrevia").disabled=true;
+
+    // document.getElementById("informeCheck1").disabled=true;
+    // document.getElementById("informeCheck2").disabled=true;
+    // document.getElementById("informeCheck3").disabled=true;
+    
+    function checkeado(form)
+    {
+        //proveedores
+        if (form.proveedores.checked == true){
+            form.telefonoP.disabled = false;
+            form.direccionP.disabled = false;
+            form.estadoP.disabled = false;
+            form.categoriaP.disabled = false;
+            form.razonP.disabled = false
+            form.rutP.disabled = false
+            form.informeCheck1.disabled = false;
+            form.informeCheck2.disabled = false;
+            form.informeCheck3.disabled = false;
+        }
+
+        if (form.proveedores.checked == false || form.proveedores.disabled == true){
+            form.telefonoP.disabled = true;
+            form.direccionP.disabled = true;
+            form.estadoP.disabled = true;
+            form.categoriaP.disabled = true;
+            form.razonP.disabled = true
+            form.rutP.disabled = true
+            form.informeCheck1.disabled = true;
+            form.informeCheck2.disabled = true;
+            form.informeCheck3.disabled = true;
+        }
+
+        if (form.estadoP.checked == true){
+            showDivAttid('estadoSelect', true)
+        }
+
+        if (form.estadoP.checked == false || form.estadoP.disabled == true){
+            showDivAttid('estadoSelect', false)
+        }
+        
+        // if (form.razonSocialP.checked == true){
+        //     showDivAttid('razonSocialSelect', true)
+        // }
+
+        // if (form.razonSocialP.checked == false || form.razonSocialP.disabled == true){
+        //     showDivAttid('razonSocialSelect', false)
+        // }
+
+        if (form.categoriaP.checked == true){
+            showDivAttid('categoriaSelect', true)
+        }
+
+        if (form.categoriaP.checked == false || form.categoriaP.disabled == true){
+            showDivAttid('categoriaSelect', false)
+        }
+
+        //visitas
+        // if (form.visitas.checked == true){
+            
+        //     form.usuarioPaginaVisitada.disabled = false;
+        //     form.fechaVisitasP.disabled = false;
+        //     form.paginaVisitada.disabled = false;
+        // }
+
+        // if (form.visitas.checked == false || form.visitas.disabled == true){
+        //     form.usuarioPaginaVisitada.disabled = true;
+        //     form.fechaVisitasP.disabled = true;
+        //     form.paginaVisitada.disabled = true;
+        // }
+        // //
+        // if (form.usuarioPaginaVisitada.checked == true){
+            
+        //     form.usuarioVisitasPaginaCheck1.disabled = false;
+        //     form.usuarioVisitasPaginaCheck2.disabled = false;
+            
+        // }
+
+        // if (form.usuarioPaginaVisitada.checked == false || form.usuarioPaginaVisitada.disabled == true){
+        //     form.usuarioVisitasPaginaCheck1.disabled = true;
+        //     form.usuarioVisitasPaginaCheck2.disabled = true;
+            
+        // }
+
+        // if (form.usuarioVisitasPaginaCheck2.checked == true){
+        //     form.id_visitas_pagina.disabled = false;
+        // }
+
+        // if (form.usuarioVisitasPaginaCheck1.checked == true){
+        //     form.id_visitas_pagina.disabled = true;
+        // }
+
+
+        //informes
+
+        if (form.informeCheck3.checked == true ){
+            form.descargarInforme.disabled = false;
+            form.vistaPrevia.disabled = false;
+        }
+
+        if (form.informeCheck1.checked == true || form.informeCheck2.checked == true){
+            form.descargarInforme.disabled = false;
+        }
+
+        if (form.informeCheck1.checked == true || form.informeCheck2.checked == true){
+            form.vistaPrevia.disabled = true;
+        }
+    }
+    
+</script>
+
+
+
+<script src="{% static 'js/informes.js' %}"></script>
+{% endblock %}
