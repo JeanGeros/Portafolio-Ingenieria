@@ -10,7 +10,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.views.decorators.csrf import csrf_exempt
 from django.db import connection
 import cx_Oracle
-
+import pandas as pd
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 import sweetify
@@ -63,7 +63,8 @@ from django.contrib import messages
 from src.forms import (
     FormClienteNormal1, FormClienteNormal2, FormClienteNormal3, addproductsForm, FormVendedorPersona,
     FormVendedorUsuario, FormVendedorEmpleado, FormEmpleadoPersona, FormEmpleadoUsuario, FormEmpleadoEmpleado,
-    FormProveedor, FormProductoproveedor, FormBodega, FormClienteEmpresa, FormCliente, FormTipodocumento, FormVenta, FormDocu
+    FormProveedor, FormProductoproveedor, FormBodega, FormClienteEmpresa, FormCliente, FormTipodocumento, FormVenta, FormDocu,
+    FormFamiliaProduct, FormDetalleorden, FormEstadoorden
 )
 
 from .models import (
@@ -2431,7 +2432,10 @@ def Ver_boleta(request):
     productos_boleta = Detalleventa.objects.filter(nroventa = boleta.nroboleta)
     venta = Venta.objects.get(nroventa = boleta.nroventa.nroventa)
     direccion_cliente = Direccioncliente.objects.get(clienteid=venta.clienteid)
-    giro = "persona natural"
+    if venta.clienteid.personaid != None:
+        giro = "persona Natural"
+    else:
+        giro = "Distribuidor Ferreteria"
 
     if request.method == 'POST':
 
@@ -2457,8 +2461,6 @@ def Ver_boleta(request):
 
                 lista2.append(list(valores))
 
-            lista3.append(["Producto","Cantidad","Subtotal"])  
-            val = Detalleventa.objects.filter(nroventa = boleta.nroventa.nroventa).values_list('productoid__nombre','cantidad','subtotal')
 
             for valores in val:
 
@@ -2740,7 +2742,7 @@ def creacion_excel(nombre_archivo, lista, tipo_doc, extension):
 
     return response
 
-def creacion_pdf(lista,tipo_doc,tamaño_pagina, nombre, extension, valor = None):
+def creacion_pdf(lista,tipo_doc,tamaño_pagina, nombre, extension,lista2 = None, valor = None):
     response = HttpResponse(content_type=f'application/{tipo_doc}')  
 
     buff = BytesIO()  
@@ -2773,6 +2775,28 @@ def creacion_pdf(lista,tipo_doc,tamaño_pagina, nombre, extension, valor = None)
     ))  
     
     data.append(t)
+
+    if lista2:
+
+        styles = getSampleStyleSheet()  
+        styles.pageBreakBefore = 2
+        styles = styles['Heading1']
+        styles.alignment = TA_CENTER 
+        header = Paragraph(f" ", styles)  
+        
+        data.append(header)  
+
+        t = Table(lista2)  
+
+        t.setStyle(TableStyle(  
+            [  
+            ('GRID', (0, 0), (12, -1), 1, colors.dodgerblue),  
+            ('LINEBELOW', (0, 0), (-1, 0), 3, colors.darkblue),  
+            ('BACKGROUND', (0, 0), (-1, 0), colors.dodgerblue)  
+            ]  
+        ))  
+        
+        data.append(t)
 
     doc.build(data)  
     response.write(buff.getvalue())   
@@ -2935,6 +2959,24 @@ def generar_factura(c, venta, documento, detalle_venta, direccion_cliente, giro,
             c.drawRightString(6.5*inch,1.7*inch,f'{neto}') #  
             c.drawRightString(6.5*inch,1.5*inch,f'{iva}') # Total 
             c.drawRightString(6.5*inch,1.3*inch,f'{str(documento_venta.totalboleta)}') # Total 
+
+    elif tipo_tributario == 3: #NOTA CREDITO
+        c.setFillColorRGB(1,0,0) # font colour
+        c.setFont("Arial", 14)
+        c.drawString(4.5*inch,9.1*inch,'NOTA DE CREDITO')
+        c.drawString(5*inch,8.7*inch,f'NRO° {documento.nronota}')
+
+        c.setFillColorRGB(0,0,0) # font colour
+        c.setFont("Arial", 11)
+        c.drawString(1.1*inch, 7.5*inch, f"{str(venta.clienteid.personaid.telefono)}")
+        c.drawString(1.05*inch, 8.3*inch, f"{str(venta.clienteid).lower().capitalize()}")
+
+        neto = str(int(documento.total)-(int(documento.total)*0.19))
+        iva = str(int(documento.total)*0.19)
+
+        c.drawRightString(6.5*inch,1.7*inch,f'{neto}') #  
+        c.drawRightString(6.5*inch,1.5*inch,f'{iva}') # Total 
+        c.drawRightString(6.5*inch,1.3*inch,f'{str(documento.total)}') # Total 
 
     c.drawString(0.6*inch, 8.1*inch, f"{giro.lower().capitalize()}")
     c.drawString(1.1*inch, 7.9*inch, f"{str(direccion_cliente.direccionid).lower().capitalize()}")
@@ -3113,7 +3155,10 @@ def crear_venta(request):
                 ultima_factura = Factura.objects.order_by('numerofactura').last()
                 detalle_venta = Detalleventa.objects.filter(nroventa = ultima_factura.nroventa)
                 direccion_cliente = Direccioncliente.objects.get(clienteid=ultima_ventas.clienteid)
-                giro = "persona natural"
+                if ultima_ventas.clienteid.personaid != None:
+                    giro = "persona natural"
+                else:
+                    giro = "Distribuidor Ferreteria"
 
                 if int(tipo_entrega) == 1:
                     Despacho.objects.create(
@@ -3179,7 +3224,10 @@ def crear_venta(request):
                 ultima_boleta = Boleta.objects.order_by('nroboleta').last()
                 detalle_venta = Detalleventa.objects.filter(nroventa = ultima_boleta.nroboleta)
                 direccion_cliente = Direccioncliente.objects.get(clienteid=ultima_ventas.clienteid)
-                giro = "persona natural"
+                if ultima_ventas.clienteid.personaid != None:
+                    giro = "persona natural"
+                else:
+                    giro = "Distribuidor Ferreteria"
 
                 response = HttpResponse(content_type=f'application/pdf')  
                 buff = BytesIO()  
@@ -3307,7 +3355,10 @@ def ver_factura(request):
     venta = Venta.objects.get(nroventa = factura.nroventa.nroventa)
     detalle_venta = Detalleventa.objects.filter(nroventa = factura.nroventa)
     direccion_cliente = Direccioncliente.objects.get(clienteid=factura.nroventa.clienteid)
-    giro = "persona natural"
+    if venta.clienteid.personaid != None:
+        giro = "persona natural"
+    else:
+        giro = "Distribuidor Ferreteria"
 
     if request.method == 'POST':
 
@@ -3319,19 +3370,19 @@ def ver_factura(request):
             lista1 = []
             lista2 = []
             lista3 = []
+
             lista1.append(["Nro Factura","Fecha","Neto","IVA","Total","Estado"])  
             val = Factura.objects.filter(numerofactura = old_post['VerFactura']).values_list('numerofactura','fechafactura','neto','iva','totalfactura','estadoid__descripcion')
-
             for valores in val:
                 lista1.append(list(valores)) 
+
             lista2.append(["Nro Venta","Tipo pago","Run cliente","DV"])  
             val = Factura.objects.filter(numerofactura = old_post['VerFactura']).values_list('nroventa__nroventa','nroventa__tipodocumentoid__descripcion','nroventa__clienteid__personaid__runcuerpo','nroventa__clienteid__personaid__dv')
-
             for valores in val:
                 lista2.append(list(valores))
+
             lista3.append(["Producto","Cantidad","Subtotal"])  
             val = Detalleventa.objects.filter(nroventa = factura.nroventa.nroventa).values_list('productoid__nombre','cantidad','subtotal')
-
             for valores in val:
                 lista3.append(list(valores))
 
@@ -3566,12 +3617,35 @@ def Ver_nota_credito(request):
                 return  creacion_excel(nombre_archivo, lista, tipo_doc, extension)
 
             if tipoInforme == "informePdf":
-                
-                tipo_doc = 'pdf'
-                extension = 'pdf'
-                nombre = 'Compras'
-                
-                return creacion_pdf(lista,tipo_doc,A4,nombre,extension, valor=False)
+
+                response = HttpResponse(content_type=f'application/pdf')  
+                buff = BytesIO()  
+
+                if nota_credito.nroboleta != None:
+                    documento_venta = Boleta.objects.get(nroboleta=nota_credito.nroboleta)
+                else:
+                    documento_venta = Factura.objects.get(numerofactura=nota_credito.numerofactura)
+
+                venta = Venta.objects.get(nroventa = documento_venta.nroventa.nroventa)
+                if venta.clienteid.personaid != None:
+                    giro = "persona Natural"
+                else:
+                    giro = "Distribuidor Ferreteria"
+
+                detalle_venta = []
+                direccion_cliente = Direccioncliente.objects.get(clienteid=documento_venta.nroventa.clienteid)
+
+
+                c = canvas.Canvas(buff, pagesize=letter)
+                c= generar_factura(c, venta, nota_credito, detalle_venta, direccion_cliente, giro, 3)
+                c.showPage()
+                c.save()
+
+                response.write(buff.getvalue())   
+                buff.seek(0)
+
+                return FileResponse(buff, as_attachment=False, filename=f'nota_credito.pdf')
+
 
             if tipoInforme == "informeWord":
 
@@ -3762,3 +3836,1051 @@ def Crear_nota_credito(request):
     }
 
     return render(request, 'notas de credito/crear_nota_credito.html', context)
+
+@login_required(login_url="ingreso")
+def listar_guias_despacho(request):
+    
+    if request.POST.get('VerPerfil') is not None:
+        request.session['_ver_perfil'] = request.POST
+        return redirect('ver_perfil')
+
+    if Usuario.objects.filter(nombreusuario=request.user).exists():
+        tipo_usuario = Usuario.objects.get(nombreusuario=request.user)
+        tipo_usuario = tipo_usuario.rolid.descripcion
+    else: 
+        tipo_usuario = None
+
+    guias_despacho = Guiadespacho.objects.all()
+
+    if request.method == 'POST':
+        if request.POST.get('VerGuiaDespacho') is not None:
+            request.session['_old_post'] = request.POST
+            return HttpResponseRedirect('ver_guia_despacho')
+
+    context = {
+        'guias_despacho': guias_despacho
+    }
+
+    return render(request, 'guias_despacho/listar_guias_despacho.html', context)
+
+def ver_guia_despacho(request):
+
+    if request.POST.get('VerPerfil') is not None:
+        request.session['_ver_perfil'] = request.POST
+        return redirect('ver_perfil')
+
+    if Usuario.objects.filter(nombreusuario=request.user).exists():
+        tipo_usuario = Usuario.objects.get(nombreusuario=request.user)
+        tipo_usuario = tipo_usuario.rolid.descripcion
+    else: 
+        tipo_usuario = None
+
+    old_post = request.session.get('_old_post')
+
+    guia = Guiadespacho.objects.get(nroguia=old_post['VerGuiaDespacho'])
+
+    venta = Venta.objects.get(nroventa = guia.despachoid.nroventa.nroventa)
+    detalle_venta = Detalleventa.objects.filter(nroventa = venta.nroventa)
+    direccion_cliente = Direccioncliente.objects.get(iddircliente=guia.iddircliente.iddircliente)
+    if venta.clienteid.personaid != None:
+        giro = "persona natural"
+    else:
+        giro = "Distribuidor Ferreteria"
+
+    if request.method == 'POST':
+
+        tipoInforme = request.POST.get('informeCheck')
+        descargarInforme = request.POST.get('descargarInforme')
+        
+        if tipoInforme is not None and descargarInforme is not None:
+
+            lista1 = []
+            lista2 = []
+
+            lista1.append(["Folio Documento","Fecha","Direccion"])  
+            val = Guiadespacho.objects.filter(nroguia = old_post['VerGuiaDespacho']).values_list('nroguia','fechaguia','iddircliente__direccionid')
+            print(val)
+            for valores in val:
+                lista1.append(list(valores)) 
+            
+            lista2.append(["Nro Venta","Tipo pago","Run cliente","DV"])  
+            val = Guiadespacho.objects.filter(nroguia = old_post['VerGuiaDespacho']).values_list('despachoid__nroventa__nroventa','despachoid__nroventa__tipodocumentoid__descripcion','despachoid__nroventa__clienteid__personaid__runcuerpo','despachoid__nroventa__clienteid__personaid__dv')
+            for valores in val:
+                lista2.append(list(valores))
+                
+            if tipoInforme == "informeExcel":
+
+                nombre_archivo = "Detalle Guia Despacho"
+                tipo_doc = 'ms-excel'
+                extension = 'xlsx'
+                
+                lista1.append("")
+                lista2.append("")
+
+                lista = lista1 + lista2 
+                
+                return  creacion_excel(nombre_archivo, lista, tipo_doc, extension)
+
+            if tipoInforme == "informePdf":
+                response = HttpResponse(content_type=f'application/pdf')  
+                buff = BytesIO()  
+
+                c = canvas.Canvas(buff, pagesize=letter)
+                c= generar_factura(c, venta, guia, detalle_venta, direccion_cliente, giro, 2)
+                c.showPage()
+                c.save()
+
+                response.write(buff.getvalue())   
+                buff.seek(0)
+
+                return FileResponse(buff, as_attachment=False, filename=f'guia_despacho.pdf')
+
+            if tipoInforme == "informeWord":
+
+                nombre_archivo = "Detalle Guia Despacho"
+                document = Document()
+                document.add_heading('Detalle Guia Despacho', 0)
+
+                filas = 0
+                for x in lista1:
+                    columnas = len(x)
+                    filas += 1
+
+                # add grid table
+                table = document.add_table(rows=filas, cols=columnas, style="Table Grid")
+
+                for x in range(columnas):
+                    table.rows[0].cells[x]._tc.get_or_add_tcPr().append(parse_xml(r'<w:shd {} w:fill="D9D9D9"/>'.format(nsdecls('w'))))
+                
+                # access first row's cells
+                heading_row = table.rows[0].cells
+
+                # add headings
+                cont = 0
+                for value in lista1[0]:
+                    heading_row[cont].text = value
+                    cont += 1
+
+                lista1.pop(0)
+                cont = 0
+                cont2 = 0
+
+                for value in lista1:
+                    cont += 1
+                    data_row = table.rows[cont].cells
+
+                    for x in value:
+                        data_row[cont2].text = f'{x}'
+                        cont2 += 1
+                    cont2 = 0
+
+                document.add_paragraph("")
+
+                # parrafo.add_run().add_break()
+                filas = 0
+                for x in lista2:
+                    columnas = len(x)
+                    filas += 1
+
+                # add grid table
+                table2 = document.add_table(rows=filas, cols=columnas, style="Table Grid")
+
+                for x in range(columnas):
+                    table2.rows[0].cells[x]._tc.get_or_add_tcPr().append(parse_xml(r'<w:shd {} w:fill="D9D9D9"/>'.format(nsdecls('w'))))
+
+                # access first row's cells
+                heading_row = table2.rows[0].cells
+
+                # add headings
+                cont = 0
+                for value in lista2[0]:
+                    heading_row[cont].text = value
+                    cont += 1
+
+                lista2.pop(0)
+                cont = 0
+                cont2 = 0
+
+                for value in lista2:
+                    cont += 1
+                    data_row = table2.rows[cont].cells
+
+                    for x in value:
+                        data_row[cont2].text = f'{x}'
+                        cont2 += 1
+                    cont2 = 0 
+
+                document.add_paragraph("")
+
+                filas = 0
+
+                response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document')
+                response['Content-Disposition'] = f'attachment; filename={nombre_archivo}.docx'
+                document.save(response)
+
+                return response
+
+
+    context = {
+        'guia': guia,
+        'tipo_usuario': tipo_usuario,
+    }
+
+    return render(request, 'guias_despacho/ver_guia_despacho.html', context)
+
+def informe_productos(request):
+    
+    form1 = addproductsForm(request.POST)
+
+    if request.method == 'POST':
+        vistaPrevia = request.POST.get('vistaPrevia')
+        descargarInforme = request.POST.get('descargarInforme')
+        productos = request.POST.get('productos')
+        precio = request.POST.get('precio')
+        nombre = request.POST.get('nombre')
+        precioCompra = request.POST.get('precioCompra')
+        stockCritico = request.POST.get('stockCritico')
+        fechaVencimiento = request.POST.get('fechaVencimiento')
+        codigoBarra = request.POST.get('codigoBarra')
+        stock_producto = request.POST.get('stock')
+        stockCheck = request.POST.get('stockCheck')
+        estado = request.POST.get('estado')
+        estadoCheck = request.POST.get('estadoCheck')
+        familiaProducto = request.POST.get('familiaProducto')
+        familiaProductoCheck = request.POST.get('familiaProductoCheck')
+        nomFamiliaProducto = request.POST.get('familia_producto')
+        tipoProducto = request.POST.get('tipoProducto')
+        nomTipoProducto = request.POST.get('tipo_producto')
+        tipoProductoCheck = request.POST.get('tipoProductoCheck')
+        familiaproid = request.POST.get('familiaproid')
+        tipoproductoid = request.POST.get('tipoproductoid')
+        
+        print("-----VALORES PRODUCTOS-----")
+        print(f"vistaPrevia: {vistaPrevia}" )
+        print(f"descargarInforme: {descargarInforme}" )
+        print(f"productos: {productos}" )
+        print(f"precio: {precio}" )
+        print(f"nombre: {nombre}" )
+        print(f"precioCompra: {precioCompra}" )
+        print(f"stockCritico: {stockCritico}" )
+        print(f"fechaVencimiento: {fechaVencimiento}" )
+        print(f"codigoBarra: {codigoBarra}" )
+        print(f"stock: {stock_producto}" )
+        print(f"stockCheck: {stockCheck}" )
+        print("----------------------")
+        print(f"estado: {estado}" )
+        print(f"estadoCheck: {estadoCheck}" )
+        print("----------------------")
+        print(f"familiaProducto: {familiaProducto}" )
+        print(f"familiaProductoCheck: {familiaProductoCheck}" )
+        print("----------------------")
+        print(f"nomFamiliaProducto: {nomFamiliaProducto}" )
+        print(f"tipoProducto: {tipoProducto}" )
+        print("----------------------")
+        print(f"nomTipoProducto: {nomTipoProducto}" )
+        print(f"tipoProductoCheck: {tipoProductoCheck}" )
+        print("----------------------")
+        print(f"familiaproid: {familiaproid}" )
+        print(f"tipoproductoid: {tipoproductoid}" )
+        
+
+        lista = []
+        visitas = []
+
+        tipoInforme = request.POST.get('informeCheck')
+        
+        np_array = []
+        np_array = np.array(lista)
+
+        if productos == "on":
+            productos = Producto.objects.filter().values_list("nombre","precio","stock","stockcritico","fechavencimiento","codigo","familiaproid__descripcion","tipoproductoid__descripcion","estadoid__descripcion","bodegaid__pasillo","bodegaid__estante","bodegaid__casillero").order_by("productoid")
+            if stockCheck == "conStock":
+                productos = productos.filter(stock__gt=0)
+            if stockCheck == "sinStock":
+                productos = productos.filter(stock__lt=0)
+            if estadoCheck == "disponible":
+                productos = productos.filter(estadoid__estadoid=1)
+            if estadoCheck == "noDisponible":
+                productos = productos.filter(estadoid__estadoid=2)
+            if familiaProductoCheck == "porNombreF":
+                productos = productos.filter(familiaproid__familiaproid = familiaproid)
+            if tipoProductoCheck == "porNombreT":
+                productos = productos.filter(tipoproductoid__tipoproductoid = tipoproductoid)
+            columnas = (["Nombre","Precio","Stock","Stock Critico","Fecha Vencimiento","Codigo","Familia Producto","Tipo Producto","Estado","Pasillo","Estante","Casillero"])
+ 
+            np_array = np.array(productos)
+            df = pd.DataFrame(np_array, columns = columnas)
+            df["Bodega"] = "Pasillo:" +df["Pasillo"] + " Estante:" + df["Estante"]+ " Casillero:" + df["Casillero"]
+            df = df.drop(['Pasillo'], axis=1)
+            df = df.drop(['Estante'], axis=1)
+            df = df.drop(['Casillero'], axis=1)
+
+            if nombre == None:
+                df = df.drop(['Nombre'], axis=1)
+            if precio == None:
+                df = df.drop(['Precio'], axis=1)
+            if stock_producto == None:
+                df = df.drop(['Stock'], axis=1)
+            if stockCritico == None:
+                df = df.drop(['Stock Critico'], axis=1)
+            if estado == None:
+                df = df.drop(['Estado'], axis=1)
+            if fechaVencimiento == None:
+                df = df.drop(['Fecha Vencimiento'], axis=1)
+            if codigoBarra == None:
+                df = df.drop(['Codigo'], axis=1)
+            if codigoBarra == None:
+                df = df.drop(['Bodega'], axis=1)
+            if familiaProducto == None:
+                df = df.drop(['Familia Producto'], axis=1)
+            if tipoProducto == None:
+                df = df.drop(['Tipo Producto'], axis=1)
+
+            if df.shape[1] > 6:
+                length_dataframe = df.shape[1]
+                df2= df.iloc[:, 6:int(length_dataframe)] 
+                df= df.iloc[:, 0:6]
+
+                lista_productos2 = df2.values.tolist() 
+                columnas_df2 = df2.columns.values.tolist() 
+                lista_productos2.insert(0, columnas_df2)
+
+                lista_productos = df.values.tolist() 
+                columnas_df = df.columns.values.tolist() 
+                lista_productos.insert(0, columnas_df)
+            else:
+                lista_productos = df.values.tolist() 
+                columnas_df = df.columns.values.tolist() 
+                lista_productos.insert(0, columnas_df)
+
+            if tipoInforme == "informeExcel":
+                
+                nombre_archivo = "Productos"
+                if visitas == []:
+                    return  creacion_excel(nombre_archivo, lista)
+                else:
+                    return  creacion_excel(nombre_archivo, lista, visitas)
+
+            if tipoInforme == "informePdf":
+
+                tipo_doc = 'pdf'
+                extension = 'pdf'
+                nombre = 'Informe Productos'
+                if df.shape[1] > 6:
+                    return creacion_pdf(lista_productos,tipo_doc,A4,nombre,extension, lista_productos2, valor=False)
+                else:
+                    return creacion_pdf(lista_productos,tipo_doc,A4,nombre,extension,valor=False)
+
+            if tipoInforme == "informeWord": 
+
+                tipo_doc = 'ms-word'
+                extension = 'docx'
+                
+                nombre = 'Productos'
+                if vistaPrevia:
+                    if visitas == []:
+                        
+                        return creacion_doc(lista_productos,nombre)
+                    else:
+                        return creacion_doc(lista_productos,nombre)
+                else:
+                    if visitas == []:
+                        return creacion_doc(lista_productos,nombre)
+                    else:
+                        return creacion_doc(lista_productos,nombre)
+
+    context = {
+        'form1': form1
+    }
+
+    return render(request, 'informes/informe_productos.html', context)
+
+def informe_proveedores(request):
+    form1 = FormProveedor(request.POST)
+
+    if request.method == 'POST':
+        vistaPrevia = request.POST.get('vistaPrevia')
+        proveedores = request.POST.get('proveedores')
+        correoP = request.POST.get('correoP')
+        telefonoP = request.POST.get('telefonoP')
+        direccionP = request.POST.get('direccionP')
+        estadoP = request.POST.get('estadoP')
+        estadoProveedorCheck = request.POST.get('estadoProveedorCheck')
+        nomProveedor = request.POST.get('proveedor')
+        categoriaP = request.POST.get('categoriaP')
+        categoriaPCheck = request.POST.get('categoriaPCheck')
+        nomCategoria = request.POST.get('categoria_proveedor')
+        rubroid = request.POST.get('rubroid')
+
+
+
+        print("-----VALORES PRODUCTOS-----")
+        print(f"vistaPrevia: {vistaPrevia}" )
+        print(f"proveedores: {proveedores}" )
+        print(f"telefonoP: {telefonoP}" )
+        print(f"direccionP: {direccionP}" )
+        print(f"estadoP: {estadoP}" )
+        print(f"estadoProveedorCheck: {estadoProveedorCheck}" )
+        print(f"nomProveedor: {nomProveedor}" )
+        print(f"categoriaP: {categoriaP}" )
+        print(f"categoriaPCheck: {categoriaPCheck}" )
+        print(f"nomCategoria: {nomCategoria}" )
+        print(f"rubroid: {rubroid}" )
+
+        lista = []
+        visitas = []
+
+        tipoInforme = request.POST.get('informeCheck')
+        
+        np_array = []
+        np_array = np.array(lista)
+
+        if proveedores == "on":
+            proveedores = Proveedor.objects.all().values_list("razonsocial","rutcuerpo","dv","fono","rubroid__descripcion","direccionid__calle","direccionid__numero","direccionid__comunaid__nombre","estadoid__descripcion").order_by("proveedorid")
+            columnas = (["Razon Social","RUN", "DV", "Telefono", "Rubro","calle","numero","comuna","Estado"])
+
+            if estadoProveedorCheck == "activosP":
+                proveedores = proveedores.filter(estadoid__estadoid=1)
+            if estadoProveedorCheck == "bloqueadosP":
+                proveedores = proveedores.filter(estadoid__estadoid=2)
+            if categoriaPCheck == "porcategoriaP":
+                proveedores = proveedores.filter(rubroid__rubroid = rubroid)
+                
+            np_array = np.array(proveedores)
+            df = pd.DataFrame(np_array, columns = columnas)
+
+            df["Direccion"] = df["calle"] + " " + df["numero"] + "," + df["comuna"]
+            df = df.drop(['calle'], axis=1)
+            df = df.drop(['numero'], axis=1)
+            df = df.drop(['comuna'], axis=1)
+
+            if telefonoP == None:
+                df = df.drop(['Telefono'], axis=1)
+            if direccionP == None:
+                df = df.drop(['Direccion'], axis=1)
+
+            if df.shape[1] > 6:
+                length_dataframe = df.shape[1]
+                df2 = df.iloc[:, 6:int(length_dataframe)] 
+                df = df.iloc[:, 0:6]
+
+                lista_proveedores2 = df2.values.tolist() 
+                columnas_df2 = df2.columns.values.tolist() 
+                lista_proveedores2.insert(0, columnas_df2)
+
+                lista_proveedores = df.values.tolist() 
+                columnas_df = df.columns.values.tolist() 
+                lista_proveedores.insert(0, columnas_df)
+            else:
+                lista_proveedores = df.values.tolist() 
+                columnas_df = df.columns.values.tolist() 
+                lista_proveedores.insert(0, columnas_df)
+
+            if tipoInforme == "informeExcel":
+                
+                nombre_archivo = "Proveedores"
+                if visitas == []:
+                    return  creacion_excel(nombre_archivo, lista_proveedores)
+                else:
+                    return  creacion_excel(nombre_archivo, lista_proveedores, visitas)
+                
+            if tipoInforme == "informePdf":
+
+                tipo_doc = 'pdf'
+                extension = 'pdf'
+                nombre = 'Informe Proveedores'
+                if df.shape[1] >= 6:
+                    return creacion_pdf(lista_proveedores,tipo_doc,A4,nombre,extension, lista_proveedores2, valor=False)
+                else:
+                    return creacion_pdf(lista_proveedores,tipo_doc,A4,nombre,extension,valor=False)
+
+            if tipoInforme == "informeWord": 
+
+                tipo_doc = 'ms-word'
+                extension = 'docx'
+                
+                nombre = 'Proveedores'
+                if vistaPrevia:
+                    if visitas == []:
+                        return creacion_doc(lista_proveedores,nombre)
+                    else:
+                        return creacion_doc(lista_proveedores,nombre)
+                else:
+                    if visitas == []:
+                        return creacion_doc(lista_proveedores,nombre)
+                    else:
+                        return creacion_doc(lista_proveedores,nombre)
+
+    context = {
+        'form1':form1
+    }
+
+    return render(request, 'informes/informe_proveedores.html', context)
+
+def informe_pedidos(request):
+    
+    form1 = FormEstadoorden(request.POST)
+
+    if request.method == 'POST':
+        ordenes = request.POST.get('ordenes')
+        fechaOrdenP = request.POST.get('fechaOrdenP')
+        fechaLlegadaOrdenP = request.POST.get('fechaLlegadaOrdenP')
+        fechaRecepOrdenP = request.POST.get('fechaRecepOrdenP')
+        horaRecepOrdenP = request.POST.get('horaRecepOrdenP')
+        cantidadOrdenP = request.POST.get('cantidadOrdenP')
+        productoOrdenP = request.POST.get('productoOrdenP')
+
+        estadoRecepcionO = request.POST.get('estadoRecepcionO')
+        estadoOrdenPCheck = request.POST.get('estadoOrdenPCheck')
+        razonSocialOrdenP = request.POST.get('razonSocialOrdenP')
+        razonSocialOrdenPCheck = request.POST.get('razonSocialOrdenPCheck')
+        nomProveedor = request.POST.get('proveedor')
+        tipoInforme = request.POST.get('informeCheck')
+        vistaPrevia = request.POST.get('vistaPrevia')
+        visitasPagina = request.POST.get('visitas')
+  
+        print("-----VALORES PRODUCTOS-----")
+        print(f"ordenes: {ordenes}" )
+        print(f"fechaOrdenP: {fechaOrdenP}" )
+        print(f"fechaLlegadaOrdenP: {fechaLlegadaOrdenP}" )
+        print(f"fechaRecepOrdenP: {fechaRecepOrdenP}" )
+        print(f"horaRecepOrdenP: {horaRecepOrdenP}" )
+        print(f"cantidadOrdenP: {cantidadOrdenP}" )
+        print(f"productoOrdenP: {productoOrdenP}" )
+        print(f"estadoRecepcionO: {estadoRecepcionO}" )
+        print(f"estadoOrdenPCheck: {estadoOrdenPCheck}" )
+        print(f"razonSocialOrdenP: {razonSocialOrdenP}" )
+        print(f"razonSocialOrdenPCheck: {razonSocialOrdenPCheck}" )
+        print(f"nomProveedor: {nomProveedor}" )
+        print(f"tipoInforme: {tipoInforme}" )
+
+        nomProveedor = Proveedor.objects.filter(proveedorid = nomProveedor)
+        for us in nomProveedor:
+            nomProveedor = us.razonsocial
+        
+        lista = []
+        visitas = []
+
+        tipoInforme = request.POST.get('informeCheck')
+        
+        np_array = []
+        np_array = np.array(lista)
+
+        if ordenes == "on":
+            ordenes = Detalleorden.objects.all().values_list("ordenid__proveedorid__razonsocial","ordenid__fechapedido","ordenid__estadoordenid__descripcion","productoid__nombre","cantidad").order_by("detalleid")
+            # ("orden_pedido__fecha_llegada","orden_pedido__fecha_recepcion","orden_pedido__hora_recepcion","cantidad").order_by("id")
+            columnas = (["Razon Social","Fecha Pedido", "Estado", "Producto", "Cantidad"])
+
+            if estadoOrdenPCheck == "enEsperaOrden":
+                ordenes1 = ordenes.filter(ordenid__estadoordenid__descripcion="Solicitado")
+                ordenes = ordenes.filter(ordenid__estadoordenid__descripcion="Productos Pendientes") 
+                ordenes+=ordenes1
+            if estadoOrdenPCheck == "recepcionadoOrden":
+                ordenes = ordenes.filter(ordenid__estadoordenid__descripcion="Aceptado")
+            if razonSocialOrdenPCheck == "porRazonSocialOrdenP":
+                ordenes = ordenes.order_by("ordenid__proveedorid__razonsocial")
+
+            np_array = np.array(ordenes)
+            df = pd.DataFrame(np_array, columns = columnas)
+            print(df)
+
+            if cantidadOrdenP == None:
+                df = df.drop(['Cantidad'], axis=1)
+            if productoOrdenP == None:
+                df = df.drop(['Producto'], axis=1)
+
+            lista_proveedores = df.values.tolist() 
+            columnas_df = df.columns.values.tolist() 
+            lista_proveedores.insert(0, columnas_df)
+            if tipoInforme == "informeExcel":
+                nombre_archivo = "Pedidos"
+                if visitas == []:
+                    return  creacion_excel(nombre_archivo, lista_proveedores)
+                else:
+                    return  creacion_excel(nombre_archivo, lista_proveedores, visitas)
+            if tipoInforme == "informePdf":
+                tipo_doc = 'pdf'
+                extension = 'pdf'
+                nombre = 'Informe Pedidos'
+                return creacion_pdf(lista_proveedores,tipo_doc,A4,nombre,extension, valor=False)
+
+            if tipoInforme == "informeWord": 
+                tipo_doc = 'ms-word'
+                extension = 'docx'
+                nombre = 'Pedidos'
+                if vistaPrevia:
+                    if visitas == []:
+                        return creacion_doc(lista_proveedores,nombre)
+                    else:
+                        return creacion_doc(lista_proveedores,nombre)
+                else:
+                    if visitas == []:
+                        return creacion_doc(lista_proveedores,nombre)
+                    else:
+                        return creacion_doc(lista_proveedores,nombre)
+
+    context = {
+        'form1':form1
+    }
+
+    return render(request, 'informes/informe_pedidos.html', context)
+
+# @login_required(login_url="login")
+# def CreacionInformesProductos(request):
+
+#     usuario = request.user
+#     usuario = User.objects.get(username=usuario)
+
+#     seguimientoPag = SEGUIMIENTO_PAGINA.objects.create(
+#         pagina_visitada = "Crear informe de productos",
+#         usuario = usuario
+#     )
+#     seguimientoPag.save()
+
+#     formP = FormProducto()
+#     formT = FormFamiliaProd()
+#     formU = FormBoleta()
+#     formC = FormClientesParaVenta()
+#     formCliente = FormClientesInforme()
+#     formProveedor = FormProductoProv()
+#     formCatProv = FormProveedor()
+#     formProveeOrden = FormInformeOrdenPedido()
+#     FormSeg = FormSeguimientoPagina()
+
+#     if request.method == 'POST':
+
+#         vistaPrevia = request.POST.get('vistaPrevia')
+#         descargarInforme = request.POST.get('descargarInforme')
+ 
+#         productos = request.POST.get('productos')
+#         precio = request.POST.get('precio')
+#         descripcion = request.POST.get('descripcion')
+#         nombre = request.POST.get('nombre')
+#         precioCompra = request.POST.get('precioCompra')
+#         stockCritico = request.POST.get('stockCritico')
+    
+#         fechaVencimiento = request.POST.get('fechaVencimiento')
+#         codigoBarra = request.POST.get('codigoBarra')
+
+#         stock = request.POST.get('stock')
+#         stockCheck = request.POST.get('stockCheck')
+
+#         estado = request.POST.get('estado')
+#         estadoCheck = request.POST.get('estadoCheck')
+
+#         familiaProducto = request.POST.get('familiaProducto')
+#         familiaProductoCheck = request.POST.get('familiaProductoCheck')
+#         nomFamiliaProducto = request.POST.get('familia_producto')
+#         nomFamiliaProducto = FAMILIA_PRODUCTO.objects.filter(id = nomFamiliaProducto)
+#         for fam in nomFamiliaProducto:
+#             nomFamiliaProducto = fam.descripcion
+        
+#         tipoProducto = request.POST.get('tipoProducto')
+#         tipoProductoCheck = request.POST.get('tipoProductoCheck')
+#         nomTipoProducto = request.POST.get('tipo_producto')
+#         nomTipoProducto = TIPO_PRODUCTO.objects.filter(id = nomTipoProducto)
+#         for tip in nomTipoProducto:
+#             nomTipoProducto = tip.descripcion
+
+#         visitasPagina = request.POST.get('visitas')
+
+#         lista = []
+#         visitas = []
+
+#         tipoInforme = request.POST.get('informeCheck')
+
+#         if productos == "on":
+#             val = PRODUCTO.objects.all().values_list("id","nombre","precio","descripcion","precio_compra","stock", "stock_critico","estado","fecha_vencimiento","codigo_barra","familia_producto__descripcion","familia_producto__tipo_producto__descripcion").order_by("id")
+#             lista.append(["id","nombre","precio","descripcion","precio_compra","stock", "stock_critico","estado","fecha_vencimiento","codigo_barra","familia_producto","tipo_producto"])
+
+#             for valores in val:
+
+#                 lista.append(list(valores))
+
+#             if nombre == None:
+#                 np_array = np.array(lista)
+#                 val = np.where(np_array == "nombre")
+#                 val = int(val[1])
+
+#                 for valor in lista:
+
+#                     valor.pop(val)
+
+
+#             if descripcion == None:
+
+#                 np_array = np.array(lista)
+#                 val = np.where(np_array == "descripcion")
+#                 val = int(val[1])
+
+#                 for valor in lista:
+
+#                     valor.pop(val)
+
+#             if precio == None:
+
+#                 np_array = np.array(lista)
+#                 val = np.where(np_array == "precio")
+#                 val = int(val[1])
+
+#                 for valor in lista:
+
+#                     valor.pop(val)
+
+
+#             if precioCompra == None:
+
+#                 np_array = np.array(lista)
+#                 val = np.where(np_array == "precio_compra")
+#                 val = int(val[1])
+
+#                 for valor in lista:
+
+#                     valor.pop(val)
+
+#             if stockCritico == None:
+#                 np_array = np.array(lista)
+#                 val = np.where(np_array == "stock_critico")
+#                 val = int(val[1])
+                
+#                 for valor in lista:
+
+#                     valor.pop(val)
+
+#             if estado == None:
+#                 np_array = np.array(lista)
+#                 val = np.where(np_array == "estado")
+#                 val = int(val[1])
+                
+#                 for valor in lista:
+
+#                     valor.pop(val)
+
+#             if fechaVencimiento == None:
+
+#                 np_array = np.array(lista)
+#                 val = np.where(np_array == "fecha_vencimiento")
+#                 val = int(val[1])
+
+#                 for valor in lista:
+
+#                     valor.pop(val)
+
+#             if codigoBarra == None:
+
+#                 np_array = np.array(lista)
+#                 val = np.where(np_array == "codigo_barra")
+#                 val = int(val[1])
+
+#                 for valor in lista:
+
+#                     valor.pop(val)
+
+#             if stock == None:
+#                 np_array = np.array(lista)
+#                 val = np.where(np_array == "stock")
+#                 val = int(val[1])
+#                 for valor in lista:
+
+#                     valor.pop(val)
+
+#             if familiaProducto == None:
+
+#                 np_array = np.array(lista)
+#                 val = np.where(np_array == "familia_producto")
+#                 val = int(val[1])
+
+#                 for valor in lista:
+
+#                     valor.pop(val)
+
+#             if tipoProducto == None:
+
+#                 np_array = np.array(lista)
+#                 val = np.where(np_array == "tipo_producto")
+#                 val = int(val[1])
+
+#                 for valor in lista:
+
+#                     valor.pop(val)
+
+#             np_array = []
+#             np_array = np.array(lista)
+#             np_arrayProd = np.array(lista)
+
+#             if stockCheck == "conStock":
+#                 np_array = np.array(lista)
+#                 val = np.where(np_array == "stock")
+#                 val = int(val[1])
+#                 cont = 0
+
+#                 for valores in lista:
+#                     numero = np_arrayProd[cont][val]
+#                     print(numero)
+#                     if cont > 0:
+
+#                         if int(numero) < 1:
+                           
+#                             np_arrayProd = np.delete(np_arrayProd, cont, axis=0)
+#                             cont = cont - 1
+                            
+#                     cont += 1
+
+#             lista = []
+#             np_array = []
+#             lista = np_arrayProd.tolist()
+#             np_arrayProd = np.array(lista)
+#             np_array = np.array(lista)
+
+#             if stockCheck == "sinStock":
+#                 np_array = np.array(lista)
+#                 val = np.where(np_array == "stock")
+#                 val = int(val[1])
+#                 cont = 0
+                
+#                 for valores in lista:
+                    
+#                     numero = np_arrayProd[cont][val]
+                    
+#                     if cont > 0:
+
+#                         if int(numero) > 0:
+                            
+#                             np_arrayProd = np.delete(np_arrayProd, cont, axis=0)
+#                             cont = cont - 1 
+                            
+#                     cont += 1
+                            
+#             lista = []
+#             np_array = []
+#             lista = np_arrayProd.tolist()
+#             np_arrayProd = np.array(lista)
+
+#             if estadoCheck == "disponible":
+#                 np_array = np.array(lista)
+#                 val = np.where(np_array == "estado")
+#                 val = int(val[1])
+#                 cont = 0
+
+#                 for valores in lista:
+                    
+#                     numero = np_arrayProd[cont][val]
+                    
+#                     if cont > 0:
+
+#                         if int(numero) < 1:
+                            
+#                             np_arrayProd = np.delete(np_arrayProd, cont, axis=0)
+#                             cont = cont - 1 
+                            
+#                     cont += 1
+                            
+#             lista = []
+#             np_array = []
+#             lista = np_arrayProd.tolist()
+#             np_arrayProd = np.array(lista)
+
+#             if estadoCheck == "noDisponible":
+#                 np_array = np.array(lista)
+#                 val = np.where(np_array == "estado")
+#                 val = int(val[1])
+#                 cont = 0
+
+#                 for valores in lista:
+                    
+#                     numero = np_arrayProd[cont][val]
+                    
+#                     if cont > 0:
+
+#                         if int(numero) > 0:
+                            
+#                             np_arrayProd = np.delete(np_arrayProd, cont, axis=0)
+#                             cont = cont - 1 
+                            
+#                     cont += 1
+                            
+#             lista = []
+#             np_array = []
+#             lista = np_arrayProd.tolist()
+#             np_arrayProd = np.array(lista)
+
+#             if familiaProductoCheck == "porNombreF":
+#                 np_array = np.array(lista)
+#                 val = np.where(np_array == "familia_producto")
+#                 val = int(val[1])
+#                 cont = 0
+
+#                 for valores in lista:
+                    
+#                     nombre = np_arrayProd[cont][val]
+                    
+#                     if cont > 0:
+
+#                         if nombre != nomFamiliaProducto:
+                            
+#                             np_arrayProd = np.delete(np_arrayProd, cont, axis=0)
+#                             cont = cont - 1 
+                            
+#                     cont += 1
+                            
+#             lista = []
+#             np_array = []
+#             lista = np_arrayProd.tolist()
+#             np_arrayProd = np.array(lista)
+
+#             if tipoProductoCheck == "porNombreT":
+#                 np_array = np.array(lista)
+#                 val = np.where(np_array == "tipo_producto")
+#                 val = int(val[1])
+#                 cont = 0
+
+#                 for valores in lista:
+                    
+#                     nombre = np_arrayProd[cont][val]
+                    
+#                     if cont > 0:
+
+#                         if nombre != nomTipoProducto:
+                            
+#                             np_arrayProd = np.delete(np_arrayProd, cont, axis=0)
+#                             cont = cont - 1 
+                            
+#                     cont += 1
+                            
+#             lista = []
+#             np_array = []
+#             lista = np_arrayProd.tolist()
+#             np_arrayProd = np.array(lista)
+
+#         if visitasPagina == "on":
+            
+#             paginaVisitada = request.POST.get('paginaVisitada')
+#             fechaVisitasP = request.POST.get('fechaVisitasP')
+
+#             usuarioVisitasPagina = request.POST.get('usuarioPaginaVisitada')
+#             usuarioVisitas = request.POST.get('usuarioVisitasPaginasCheck')
+#             nomUsuario = request.POST.get('usuario')
+#             nomUsuario = User.objects.filter(id = nomUsuario)
+#             for us in nomUsuario:
+#                 nomUsuario = us.username
+
+#             val = SEGUIMIENTO_PAGINA.objects.all().values_list("id","pagina_visitada","fecha_ingreso","usuario__username").order_by("id")
+#             visitas.append(["id","pagina_visitada","fecha_ingreso","usuario"])
+            
+#             for valores in val:
+
+#                 visitas.append(list(valores))
+
+#             if paginaVisitada == None:
+#                 np_array = np.array(visitas)
+#                 val = np.where(np_array == "pagina_visitada")
+#                 val = int(val[1])
+
+#                 for valor in visitas:
+
+#                     valor.pop(val)
+
+#             if fechaVisitasP == None:
+#                 np_array = np.array(visitas)
+#                 val = np.where(np_array == "fecha_ingreso")
+#                 val = int(val[1])
+
+#                 for valor in visitas:
+
+#                     valor.pop(val)
+
+#             if usuarioVisitasPagina == None:
+#                 np_array = np.array(visitas)
+#                 val = np.where(np_array == "usuario")
+#                 val = int(val[1])
+
+#                 for valor in visitas:
+
+#                     valor.pop(val)
+
+#             np_array = []
+#             np_array = np.array(visitas)
+#             np_arrayProd = np.array(visitas)
+            
+#             if usuarioVisitas == "porNombreVisitasP":
+#                 np_array = np.array(visitas)
+#                 val = np.where(np_array == "usuario")
+#                 val = int(val[1])
+#                 cont = 0
+
+#                 for valores in visitas:
+                    
+#                     nombre = np_arrayProd[cont][val]
+                    
+#                     if cont > 0:
+
+#                         if nombre != nomUsuario:
+                            
+#                             np_arrayProd = np.delete(np_arrayProd, cont, axis=0)
+#                             cont = cont - 1 
+                            
+#                     cont += 1
+
+#             visitas = []
+#             np_array = []
+#             visitas = np_arrayProd.tolist()
+#             np_arrayProd = np.array(visitas)
+
+#         if tipoInforme == "informeExcel":
+            
+#             nombre_archivo = "Productos"
+#             if visitas == []:
+#                 return  creacion_excel(nombre_archivo, lista)
+#             else:
+#                 return  creacion_excel(nombre_archivo, lista, visitas)
+            
+
+#         if tipoInforme == "informePdf":
+
+#             tipo_doc = 'pdf'
+#             extension = 'pdf'
+            
+#             nombre = 'Productos'
+            
+#             if vistaPrevia:
+#                 if visitas == []:
+#                     return creacion_doc(lista,tipo_doc,A2,nombre,extension, valor=False)
+#                 else:
+#                     return creacion_doc(lista,tipo_doc,A2,nombre,extension, valor=False, visitas=visitas)
+#             else:
+#                 if visitas == []:
+#                     return creacion_doc(lista,tipo_doc,A2,nombre,extension, valor=True)
+#                 else:
+#                     return creacion_doc(lista,tipo_doc,A2,nombre,extension, valor=True, visitas=visitas)
+ 
+#         if tipoInforme == "informeWord": 
+
+#             tipo_doc = 'ms-word'
+#             extension = 'docx'
+            
+#             nombre = 'Productos'
+#             if vistaPrevia:
+#                 if visitas == []:
+#                     return creacion_doc(lista,tipo_doc,A2,nombre,extension, valor=False)
+#                 else:
+#                     return creacion_doc(lista,tipo_doc,A2,nombre,extension, valor=False, visitas=visitas)
+#             else:
+#                 if visitas == []:
+#                     return creacion_doc(lista,tipo_doc,A2,nombre,extension, valor=True)
+#                 else:
+#                     return creacion_doc(lista,tipo_doc,A2,nombre,extension, valor=True, visitas=visitas)
+
+#     context = {
+#         'formP':formP,
+#         'formT':formT,
+#         'formU':formU,
+#         'formC':formC,
+#         'formCliente':formCliente,
+#         'formProveedor':formProveedor,
+#         'formCatProv':formCatProv,
+#         'formProveeOrden':formProveeOrden,
+        
+#         'FormSeg':FormSeg,
+
+#     }
+#     return render(request, 'informes/informe_productos.html', context)
