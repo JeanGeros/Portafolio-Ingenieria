@@ -58,8 +58,8 @@ urlpatterns = [
     path('proveedores/agregar_proveedor/', views.Agregar_proveedor, name="agregar_proveedor"),
     path('proveedores/ver_proveedor', views.Ver_proveedor, name="ver_proveedor"),
     path('proveedores/editar_proveedor', views.Editar_proveedor, name="editar_proveedor"),
-    path('proveedor/listar_ordenes', views.Listar_Ordenes, name="listar_ordenes"),
-    #path('proveedor/ver_Orden', views.ver_Orden, name="ver_Orden"),
+    path('proveedores/listar_ordenes/', views.Listar_orden, name="orden_compra"),
+    path('proveedores/listar_ordenes/ver_orden', views.Ver_orden, name="ver_orden"),
     
     path('empleados/', views.Listar_empleados, name="listar_empleados"),
     path('empleados/agregar_empleado', views.Agregar_empleado, name="agregar_empleado"),
