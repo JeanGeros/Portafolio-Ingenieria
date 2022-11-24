@@ -63,8 +63,8 @@ from django.contrib import messages
 from src.forms import (
     FormClienteNormal1, FormClienteNormal2, FormClienteNormal3, addproductsForm, FormVendedorPersona,
     FormVendedorUsuario, FormVendedorEmpleado, FormEmpleadoPersona, FormEmpleadoUsuario, FormEmpleadoEmpleado,
-    FormProveedor, FormProductoproveedor, FormBodega, FormClienteEmpresa, FormCliente, FormTipodocumento, FormVenta, FormDocu,
-    FormFamiliaProduct, FormDetalleorden, FormOrdencompra
+    FormProveedor, FormProductoproveedor, FormBodega, FormClienteEmpresa, FormCliente, FormTipodocumento, FormVenta, 
+    FormDocu, FormProveedorUsuario,FormDireProvee, FormFamiliaProduct, FormDetalleorden, FormOrdencompra
 )
 
 from .models import (
@@ -1695,6 +1695,7 @@ def Editar_cliente_vendedor(request):
 @login_required(login_url="ingreso")
 def Agregar_proveedor(request):
 
+
     if request.POST.get('VerPerfil') is not None:
         request.session['_ver_perfil'] = request.POST
         return redirect('ver_perfil')
@@ -1704,40 +1705,88 @@ def Agregar_proveedor(request):
         tipo_usuario = tipo_usuario.rolid.descripcion
     else: 
         tipo_usuario = None
-        
+
     form = FormProveedor()
+    form2 = FormProveedorUsuario()
+    form3 = FormDireProvee()
 
     if request.method == 'POST':
-        razonsocial = request.POST.get('razonsocial')
-        rutcuerpo = request.POST.get('rutcuerpo')
+        rut_cuerpo = request.POST.get('rutcuerpo')
         dv = request.POST.get('dv')
-        fono = request.POST.get('fono')
-        rubroid = request.POST.get('rubroid')
-        direccionid = request.POST.get('direccionid')
-        estadoid = request.POST.get('estadoid')
+        razonsocial = request.POST.get('razonsocial')
+        telefono = request.POST.get('fono')
+        rubro_id = request.POST.get('rubroid')
+        email = request.POST.get('email')
+        calle = request.POST.get('calle')
+        numero = request.POST.get('numero')
+        comuna_id = request.POST.get('comunaid')
+        tipo_vivienda_id = request.POST.get('tipoviviendaid')
+        tipo_barrio_id = request.POST.get('tipobarrioid')
+        nombre_sector = request.POST.get('nombresector')
+        nombre_usuario = request.POST.get('nombreusuario')
+        contraseña = request.POST.get('password')
+        confirme_contraseña = request.POST.get('confirme_contraseña')
 
-        rubro = Tiporubro.objects.get(rubroid=rubroid)
-        direccion = Direccion.objects.get(direccionid=direccionid)
-        estado = Estado.objects.get(estadoid=estadoid)
+        proveedorRegistro = Proveedor.objects.filter(rutcuerpo=rut_cuerpo, dv=dv).exists()
+        usuarioRegistro = Usuario.objects.filter(email=email).exists()
+        usuarioRegistro3 = Usuario.objects.filter(nombreusuario=nombre_usuario).exists()
 
-        proveedor = Proveedor.objects.create(
-            razonsocial=razonsocial.strip(),
-            rutcuerpo=rutcuerpo.strip(),
-            dv=dv.strip(),
-            fono=fono.strip(),
-            direccionid=direccion,
-            estadoid=estado,
-            rubroid=rubro,
-        )
-
-        if proveedor is not None:
-            messages.warning(request, 'Proveedor creado correctamente')
-            return redirect('listar_proveedores')
+        if proveedorRegistro == True:
+            sweetify.warning(request, "El rut ingresado ya existe")
+        elif usuarioRegistro == True:
+            sweetify.warning(request, "El correo ingresado ya existe")
+        elif usuarioRegistro3 == True:
+            sweetify.warning(request, "El usuario ingresado ya esta registrado")
         else:
-            messages.warning(request, 'No se pudo crear el Producto')
+            
+            rolusuario = 5 #Rolusuario.objects.filter(descripcion="Proveedor").values('rolid')
+            django_cursor = connection.cursor()
+            cursor = django_cursor.connection.cursor()
+            procedimiento = cursor.callproc(
+                'SP_InsertProveedor', 
+                [
+                    int(rut_cuerpo), 
+                    dv, 
+                    razonsocial,
+                    int(telefono), 
+                    rubro_id,
+                    calle,
+                    str(numero),
+                    nombre_sector,
+                    tipo_vivienda_id,
+                    tipo_barrio_id,
+                    comuna_id,
+                    email,
+                    nombre_usuario,
+                    contraseña,
+                    rolusuario
+                ]
+            )
+
+            user = User.objects.create_user(
+                username=nombre_usuario,
+                first_name=razonsocial,
+                last_name=razonsocial,
+                email=email,
+                is_superuser=False,
+                is_active=True
+            )
+            user.set_password(contraseña)
+            user.set_password(confirme_contraseña)
+
+            if (procedimiento is not None and 
+                user is not None):
+                user.save()
+
+                sweetify.success(request, "Se ha registrado correctamente")
+                return redirect('index')
+            else:
+                sweetify.error(request, "No es posible registrarse en este momento")
 
     context = {
         'form': form,
+        'form2': form2,
+        'form3': form3,
         'tipo_usuario': tipo_usuario,
     }
 
@@ -1754,6 +1803,63 @@ def Cambiar_estado_proveedor(id_proveedor):
         proveedor.estadoid = Estado.objects.get(descripcion="Activo")
         proveedor.save()
 
+def Listar_orden(request):
+
+    if request.POST.get('VerPerfil') is not None:
+        request.session['_ver_perfil'] = request.POST
+        return redirect('ver_perfil')
+
+    if Usuario.objects.filter(nombreusuario=request.user).exists():
+        tipo = Usuario.objects.get(nombreusuario=request.user)
+        tipo_usuario = tipo.rolid.descripcion
+        proveid = tipo.proveedorid.proveedorid
+    else: 
+        tipo_usuario = None
+        proveid = None
+
+    if proveid is not None:
+        ordenes = Ordencompra.objects.filter(proveedorid = proveid)
+    else:
+        context = {}
+        return render(request, 'index.html', context)
+
+    if request.method == 'POST':
+
+        if request.POST.get('VerOrden') is not None:
+            request.session['_ver_orden'] = request.POST
+            return HttpResponseRedirect('ver_orden')
+
+    context = {
+        'ordenes': ordenes,
+        'tipo_usuario': tipo_usuario,
+    }
+
+    return render(request, 'proveedores/listar_ordenes.html', context)
+
+def Ver_orden(request):
+
+    if request.POST.get('VerPerfil') is not None:
+        request.session['_ver_perfil'] = request.POST
+        return redirect('ver_perfil')
+
+    if Usuario.objects.filter(nombreusuario=request.user).exists():
+        tipo_usuario = Usuario.objects.get(nombreusuario=request.user)
+        tipo_usuario = tipo_usuario.rolid.descripcion
+    else: 
+        tipo_usuario = None
+
+    ver_orden = request.session.get('_ver_orden')
+    orden = Ordencompra.objects.get(ordenid = ver_orden['VerOrden'])
+    productos_orden = Detalleorden.objects.filter(ordenid = orden.ordenid)
+
+
+    context = {
+        'orden': orden,
+        'tipo_usuario': tipo_usuario,
+        'productos_orden': productos_orden
+    }
+
+    return render(request, 'proveedores/ver_orden.html', context)
 
 @login_required(login_url="ingreso")
 def Listar_proveedores(request):
@@ -2155,7 +2261,6 @@ def Crear_pedido(request, id=None):
 
     proveedor = Proveedor.objects.get(proveedorid=id)
     listaProds = Productoproveedor.objects.filter(proveedorid=proveedor)
-
     if request.method == 'POST':
         lista_productos = []
         for key, value in request.POST.items():
@@ -2713,6 +2818,40 @@ def Cambiar_estado_despacho(despachoId,estado_id,estado):
     else:
         despacho.estadoid = Estado.objects.get(descripcion="Activo")
         despacho.save()
+
+#****************************Orden Proveedor******************************************
+
+def Ver_Orden(request):
+
+    if request.POST.get('VerPerfil') is not None:
+        request.session['_ver_perfil'] = request.POST
+        return redirect('ver_perfil')
+
+    if Usuario.objects.filter(nombreusuario=request.user).exists():
+        tipo_usuario = Usuario.objects.get(nombreusuario=request.user)
+        tipo_usuario = tipo_usuario.rolid.descripcion
+    else: 
+        tipo_usuario = None
+
+    ver_despacho = request.session.get('_ver_despacho')
+    despacho = Despacho.objects.get(despachoid = ver_despacho['VerDespacho'])
+    productos_despacho = Detalleventa.objects.filter(nroventa = despacho.nroventa.nroventa)
+
+    if request.method == 'POST':
+
+        despachoId = request.POST.get('despacho_id')
+        estado_id = request.POST.get('estado_id')
+        estado = request.POST.get('btnAccion')
+        Cambiar_estado_despacho(despachoId,estado_id,estado)
+        return redirect('listar_despacho')
+
+    context = {
+        'despacho': despacho,
+        'tipo_usuario': tipo_usuario,
+        'productos_despacho': productos_despacho
+    }
+
+    return render(request, 'proveedor/ver_orden.html', context)
 
 #****************************Creacion de archivos******************************************
 
