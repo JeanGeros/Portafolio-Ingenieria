@@ -10,43 +10,46 @@
 <form method="post" action="" class="">
     {% csrf_token %}
     <div class="container border border-primary rounded">
-        <label for="pedidos" class="p-2 ">Ordenes de pedidos:</label>
-        <input type="checkbox" class="ordenes" name="ordenes" id="ordenes" onclick="checkeado(this.form)"/></br>
+        <label for="ventas" class="p-2 ">Ventas:</label>
+        <input type="checkbox" class="ventas" name="ventas" id="ventas" onclick="checkeado(this.form)"/></br>
          
         <div class="row row-cols-4">
             <div class="col border border-primary rounded">
-                </br>
                 <label for="ventas" class="p-2">Fecha Venta:</label>
                 <input type="checkbox" class="fechaVenta" name="fechaVenta" id="fechaVenta"/></br>
 
                 <label for="ventas" class="p-2">Monto Total Venta:</label>
                 <input type="checkbox" class="montoTotal" name="montoTotal" id="montoTotal"/></br>
 
+
+                <label for="ventas" class="p-2">Nombre Cliente:</label>
+                <input type="checkbox" class="nombreCliente" name="nombreCliente" id="nombreCliente"/></br>
+            </div>
+            
+            <div class="col border border-primary rounded">
+                <label for="ventas" class="p-2">Nombre Producto:</label>
+                <input type="checkbox" class="nombreProducto" name="nombreProducto" id="nombreProducto"/></br>
+
                 <label for="ventas" class="p-2">Cantidad:</label>
                 <input type="checkbox" class="cantidadVenta" name="cantidadVenta" id="cantidadVenta"/></br>
 
                 <label for="ventas" class="p-2">Valor Sub Total:</label>
                 <input type="checkbox" class="subTotal" name="subTotal" id="subTotal"/></br>
-
-                <label for="ventas" class="p-2">Nombre Producto:</label>
-                <input type="checkbox" class="nombreProducto" name="nombreProducto" id="nombreProducto"/></br>
             </div>
             
-            <!-- <div class="col border border-primary rounded">
-                <label for="productos" class="p-2">Productos Ventas</label>
-                <input type="checkbox" class="detalleOrdenP" name="detalleOrdenP" id="detalleOrdenP" onclick="checkeado(this.form)"/></br></br>
-
-            </div> -->
-            
             <div class="col border border-primary rounded">
+                <label for="productos" class="p-2">Documento Tributario:</label>
+                <input type="checkbox" class="DocuTributario" name="DocuTributario" id="DocuTributario" onclick="checkeado(this.form)"/></br></br>
 
-                {% render_field form1.estadoordenid class="form-control input border border-secondary" disabled="disabled" name="estadoordenid" id="estadoordenid" style="opacity:0"%}
-            </div>
-
-            <div class="col border border-primary rounded">
-                <label for="productos" class="p-2">Tipo Pago:</label>
-                <input type="checkbox" class="tipoPago" name="tipoPago" id="tipoPago" onclick="checkeado(this.form)"/></br></br>
-                {% render_field form1.estadoordenid class="form-control input border border-secondary" disabled="disabled" name="estadoordenid" id="estadoordenid" style="opacity:0"%}
+                <div class="inputFilter" id="docuTributarioSelect" style="display:none;">
+                    <select class="form-select" type="text" id="docuTributarioCheck" name="docuTributarioCheck" aria-label="Default select example" onchange="showDivAttid3('docuTributarioCheck','tipodocumentoid', 'porDocuTributario')">
+                        <option selected>----------</option>
+                        <option value="todosOrdenP">Todos</option>
+                        <option value="porDocuTributario">Por Documento Tributario</option>
+                        </select>
+                </div>
+                <br>
+                {% render_field form1.tipodocumentoid class="form-control input border border-secondary" disabled="disabled" name="tipodocumentoid" id="tipodocumentoid" style="opacity:0"%}
             </div>
 
             
@@ -55,68 +58,19 @@
                 <input type="checkbox" class="tipoPago" name="tipoPago" id="tipoPago" onclick="checkeado(this.form)"/></br></br>
 
                 <div class="inputFilter" id="TipoPagoSelect" style="display:none;">
-                    <select class="form-select" type="text" id="TipoPagoCheck" name="TipoPagoCheck" aria-label="Default select example" onchange="showDivAttid3('TipoPagoCheck','proveedorid', 'porRazonSocialOrdenP')">
+                    <select class="form-select" type="text" id="TipoPagoCheck" name="TipoPagoCheck" aria-label="Default select example" onchange="showDivAttid3('TipoPagoCheck','tipopagoid', 'porTipoPago')">
                         <option selected>----------</option>
                         <option value="todosOrdenP">Todos</option>
-                        <option value="porRazonSocialOrdenP">Por Razon Social</option>
+                        <option value="porTipoPago">Por Tipo de Pago</option>
                         </select>
                 </div>
                 <br>
-                {% render_field form1.proveedorid class="form-control input border border-secondary" disabled="disabled" name="proveedorid" id="proveedorid" style="opacity:0"%}
+                {% render_field form1.tipopagoid class="form-control input border border-secondary" disabled="disabled" name="tipopagoid" id="tipopagoid" style="opacity:0"%}
                 <br>
             </div>
-
-            <div class="col border border-primary rounded">
-                <label for="productos" class="p-2">Nombre proveedor:</label>
-                <input type="checkbox" class="razonSocialOrdenP" name="razonSocialOrdenP" id="razonSocialOrdenP" onclick="checkeado(this.form)"/></br></br>
-
-                <div class="inputFilter" id="razonSocialOrdenSelect" style="display:none;">
-                    <select class="form-select" type="text" id="razonSocialOrdenPCheck" name="razonSocialOrdenPCheck" aria-label="Default select example" onchange="showDivAttid3('razonSocialOrdenPCheck','proveedorid', 'porRazonSocialOrdenP')">
-                        <option selected>----------</option>
-                        <option value="todosOrdenP">Todos</option>
-                        <option value="porRazonSocialOrdenP">Por Razon Social</option>
-                        </select>
-                </div>
-                <br>
-                {% render_field form1.proveedorid class="form-control input border border-secondary" disabled="disabled" name="proveedorid" id="proveedorid" style="opacity:0"%}
-                <br>
-            </div>
-
-
-  
         </div>
     </div>
-    
-    <!-- seguimiento pagina -->
-
-    <!-- <div class="container border border-primary rounded mt-3">
-        <label for="productos" class="p-2">Visitas a paginas:</label>
-        <input type="checkbox" class="visitas" name="visitas" id="visitas" onclick="checkeado(this.form)"/></br>
-        
-        <div class="row row-cols-2">
-
-            <div class="col border border-primary rounded">
-                <label for="productos" class="p-2">Usuario:</label>
-                <input type="checkbox" class="usuarioPaginaVisitada" name="usuarioPaginaVisitada" id="usuarioPaginaVisitada" onclick="checkeado(this.form)"/></br></br>
-                <input type="radio" name="usuarioVisitasPaginaCheck" value="todosVisitasP" id="usuarioVisitasPaginaCheck1" checked onclick="checkeado(this.form)"> Todos</br></br>
-                <input type="radio" name="usuarioVisitasPaginaCheck" value="porNombreVisitasP" id="usuarioVisitasPaginaCheck2" onclick="checkeado(this.form)"> Por nombre</br>
-                {{ FormSeg.usuario }} 
-                </br></br>
-            </div>
-            
-            <div class="col border border-primary rounded">
-                </br>
-                <label for="productos" class="p-2">Fecha ingreso:</label>
-                <input type="checkbox" class="fechaVisitasP" name="fechaVisitasP" id="fechaVisitasP"/></br>
-
-                <label for="productos" class="p-2">Pagina visitada:</label>
-                <input type="checkbox" class="paginaVisitada" name="paginaVisitada" id="paginaVisitada"/></br>
-            </div>
-    
-        </div>
-    
-    </div>
--->
+   
     <div class="container p-3">
         <div class="row">
             <div class="col-md-2">
@@ -172,19 +126,49 @@
 
 </script>
 
+
+<script>
+    let startDate = new Date();
+    let elapsedTime = 0;
+
+    const focus = function() {
+        startDate = new Date();
+    };
+
+    const blur = function() {
+        const endDate = new Date();
+        const spentTime = endDate.getTime() - startDate.getTime();
+        elapsedTime += spentTime;
+    };
+
+    const beforeunload = function() {
+        const endDate = new Date();
+        const spentTime = endDate.getTime() - startDate.getTime();
+        elapsedTime += spentTime;
+        // elapsedTime contains the time spent on page in milliseconds
+    };
+    
+    console.log(window.addEventListener('focus', focus))
+    console.log(window.addEventListener('blur', blur))
+    console.log(window.addEventListener('beforeunload', beforeunload))
+    console.log(elapsedTime)
+    
+    
+    
+    
+</script>
 <script language="JavaScript">
 
-    document.getElementById("fechaOrdenP").disabled=true;
-    // document.getElementById("fechaLlegadaOrdenP").disabled=true;
-    // document.getElementById("fechaRecepOrdenP").disabled=true;
-    // document.getElementById("horaRecepOrdenP").disabled=true;
-    document.getElementById("estadoRecepcionO").disabled=true;
-    document.getElementById("razonSocialOrdenP").disabled=true;
-    document.getElementById("detalleOrdenP").disabled=true;
-    document.getElementById("cantidadOrdenP").disabled=true;
-    document.getElementById("productoOrdenP").disabled=true;
-    // document.getElementById("id_familia_producto").disabled=true;
+    document.getElementById("fechaVenta").disabled=true;
+    document.getElementById("montoTotal").disabled=true;
+    document.getElementById("nombreCliente").disabled=true;
+    document.getElementById("nombreProducto").disabled=true;
+    document.getElementById("cantidadVenta").disabled=true;
+    document.getElementById("subTotal").disabled=true;
     
+    document.getElementById("DocuTributario").disabled=true;
+    document.getElementById("tipoPago").disabled=true;
+
     // document.getElementById("usuarioPaginaVisitada").disabled=true;
     // document.getElementById("usuarioVisitasPaginaCheck1").disabled=true;
     // document.getElementById("usuarioVisitasPaginaCheck2").disabled=true;
@@ -199,70 +183,57 @@
     document.getElementById("informeCheck2").disabled=true;
     document.getElementById("informeCheck3").disabled=true;
     
-    function checkeado(form)
-    {
+    function checkeado(form){
 
         //orden pedido
-        if (form.ordenes.checked == true){
-            form.fechaOrdenP.disabled = false;
-            // form.fechaLlegadaOrdenP.disabled = false;
-            // form.fechaRecepOrdenP.disabled = false;
-            // form.horaRecepOrdenP.disabled = false;
-            form.estadoRecepcionO.disabled = false;
-            form.razonSocialOrdenP.disabled = false;
-            form.detalleOrdenP.disabled = false;
+        if (form.ventas.checked == true){
+            form.fechaVenta.disabled = false;
+            form.montoTotal.disabled = false;
+            form.nombreCliente.disabled = false;
+            form.nombreProducto.disabled = false;
+            form.cantidadVenta.disabled = false;
+            form.subTotal.disabled = false;
+
+            form.DocuTributario.disabled = false;
+            form.tipoPago.disabled = false;
+
             form.informeCheck1.disabled = false;
             form.informeCheck2.disabled = false;
             form.informeCheck3.disabled = false;
             
         }
 
-        if (form.ordenes.checked == false || form.ordenes.disabled == true){
-            form.fechaOrdenP.disabled = true;
-            // form.fechaLlegadaOrdenP.disabled = true;
-            // form.fechaRecepOrdenP.disabled = true;
-            // form.horaRecepOrdenP.disabled = true;
-            form.estadoRecepcionO.disabled = true;
-            form.razonSocialOrdenP.disabled = true;
-            form.detalleOrdenP.disabled = true;
+        if (form.ventas.checked == false || form.ventas.disabled == true){
+            form.fechaVenta.disabled = false;
+            form.montoTotal.disabled = false;
+            form.nombreCliente.disabled = false;
+            form.nombreProducto.disabled = false;
+            form.cantidadVenta.disabled = false;
+            form.subTotal.disabled = false;
+
+            form.DocuTributario.disabled = false;
+            form.tipoPago.disabled = false;
+
             form.informeCheck1.disabled = true;
             form.informeCheck2.disabled = true;
             form.informeCheck3.disabled = true;
         }
         
-        if (form.estadoRecepcionO.checked == true){
-            showDivAttid2('estadoordenid', true)
+        if (form.tipoPago.checked == true){
+            showDivAttid('TipoPagoSelect', true)
         }
 
-        if (form.estadoRecepcionO.checked == false || form.estadoRecepcionO.disabled == true){
-            showDivAttid2('estadoordenid', false)
+        if (form.tipoPago.checked == false || form.tipoPago.disabled == true){
+            showDivAttid('TipoPagoSelect', false)
         }
         
-        if (form.detalleOrdenP.checked == true){
-            form.cantidadOrdenP.disabled = false;
-            form.productoOrdenP.disabled = false;
+        if (form.DocuTributario.checked == true){
+            showDivAttid('docuTributarioSelect', true)
         }
 
-        if (form.detalleOrdenP.checked == false || form.detalleOrdenP.disabled == true){
-            form.cantidadOrdenP.disabled = true;
-            form.productoOrdenP.disabled = true;
+        if (form.DocuTributario.checked == false || form.DocuTributario.disabled == true){
+            showDivAttid('docuTributarioSelect', false)
         }
-        
-        if (form.razonSocialOrdenP.checked == true){
-            showDivAttid('razonSocialOrdenSelect', true)
-        }
-
-        if (form.razonSocialOrdenP.checked == false || form.razonSocialOrdenP.disabled == true){
-            showDivAttid('razonSocialOrdenSelect', false)
-        }
-
-        // if (form.razonSocialOrdenPCheck2.checked == true){
-        //     form.id_ordenP_informe.disabled = false;
-        // }
-
-        // if (form.razonSocialOrdenPCheck1.checked == true){
-        //     form.id_ordenP_informe.disabled = true;
-        // }
 
         // //visitas
         // if (form.visitas.checked == true){
