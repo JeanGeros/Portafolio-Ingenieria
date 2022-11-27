@@ -162,6 +162,7 @@ class Despacho(models.Model):
     fechadespacho = models.DateField(blank=True, null=True)
     nroventa = models.ForeignKey('Venta', models.DO_NOTHING, db_column='nroventa')
     estadoid = models.ForeignKey('Estado', models.DO_NOTHING, db_column='estadoid')
+    tipodespacho = models.CharField(max_length=10)
 
     def __str__(self):
         return f"{self.despachoid}"
