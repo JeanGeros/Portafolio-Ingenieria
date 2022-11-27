@@ -3,9 +3,8 @@ from django.db import models
 
 class Accionpagina(models.Model):
     accionid = models.BigIntegerField(primary_key=True)
-    fechain = models.DateField()
+    fechain = models.DateTimeField()
     modulo = models.CharField(max_length=100)
-    fechaout = models.DateField(blank=True, null=True)
     usuarioid = models.ForeignKey('Usuario', models.DO_NOTHING, db_column='usuarioid')
     
     def __str__(self):
@@ -341,9 +340,9 @@ class Estadoorden(models.Model):
 class Factura(models.Model):
     numerofactura = models.BigIntegerField(primary_key=True)
     fechafactura = models.DateField()
-    neto = models.BigIntegerField()
-    iva = models.BigIntegerField()
-    totalfactura = models.BigIntegerField()
+    neto = models.FloatField()
+    iva = models.FloatField()
+    totalfactura = models.FloatField()
     nroventa = models.ForeignKey('Venta', models.DO_NOTHING, db_column='nroventa')
     estadoid = models.ForeignKey(Estado, models.DO_NOTHING, db_column='estadoid')
 

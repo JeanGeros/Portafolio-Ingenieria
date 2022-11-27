@@ -3,7 +3,7 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 
-from .models import Producto, Persona, Direccion, Proveedor, Usuario, Cliente, Empleado, Productoproveedor, Bodega, Empresa, Tipodocumento, Venta, Familiaproducto, Detalleorden,Estadoorden, Ordencompra
+from .models import Producto, Persona, Direccion, Proveedor, Usuario, Cliente, Empleado, Productoproveedor, Bodega, Empresa, Tipodocumento, Venta, Familiaproducto, Detalleorden,Estadoorden, Ordencompra, Accionpagina
 
 class FormRegistroUsuario(UserCreationForm):
 
@@ -166,4 +166,9 @@ class FormOrdencompra(forms.ModelForm):
         model = Ordencompra
         fields = '__all__'    
 
+class FormAccionpagina(forms.ModelForm):
+    class Meta:
+        model = Accionpagina
+        fields = '__all__'    
+        
         

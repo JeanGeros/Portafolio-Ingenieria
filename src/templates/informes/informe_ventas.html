@@ -4,7 +4,7 @@
 
 {% block content %}
 <link rel="stylesheet" href="{% static 'css/informes.css' %}">
-<h1 class="text-center pb-3 pt-5">Crear Informe de Pedidos</h1>
+<h1 class="text-center pb-3 pt-5">Crear Informe de Ventas</h1>
 
 
 <form method="post" action="" class="">
@@ -121,41 +121,8 @@
             document.getElementById(`${idshow}`).disabled = true
             document.getElementById(`${idshow}`).style.opacity = '0'
         }
-        // status === true ?  :  document.getElementById(`${value}`).style.display = 'none'
     }
 
-</script>
-
-
-<script>
-    let startDate = new Date();
-    let elapsedTime = 0;
-
-    const focus = function() {
-        startDate = new Date();
-    };
-
-    const blur = function() {
-        const endDate = new Date();
-        const spentTime = endDate.getTime() - startDate.getTime();
-        elapsedTime += spentTime;
-    };
-
-    const beforeunload = function() {
-        const endDate = new Date();
-        const spentTime = endDate.getTime() - startDate.getTime();
-        elapsedTime += spentTime;
-        // elapsedTime contains the time spent on page in milliseconds
-    };
-    
-    console.log(window.addEventListener('focus', focus))
-    console.log(window.addEventListener('blur', blur))
-    console.log(window.addEventListener('beforeunload', beforeunload))
-    console.log(elapsedTime)
-    
-    
-    
-    
 </script>
 <script language="JavaScript">
 
@@ -169,13 +136,6 @@
     document.getElementById("DocuTributario").disabled=true;
     document.getElementById("tipoPago").disabled=true;
 
-    // document.getElementById("usuarioPaginaVisitada").disabled=true;
-    // document.getElementById("usuarioVisitasPaginaCheck1").disabled=true;
-    // document.getElementById("usuarioVisitasPaginaCheck2").disabled=true;
-    // document.getElementById("id_visitas_pagina").disabled=true;
-    // document.getElementById("fechaVisitasP").disabled=true;
-    // document.getElementById("paginaVisitada").disabled=true;
-    
     document.getElementById("descargarInforme").disabled=true;
     document.getElementById("vistaPrevia").disabled=true;
 
@@ -234,42 +194,6 @@
         if (form.DocuTributario.checked == false || form.DocuTributario.disabled == true){
             showDivAttid('docuTributarioSelect', false)
         }
-
-        // //visitas
-        // if (form.visitas.checked == true){
-            
-        //     form.usuarioPaginaVisitada.disabled = false;
-        //     form.fechaVisitasP.disabled = false;
-        //     form.paginaVisitada.disabled = false;
-        // }
-
-        // if (form.visitas.checked == false || form.visitas.disabled == true){
-        //     form.usuarioPaginaVisitada.disabled = true;
-        //     form.fechaVisitasP.disabled = true;
-        //     form.paginaVisitada.disabled = true;
-        // }
-        // //
-        // if (form.usuarioPaginaVisitada.checked == true){
-            
-        //     form.usuarioVisitasPaginaCheck1.disabled = false;
-        //     form.usuarioVisitasPaginaCheck2.disabled = false;
-            
-        // }
-
-        // if (form.usuarioPaginaVisitada.checked == false || form.usuarioPaginaVisitada.disabled == true){
-        //     form.usuarioVisitasPaginaCheck1.disabled = true;
-        //     form.usuarioVisitasPaginaCheck2.disabled = true;
-            
-        // }
-
-        // if (form.usuarioVisitasPaginaCheck2.checked == true){
-        //     form.id_visitas_pagina.disabled = false;
-        // }
-
-        // if (form.usuarioVisitasPaginaCheck1.checked == true){
-        //     form.id_visitas_pagina.disabled = true;
-        // }
-
 
         //informes
 

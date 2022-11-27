@@ -93,36 +93,6 @@
         </div>
     </div>
     
-    <!-- seguimiento pagina -->
-
-    <!-- <div class="container border border-primary rounded mt-3">
-        <label for="productos" class="p-2">Visitas a paginas:</label>
-        <input type="checkbox" class="visitas" name="visitas" id="visitas" onclick="checkeado(this.form)"/></br>
-        
-        <div class="row row-cols-2">
-
-            <div class="col border border-primary rounded">
-                <label for="productos" class="p-2">Usuario:</label>
-                <input type="checkbox" class="usuarioPaginaVisitada" name="usuarioPaginaVisitada" id="usuarioPaginaVisitada" onclick="checkeado(this.form)"/></br></br>
-                <input type="radio" name="usuarioVisitasPaginaCheck" value="todosVisitasP" id="usuarioVisitasPaginaCheck1" checked onclick="checkeado(this.form)"> Todos</br></br>
-                <input type="radio" name="usuarioVisitasPaginaCheck" value="porNombreVisitasP" id="usuarioVisitasPaginaCheck2" onclick="checkeado(this.form)"> Por nombre</br>
-                {{ FormSeg.usuario }} 
-                </br></br>
-            </div>
-            
-            <div class="col border border-primary rounded">
-                </br>
-                <label for="productos" class="p-2">Fecha ingreso:</label>
-                <input type="checkbox" class="fechaVisitasP" name="fechaVisitasP" id="fechaVisitasP"/></br>
-
-                <label for="productos" class="p-2">Pagina visitada:</label>
-                <input type="checkbox" class="paginaVisitada" name="paginaVisitada" id="paginaVisitada"/></br>
-            </div>
-    
-        </div>
-    
-    </div>
--->
     <div class="container p-3">
         <div class="row">
             <div class="col-md-2">
@@ -163,7 +133,6 @@
             document.getElementById(`${idshow}`).disabled = true
             document.getElementById(`${idshow}`).style.opacity = '0'
         }
-        // status === true ?  :  document.getElementById(`${value}`).style.display = 'none'
     }
 
 </script>
@@ -184,15 +153,7 @@
     document.getElementById("informeCheck2").disabled=true;
     document.getElementById("informeCheck3").disabled=true;
 
-    // document.getElementById("usuarioPaginaVisitada").disabled=true;
-    // document.getElementById("usuarioVisitasPaginaCheck1").disabled=true;
-    // document.getElementById("usuarioVisitasPaginaCheck2").disabled=true;
-    // document.getElementById("id_visitas_pagina").disabled=true;
-    // document.getElementById("fechaVisitasP").disabled=true;
-    // document.getElementById("paginaVisitada").disabled=true;
-    
     document.getElementById("descargarInforme").disabled=true;
-    // document.getElementById("vistaPrevia").disabled=true;
 
     function checkeado(form)
     {
@@ -254,13 +215,6 @@
         if (form.familiaProducto.checked == false || form.familiaProducto.disabled == true){
             showDivAttid('familiaProductoSelect', false)
         }
-       
-        // if (form.familiaProductoCheck2.checked == true){
-        //     // form.id_familia_producto.disabled = false;
-        // }
-        // if (form.familiaProductoCheck1.checked == true){
-        //     form.id_familia_producto.disabled = true;
-        // }
         
         if (form.tipoProducto.checked == true){
             showDivAttid('tipoProductoSelect', true)
@@ -268,50 +222,7 @@
 
         if (form.tipoProducto.checked == false || form.tipoProducto.disabled == true){
             showDivAttid('tipoProductoSelect', false)
-            // form.tipoProductoCheck1.disabled = true;
-            // form.tipoProductoCheck2.disabled = true;
         }
-
-        // if (form.tipoProductoCheck2.checked == true){
-        //     form.id_tipo_producto.disabled = false;
-        // }
-
-        // if (form.tipoProductoCheck1.checked == true){
-        //     form.id_tipo_producto.disabled = true;
-        // }
-
-        //visitas
-        // if (form.visitas.checked == true){
-        //     form.usuarioPaginaVisitada.disabled = false;
-        //     form.fechaVisitasP.disabled = false;
-        //     form.paginaVisitada.disabled = false;
-        // }
-
-        // if (form.visitas.checked == false || form.visitas.disabled == true){
-        //     form.usuarioPaginaVisitada.disabled = true;
-        //     form.fechaVisitasP.disabled = true;
-        //     form.paginaVisitada.disabled = true;
-            
-        // }
-        // if (form.usuarioPaginaVisitada.checked == true){
-            
-        //     form.usuarioVisitasPaginaCheck1.disabled = false;
-        //     form.usuarioVisitasPaginaCheck2.disabled = false;
-            
-        // }
-
-        // if (form.usuarioPaginaVisitada.checked == false || form.usuarioPaginaVisitada.disabled == true){
-        //     form.usuarioVisitasPaginaCheck1.disabled = true;
-        //     form.usuarioVisitasPaginaCheck2.disabled = true;
-        // }
-
-        // if (form.usuarioVisitasPaginaCheck2.checked == true){
-        //     form.id_visitas_pagina.disabled = false;
-        // }
-
-        // if (form.usuarioVisitasPaginaCheck1.checked == true){
-        //     form.id_visitas_pagina.disabled = true;
-        // }
         //informes
 
         if (form.informeCheck3.checked == true ){

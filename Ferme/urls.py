@@ -100,6 +100,7 @@ urlpatterns = [
     path('informes/proveedores', views.informe_proveedores, name="informe_proveedores"),
     path('informes/pedidos', views.informe_pedidos, name="informe_pedidos"),
     path('informes/ventas', views.informe_ventas, name="informe_ventas"),
+    path('informes/visitas', views.informe_visitas, name="informe_visitas"),
 
     # path('informes/ventas', views.generar_informes, name="informe_productos"),
 
