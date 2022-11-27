@@ -2534,7 +2534,7 @@ def Ver_boleta(request):
     ver_boleta = request.session.get('_ver_boleta')
 
     boleta = Boleta.objects.get(nroboleta = ver_boleta['VerBoleta'])
-    productos_boleta = Detalleventa.objects.filter(nroventa = boleta.nroboleta)
+    productos_boleta = Detalleventa.objects.filter(nroventa = boleta.nroventa)
     venta = Venta.objects.get(nroventa = boleta.nroventa.nroventa)
     direccion_cliente = Direccioncliente.objects.get(clienteid=venta.clienteid)
     if venta.clienteid.personaid != None:
