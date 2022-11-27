@@ -3081,8 +3081,8 @@ def generar_factura(c, venta, documento, detalle_venta, direccion_cliente, giro,
         c.drawString(1.1*inch, 7.5*inch, f"{str(venta.clienteid.personaid.telefono)}")
         c.drawString(1.05*inch, 8.3*inch, f"{str(venta.clienteid).lower().capitalize()}")
         
-        neto = str(int(documento.totalboleta)-(int(documento.totalboleta)*0.19))
-        iva = str(int(documento.totalboleta)*0.19)
+        neto = round(int(documento.totalboleta)-(int(documento.totalboleta)*0.19))
+        iva = round(int(documento.totalboleta)*0.19)
 
         c.drawRightString(6.5*inch,1.7*inch,f'{neto}') #  
         c.drawRightString(6.5*inch,1.5*inch,f'{iva}') # Total 
@@ -3409,7 +3409,7 @@ def crear_venta(request):
                 productos_venta.insert(0 , ["Nombre Producto", "Cantidad", "Total"]) 
 
                 ultima_boleta = Boleta.objects.order_by('nroboleta').last()
-                detalle_venta = Detalleventa.objects.filter(nroventa = ultima_boleta.nroboleta)
+                detalle_venta = Detalleventa.objects.filter(nroventa = ultima_boleta.nroventa)
                 direccion_cliente = Direccioncliente.objects.get(clienteid=ultima_ventas.clienteid)
                 if ultima_ventas.clienteid.personaid != None:
                     giro = "persona natural"
