@@ -101,6 +101,7 @@ urlpatterns = [
     path('informes/pedidos', views.informe_pedidos, name="informe_pedidos"),
     path('informes/ventas', views.informe_ventas, name="informe_ventas"),
     path('informes/visitas', views.informe_visitas, name="informe_visitas"),
+    path('informes', views.Seleccion_informe, name="informes"),
 
     # path('informes/ventas', views.generar_informes, name="informe_productos"),
 

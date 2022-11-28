@@ -4574,6 +4574,25 @@ def informe_proveedores(request):
 
     return render(request, 'informes/informe_proveedores.html', context)
 
+def Seleccion_informe(request):
+
+    if request.POST.get('VerPerfil') is not None:
+        request.session['_ver_perfil'] = request.POST
+        return redirect('ver_perfil')
+
+    if Usuario.objects.filter(nombreusuario=request.user).exists():
+        tipo_usuario = Usuario.objects.get(nombreusuario=request.user)
+        tipo_usuario = tipo_usuario.rolid.descripcion
+    else: 
+        tipo_usuario = None
+    
+    context = {
+        'tipo_usuario': tipo_usuario,
+    }
+
+    return render(request, 'informes/seleccion_informe.html', context)
+
+
 def informe_pedidos(request):
     if Usuario.objects.filter(nombreusuario=request.user).exists():
         tipo_usuario = Usuario.objects.get(nombreusuario=request.user)
