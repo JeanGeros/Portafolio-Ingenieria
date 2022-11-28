@@ -11,3 +11,18 @@ input[type="radio"] {
     
 }
 
+
+
+.caja {
+    padding-top: 2%;
+    padding-bottom: 3%;
+    padding-left: 2%;
+    padding-right: 2%;
+    margin-top: 5%!important;
+    margin-bottom: 6%!important;
+    background-color: #D9D9D9;
+}
+
+.btn {
+    background-color: #FF9550!important;
+}

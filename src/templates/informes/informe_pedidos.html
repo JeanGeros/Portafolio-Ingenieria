@@ -4,81 +4,80 @@
 
 {% block content %}
 <link rel="stylesheet" href="{% static 'css/informes.css' %}">
-<h1 class="text-center pb-3 pt-5">Crear Informe de Pedidos</h1>
+<div class="container caja rounded mt-5">
 
-
-<form method="post" action="" class="">
-    {% csrf_token %}
-    <div class="container border border-primary rounded">
-        <label for="pedidos" class="p-2 ">Ordenes de pedidos:</label>
-        <input type="checkbox" class="ordenes" name="ordenes" id="ordenes" onclick="checkeado(this.form)"/></br>
-         
-        <div class="row row-cols-4">
-            <div class="col border border-primary rounded">
-                <label for="productos" class="p-2">Fecha pedido:</label>
-                <input type="checkbox" class="fechaOrdenP" name="fechaOrdenP" id="fechaOrdenP"/></br>
-            </div>
+    <h1 class="text-center pb-3 pt-5">Crear Informe de Pedidos</h1>
+    <form method="post" action="" class="">
+        {% csrf_token %}
+        <div class="container border border-primary rounded">
+            <label for="pedidos" class="p-2 ">Ordenes de pedidos:</label>
+            <input type="checkbox" class="ordenes" name="ordenes" id="ordenes" onclick="checkeado(this.form)"/></br>
             
-            <div class="col border border-primary rounded">
-                <label for="productos" class="p-2">Estado recepcion:</label>
-                <input type="checkbox" class="estadoRecepcionO" name="estadoRecepcionO" id="estadoRecepcionO" onclick="checkeado(this.form)"/></br></br>
-                {% render_field form1.estadoordenid class="form-control input border border-secondary" disabled="disabled" name="estadoordenid" id="estadoordenid" style="opacity:0"%}
-            </div>
-
-            <div class="col border border-primary rounded">
-                <label for="productos" class="p-2">Nombre proveedor:</label>
-                <input type="checkbox" class="razonSocialOrdenP" name="razonSocialOrdenP" id="razonSocialOrdenP" onclick="checkeado(this.form)"/></br></br>
-
-                <div class="inputFilter" id="razonSocialOrdenSelect" style="display:none;">
-                    <select class="form-select" type="text" id="razonSocialOrdenPCheck" name="razonSocialOrdenPCheck" aria-label="Default select example" onchange="showDivAttid3('razonSocialOrdenPCheck','proveedorid', 'porRazonSocialOrdenP')">
-                        <option selected>----------</option>
-                        <option value="todosOrdenP">Todos</option>
-                        <option value="porRazonSocialOrdenP">Por Razon Social</option>
-                        </select>
+            <div class="row row-cols-4">
+                <div class="col border border-primary rounded">
+                    <label for="productos" class="p-2">Fecha pedido:</label>
+                    <input type="checkbox" class="fechaOrdenP" name="fechaOrdenP" id="fechaOrdenP"/></br>
                 </div>
-                <br>
-                {% render_field form1.proveedorid class="form-control input border border-secondary" disabled="disabled" name="proveedorid" id="proveedorid" style="opacity:0"%}
-                <br>
+                
+                <div class="col border border-primary rounded">
+                    <label for="productos" class="p-2">Estado recepcion:</label>
+                    <input type="checkbox" class="estadoRecepcionO" name="estadoRecepcionO" id="estadoRecepcionO" onclick="checkeado(this.form)"/></br></br>
+                    {% render_field form1.estadoordenid class="form-control input border border-secondary" disabled="disabled" name="estadoordenid" id="estadoordenid" style="opacity:0"%}
+                </div>
 
-            </div>
+                <div class="col border border-primary rounded">
+                    <label for="productos" class="p-2">Nombre proveedor:</label>
+                    <input type="checkbox" class="razonSocialOrdenP" name="razonSocialOrdenP" id="razonSocialOrdenP" onclick="checkeado(this.form)"/></br></br>
 
-            <div class="col border border-primary rounded">
-                <label for="productos" class="p-2">Productos pedido</label>
-                <input type="checkbox" class="detalleOrdenP" name="detalleOrdenP" id="detalleOrdenP" onclick="checkeado(this.form)"/></br></br>
-                <label for="productos" class="p-2">Cantidad:</label>
-                <input type="checkbox" class="cantidadOrdenP" name="cantidadOrdenP" id="cantidadOrdenP"/></br>
-                <label for="productos" class="p-2">Producto:</label>
-                <input type="checkbox" class="productoOrdenP" name="productoOrdenP" id="productoOrdenP"/></br>
-            </div>
-  
-        </div>
-    </div>
-    <div class="container p-3">
-        <div class="row">
-            <div class="col-md-2">
-            </div>
-            <div class="col-md-4 text-center border border-dark rounded">
-                <br>
-                <label for="">Exportar a documento tipo:</label></br></br>
-                <input type="radio" name="informeCheck" value="informeExcel" id="informeCheck1" onclick="checkeado(this.form)"> Excel</br></br>
-                <input type="radio" name="informeCheck" value="informeWord" id="informeCheck2" onclick="checkeado(this.form)"> Word</br></br>
-                <input type="radio" name="informeCheck" value="informePdf" id="informeCheck3" onclick="checkeado(this.form)"> PDF</br><br>
-            </div>
+                    <div class="inputFilter" id="razonSocialOrdenSelect" style="display:none;">
+                        <select class="form-select" type="text" id="razonSocialOrdenPCheck" name="razonSocialOrdenPCheck" aria-label="Default select example" onchange="showDivAttid3('razonSocialOrdenPCheck','proveedorid', 'porRazonSocialOrdenP')">
+                            <option selected>----------</option>
+                            <option value="todosOrdenP">Todos</option>
+                            <option value="porRazonSocialOrdenP">Por Razon Social</option>
+                            </select>
+                    </div>
+                    <br>
+                    {% render_field form1.proveedorid class="form-control input border border-secondary" disabled="disabled" name="proveedorid" id="proveedorid" style="opacity:0"%}
+                    <br>
 
-            <div class="col-md-4 text-center border border-dark rounded">
-                <br>
-                <label for="">Para descargar el informe debe seleccionar un formato de documento, para obtener una vista previa del informe solo se puede en formato PDF:</label></br></br>
-                <button type="submit" name="vistaPrevia" value="vistaPrevia" id="vistaPrevia" class="btn btn-primary">Vista previa</button><br><br>
-                <button type="submit" name="descargarInforme" value="descargarInforme" id="descargarInforme" class="btn btn-primary">Descargar</button><br><br>
-            </div>
-            <div class="col-md-2">
-            </div>
-            
-        </div>
-    </div> 
+                </div>
+
+                <div class="col border border-primary rounded">
+                    <label for="productos" class="p-2">Productos pedido</label>
+                    <input type="checkbox" class="detalleOrdenP" name="detalleOrdenP" id="detalleOrdenP" onclick="checkeado(this.form)"/></br></br>
+                    <label for="productos" class="p-2">Cantidad:</label>
+                    <input type="checkbox" class="cantidadOrdenP" name="cantidadOrdenP" id="cantidadOrdenP"/></br>
+                    <label for="productos" class="p-2">Producto:</label>
+                    <input type="checkbox" class="productoOrdenP" name="productoOrdenP" id="productoOrdenP"/></br>
+                </div>
     
-</form>
+            </div>
+        </div>
+        <div class="container p-3">
+            <div class="row">
+                <div class="col-md-2">
+                </div>
+                <div class="col-md-4 text-center border border-dark rounded">
+                    <br>
+                    <label for="">Exportar a documento tipo:</label></br></br>
+                    <input type="radio" name="informeCheck" value="informeExcel" id="informeCheck1" onclick="checkeado(this.form)"> Excel</br></br>
+                    <input type="radio" name="informeCheck" value="informeWord" id="informeCheck2" onclick="checkeado(this.form)"> Word</br></br>
+                    <input type="radio" name="informeCheck" value="informePdf" id="informeCheck3" onclick="checkeado(this.form)"> PDF</br><br>
+                </div>
 
+                <div class="col-md-4 text-center border border-dark rounded">
+                    <br>
+                    <label for="">Para descargar el informe debe seleccionar un formato de documento, para obtener una vista previa del informe solo se puede en formato PDF:</label></br></br>
+                    <button type="submit" name="vistaPrevia" value="vistaPrevia" id="vistaPrevia" class="btn btn-primary">Vista previa</button><br><br>
+                    <button type="submit" name="descargarInforme" value="descargarInforme" id="descargarInforme" class="btn btn-primary">Descargar</button><br><br>
+                </div>
+                <div class="col-md-2">
+                </div>
+            </div>
+        </div> 
+
+    </form>
+</div>
 <script>
 
     function showDivAttid(value , status){
