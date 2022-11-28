@@ -4,59 +4,42 @@
 
 {% block content %}
 <link rel="stylesheet" href="{% static 'css/informes.css' %}">
-<h1 class="text-center pb-3">Crear Informe de Pedidos</h1>
+<h1 class="text-center pb-3 pt-5">Crear Informe de Pedidos</h1>
 
 
 <form method="post" action="" class="">
     {% csrf_token %}
     <div class="container border border-primary rounded">
-        <label for="productos" class="p-2">Ordenes de pedidos:</label>
+        <label for="pedidos" class="p-2 ">Ordenes de pedidos:</label>
         <input type="checkbox" class="ordenes" name="ordenes" id="ordenes" onclick="checkeado(this.form)"/></br>
          
         <div class="row row-cols-4">
             <div class="col border border-primary rounded">
-                </br>
                 <label for="productos" class="p-2">Fecha pedido:</label>
                 <input type="checkbox" class="fechaOrdenP" name="fechaOrdenP" id="fechaOrdenP"/></br>
-
-                <!-- <label for="productos" class="p-2">Fecha llegada:</label>
-                <input type="checkbox" class="fechaLlegadaOrdenP" name="fechaLlegadaOrdenP" id="fechaLlegadaOrdenP"/></br>
-
-                <label for="productos" class="p-2">Fecha recepcion:</label>
-                <input type="checkbox" class="fechaRecepOrdenP" name="fechaRecepOrdenP" id="fechaRecepOrdenP"/></br>
-
-                <label for="productos" class="p-2">Hora recepcion:</label>
-                <input type="checkbox" class="horaRecepOrdenP" name="horaRecepOrdenP" id="horaRecepOrdenP"/></br> -->
             </div>
             
             <div class="col border border-primary rounded">
                 <label for="productos" class="p-2">Estado recepcion:</label>
                 <input type="checkbox" class="estadoRecepcionO" name="estadoRecepcionO" id="estadoRecepcionO" onclick="checkeado(this.form)"/></br></br>
-                
-                <!-- <div class="inputFilter" id="estadoRecepcionSelect" style="display:none;">
-                    <select class="form-select" type="text" name="estadoOrdenPCheck" aria-label="Default select example">
-                        <option selected>----------</option>
-                        <option value="todosOrdenP">Todos</option>
-                        <option value="enEsperaOrden">En espera</option>
-                        <option value="recepcionadoOrden">Recepcionado</option>
-                        </select>
-                </div> -->
-
-                
                 {% render_field form1.estadoordenid class="form-control input border border-secondary" disabled="disabled" name="estadoordenid" id="estadoordenid" style="opacity:0"%}
-
             </div>
 
             <div class="col border border-primary rounded">
                 <label for="productos" class="p-2">Nombre proveedor:</label>
                 <input type="checkbox" class="razonSocialOrdenP" name="razonSocialOrdenP" id="razonSocialOrdenP" onclick="checkeado(this.form)"/></br></br>
+
                 <div class="inputFilter" id="razonSocialOrdenSelect" style="display:none;">
-                    <select class="form-select" type="text" name="razonSocialOrdenPCheck" aria-label="Default select example">
+                    <select class="form-select" type="text" id="razonSocialOrdenPCheck" name="razonSocialOrdenPCheck" aria-label="Default select example" onchange="showDivAttid3('razonSocialOrdenPCheck','proveedorid', 'porRazonSocialOrdenP')">
                         <option selected>----------</option>
                         <option value="todosOrdenP">Todos</option>
                         <option value="porRazonSocialOrdenP">Por Razon Social</option>
                         </select>
                 </div>
+                <br>
+                {% render_field form1.proveedorid class="form-control input border border-secondary" disabled="disabled" name="proveedorid" id="proveedorid" style="opacity:0"%}
+                <br>
+
             </div>
 
             <div class="col border border-primary rounded">
@@ -70,37 +53,6 @@
   
         </div>
     </div>
-    
-    <!-- seguimiento pagina -->
-
-    <!-- <div class="container border border-primary rounded mt-3">
-        <label for="productos" class="p-2">Visitas a paginas:</label>
-        <input type="checkbox" class="visitas" name="visitas" id="visitas" onclick="checkeado(this.form)"/></br>
-        
-        <div class="row row-cols-2">
-
-            <div class="col border border-primary rounded">
-                <label for="productos" class="p-2">Usuario:</label>
-                <input type="checkbox" class="usuarioPaginaVisitada" name="usuarioPaginaVisitada" id="usuarioPaginaVisitada" onclick="checkeado(this.form)"/></br></br>
-                <input type="radio" name="usuarioVisitasPaginaCheck" value="todosVisitasP" id="usuarioVisitasPaginaCheck1" checked onclick="checkeado(this.form)"> Todos</br></br>
-                <input type="radio" name="usuarioVisitasPaginaCheck" value="porNombreVisitasP" id="usuarioVisitasPaginaCheck2" onclick="checkeado(this.form)"> Por nombre</br>
-                {{ FormSeg.usuario }} 
-                </br></br>
-            </div>
-            
-            <div class="col border border-primary rounded">
-                </br>
-                <label for="productos" class="p-2">Fecha ingreso:</label>
-                <input type="checkbox" class="fechaVisitasP" name="fechaVisitasP" id="fechaVisitasP"/></br>
-
-                <label for="productos" class="p-2">Pagina visitada:</label>
-                <input type="checkbox" class="paginaVisitada" name="paginaVisitada" id="paginaVisitada"/></br>
-            </div>
-    
-        </div>
-    
-    </div>
--->
     <div class="container p-3">
         <div class="row">
             <div class="col-md-2">
@@ -142,28 +94,27 @@
         }
     }
 
+    function showDivAttid3(value, idshow, field){
+        console.log(document.getElementById(`${value}`).value)
+        if(document.getElementById(`${value}`).value === field){
+            document.getElementById(`${idshow}`).disabled = false
+            document.getElementById(`${idshow}`).style.opacity = '1'
+        }else{
+            document.getElementById(`${idshow}`).disabled = true
+            document.getElementById(`${idshow}`).style.opacity = '0'
+        }
+    }
+
 </script>
 
 <script language="JavaScript">
 
     document.getElementById("fechaOrdenP").disabled=true;
-    // document.getElementById("fechaLlegadaOrdenP").disabled=true;
-    // document.getElementById("fechaRecepOrdenP").disabled=true;
-    // document.getElementById("horaRecepOrdenP").disabled=true;
     document.getElementById("estadoRecepcionO").disabled=true;
     document.getElementById("razonSocialOrdenP").disabled=true;
     document.getElementById("detalleOrdenP").disabled=true;
     document.getElementById("cantidadOrdenP").disabled=true;
     document.getElementById("productoOrdenP").disabled=true;
-    // document.getElementById("id_familia_producto").disabled=true;
-    
-    // document.getElementById("usuarioPaginaVisitada").disabled=true;
-    // document.getElementById("usuarioVisitasPaginaCheck1").disabled=true;
-    // document.getElementById("usuarioVisitasPaginaCheck2").disabled=true;
-    // document.getElementById("id_visitas_pagina").disabled=true;
-    // document.getElementById("fechaVisitasP").disabled=true;
-    // document.getElementById("paginaVisitada").disabled=true;
-    
     document.getElementById("descargarInforme").disabled=true;
     document.getElementById("vistaPrevia").disabled=true;
 
@@ -177,9 +128,6 @@
         //orden pedido
         if (form.ordenes.checked == true){
             form.fechaOrdenP.disabled = false;
-            // form.fechaLlegadaOrdenP.disabled = false;
-            // form.fechaRecepOrdenP.disabled = false;
-            // form.horaRecepOrdenP.disabled = false;
             form.estadoRecepcionO.disabled = false;
             form.razonSocialOrdenP.disabled = false;
             form.detalleOrdenP.disabled = false;
@@ -191,9 +139,6 @@
 
         if (form.ordenes.checked == false || form.ordenes.disabled == true){
             form.fechaOrdenP.disabled = true;
-            // form.fechaLlegadaOrdenP.disabled = true;
-            // form.fechaRecepOrdenP.disabled = true;
-            // form.horaRecepOrdenP.disabled = true;
             form.estadoRecepcionO.disabled = true;
             form.razonSocialOrdenP.disabled = true;
             form.detalleOrdenP.disabled = true;
@@ -227,50 +172,6 @@
         if (form.razonSocialOrdenP.checked == false || form.razonSocialOrdenP.disabled == true){
             showDivAttid('razonSocialOrdenSelect', false)
         }
-
-        // if (form.razonSocialOrdenPCheck2.checked == true){
-        //     form.id_ordenP_informe.disabled = false;
-        // }
-
-        // if (form.razonSocialOrdenPCheck1.checked == true){
-        //     form.id_ordenP_informe.disabled = true;
-        // }
-
-        // //visitas
-        // if (form.visitas.checked == true){
-            
-        //     form.usuarioPaginaVisitada.disabled = false;
-        //     form.fechaVisitasP.disabled = false;
-        //     form.paginaVisitada.disabled = false;
-        // }
-
-        // if (form.visitas.checked == false || form.visitas.disabled == true){
-        //     form.usuarioPaginaVisitada.disabled = true;
-        //     form.fechaVisitasP.disabled = true;
-        //     form.paginaVisitada.disabled = true;
-        // }
-        // //
-        // if (form.usuarioPaginaVisitada.checked == true){
-            
-        //     form.usuarioVisitasPaginaCheck1.disabled = false;
-        //     form.usuarioVisitasPaginaCheck2.disabled = false;
-            
-        // }
-
-        // if (form.usuarioPaginaVisitada.checked == false || form.usuarioPaginaVisitada.disabled == true){
-        //     form.usuarioVisitasPaginaCheck1.disabled = true;
-        //     form.usuarioVisitasPaginaCheck2.disabled = true;
-            
-        // }
-
-        // if (form.usuarioVisitasPaginaCheck2.checked == true){
-        //     form.id_visitas_pagina.disabled = false;
-        // }
-
-        // if (form.usuarioVisitasPaginaCheck1.checked == true){
-        //     form.id_visitas_pagina.disabled = true;
-        // }
-
 
         //informes
 

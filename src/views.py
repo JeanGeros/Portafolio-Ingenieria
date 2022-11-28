@@ -64,17 +64,26 @@ from src.forms import (
     FormClienteNormal1, FormClienteNormal2, FormClienteNormal3, addproductsForm, FormVendedorPersona,
     FormVendedorUsuario, FormVendedorEmpleado, FormEmpleadoPersona, FormEmpleadoUsuario, FormEmpleadoEmpleado,
     FormProveedor, FormProductoproveedor, FormBodega, FormClienteEmpresa, FormCliente, FormTipodocumento, FormVenta, 
-    FormDocu, FormProveedorUsuario,FormDireProvee, FormFamiliaProduct, FormDetalleorden, FormEstadoorden
+    FormDocu, FormProveedorUsuario,FormDireProvee, FormFamiliaProduct, FormDetalleorden, FormOrdencompra, FormAccionpagina
 )
 
 from .models import (
     Detalleorden, Estadoorden, Guiadespacho, Ordencompra, Persona, Direccion, Usuario, Cliente, Estado, Comuna, Tipobarrio, Despacho,
     Tipovivienda, Rolusuario, Direccioncliente, Empresa, Proveedor, Tipoproducto, Producto, Familiaproducto, Tipopago,
     Empleado, Cargo, Tiporubro, Recepcion, Productoproveedor, Bodega, Boleta, Factura, Venta, Tipodocumento, Detalleventa, Boleta,
-    Notacredito
+    Notacredito, Accionpagina
 )
 
 from django.utils.encoding import smart_str
+
+def Seguimiento_paginas(modulo, usuario):
+    today = datetime.now()
+    usuario_id = Usuario.objects.get(nombreusuario=usuario)
+    seguimientoPag = Accionpagina.objects.create(
+        fechain = today,
+        modulo = modulo,
+        usuarioid = usuario_id
+    )
 
 def Index(request):
     
@@ -146,6 +155,7 @@ def Ingreso(request):
 #************************************Productos*********************************************
 @login_required(login_url="ingreso")
 def Agregar_productos(request):
+    Seguimiento_paginas("Modulo Productos - Crear Producto", request.user)
 
     if request.POST.get('VerPerfil') is not None:
         request.session['_ver_perfil'] = request.POST
@@ -242,6 +252,7 @@ def Listar_productos(request):
         tipo_usuario = None
 
     productos = Productoproveedor.objects.all()
+    Seguimiento_paginas("Modulo Productos - Listar Productos", request.user)
 
     if request.method == 'POST':
         if request.POST.get('CambiarEstado') is not None:
@@ -279,6 +290,7 @@ def Cambiar_estado_producto(id_producto):
 
 @login_required(login_url="ingreso")
 def Ver_producto(request):
+    Seguimiento_paginas("Modulo Productos - Ver Detalles Producto", request.user)
 
     if request.POST.get('VerPerfil') is not None:
         request.session['_ver_perfil'] = request.POST
@@ -305,6 +317,7 @@ def Ver_producto(request):
 
 @login_required(login_url="ingreso")
 def Editar_producto(request):
+    Seguimiento_paginas("Modulo Productos - Editar Producto", request.user)
 
     if request.POST.get('VerPerfil') is not None:
         request.session['_ver_perfil'] = request.POST
@@ -394,6 +407,7 @@ def Editar_producto(request):
 
 @login_required(login_url="ingreso")
 def Ver_perfil(request):
+    Seguimiento_paginas("Ver Perfil", request.user)
 
     if request.POST.get('VerPerfil') is not None:
         request.session['_ver_perfil'] = request.POST
@@ -476,6 +490,7 @@ def Ver_perfil(request):
 
 @login_required(login_url="ingreso")
 def Revisar_compras(request):
+    Seguimiento_paginas("Revisar Compras", request.user)
 
     if request.POST.get('VerPerfil') is not None:
         request.session['_ver_perfil'] = request.POST
@@ -564,6 +579,7 @@ def Revisar_compras(request):
 
 @login_required(login_url="ingreso")
 def Editar_perfil(request):
+    Seguimiento_paginas("Editar Perfil", request.user)
 
     if request.POST.get('VerPerfil') is not None:
         request.session['_ver_perfil'] = request.POST
@@ -712,6 +728,7 @@ def Seleccion_registro(request):
 
 
 def Registro_clientes(request):
+    Seguimiento_paginas("Modulo Clientes - Registro Clientes", request.user)
 
     if request.POST.get('VerPerfil') is not None:
         request.session['_ver_perfil'] = request.POST
@@ -814,6 +831,7 @@ def Registro_clientes(request):
 
 @login_required(login_url="ingreso")
 def Agregar_cliente(request):
+    Seguimiento_paginas("Modulo Clientes - Agregar Clientes", request.user)
     
     if request.POST.get('VerPerfil') is not None:
         request.session['_ver_perfil'] = request.POST
@@ -916,6 +934,7 @@ def Agregar_cliente(request):
 
 @login_required(login_url="ingreso")
 def Listar_clientes(request):
+    Seguimiento_paginas("Modulo Clientes - Lista de Clientes", request.user)
     
     if request.POST.get('VerPerfil') is not None:
         request.session['_ver_perfil'] = request.POST
@@ -973,6 +992,7 @@ def Cambiar_estado_cliente(id_cliente):
 
 @login_required(login_url="ingreso")
 def Ver_cliente(request):
+    Seguimiento_paginas("Modulo Clientes - Ver Cliente", request.user)
 
     if request.POST.get('VerPerfil') is not None:
         request.session['_ver_perfil'] = request.POST
@@ -1000,6 +1020,7 @@ def Ver_cliente(request):
 
 @login_required(login_url="ingreso")
 def Editar_cliente(request):
+    Seguimiento_paginas("Modulo Clientes - Editar Cliente", request.user)
 
     if request.POST.get('VerPerfil') is not None:
         request.session['_ver_perfil'] = request.POST
@@ -1184,6 +1205,7 @@ def Registro_clientes_empresa(request):
 
 @login_required(login_url="ingreso")
 def Listar_vendedores(request):
+    Seguimiento_paginas("Modulo Vendedores - Listar Vendedores", request.user)
 
     if request.POST.get('VerPerfil') is not None:
         request.session['_ver_perfil'] = request.POST
@@ -1225,6 +1247,7 @@ def Listar_vendedores(request):
 
 @login_required(login_url="ingreso")
 def Agregar_vendedor(request):
+    Seguimiento_paginas("Modulo Vendedores - Agregar Vendedor", request.user)
 
     if request.POST.get('VerPerfil') is not None:
         request.session['_ver_perfil'] = request.POST
@@ -1323,6 +1346,7 @@ def Agregar_vendedor(request):
 
 @login_required(login_url="ingreso")
 def Ver_vendedor(request):
+    Seguimiento_paginas("Modulo Vendedores - Ver Vendedores", request.user)
 
     if request.POST.get('VerPerfil') is not None:
         request.session['_ver_perfil'] = request.POST
@@ -1346,6 +1370,7 @@ def Ver_vendedor(request):
 
 @login_required(login_url="ingreso")
 def Editar_vendedor(request):
+    Seguimiento_paginas("Modulo Vendedores - Editar Vendedor", request.user)
 
     if request.POST.get('VerPerfil') is not None:
         request.session['_ver_perfil'] = request.POST
@@ -1444,6 +1469,7 @@ def Cambiar_estado_vendedor(id_vendedor):
 
 @login_required(login_url="ingreso")
 def Listar_clientes_vendedor(request):
+    Seguimiento_paginas("Modulo Vendedores - Listar Cliente de Vendedor", request.user)
 
     if request.POST.get('VerPerfil') is not None:
         request.session['_ver_perfil'] = request.POST
@@ -1472,6 +1498,7 @@ def Listar_clientes_vendedor(request):
 
 @login_required(login_url="ingreso")
 def Ver_cliente_vendedor(request):
+    Seguimiento_paginas("Modulo Vendedores - Ver Cliente Vendedor", request.user)
 
     if request.POST.get('VerPerfil') is not None:
         request.session['_ver_perfil'] = request.POST
@@ -1507,6 +1534,7 @@ def Ver_cliente_vendedor(request):
 
 @login_required(login_url="ingreso")
 def Agregar_cliente_vendedor(request):
+    Seguimiento_paginas("Modulo Vendedores - Agregar Cliente a Vendedor", request.user)
     
     if request.POST.get('VerPerfil') is not None:
         request.session['_ver_perfil'] = request.POST
@@ -1609,6 +1637,7 @@ def Agregar_cliente_vendedor(request):
 
 @login_required(login_url="ingreso")
 def Editar_cliente_vendedor(request):
+    Seguimiento_paginas("Modulo Vendedores - Editar Cliente de Vendedor", request.user)
 
     if request.POST.get('VerPerfil') is not None:
         request.session['_ver_perfil'] = request.POST
@@ -1694,7 +1723,7 @@ def Editar_cliente_vendedor(request):
 
 @login_required(login_url="ingreso")
 def Agregar_proveedor(request):
-
+    Seguimiento_paginas("Modulo Proveedores - Agregar Proveedor", request.user)
 
     if request.POST.get('VerPerfil') is not None:
         request.session['_ver_perfil'] = request.POST
@@ -1792,7 +1821,6 @@ def Agregar_proveedor(request):
 
     return render(request, 'proveedores/agregar_proveedor.html', context)
 
-
 def Cambiar_estado_proveedor(id_proveedor):
     proveedor = Proveedor.objects.get(proveedorid=id_proveedor)
 
@@ -1804,6 +1832,7 @@ def Cambiar_estado_proveedor(id_proveedor):
         proveedor.save()
 
 def Listar_orden(request):
+    Seguimiento_paginas("Modulo Ordenes de Compra - Listar Ordenes", request.user)
 
     if request.POST.get('VerPerfil') is not None:
         request.session['_ver_perfil'] = request.POST
@@ -1837,6 +1866,7 @@ def Listar_orden(request):
     return render(request, 'proveedores/listar_ordenes.html', context)
 
 def Ver_orden(request):
+    Seguimiento_paginas("Modulo Ordenes de Compra - Ver Detalle Orden", request.user)
 
     if request.POST.get('VerPerfil') is not None:
         request.session['_ver_perfil'] = request.POST
@@ -1863,6 +1893,7 @@ def Ver_orden(request):
 
 @login_required(login_url="ingreso")
 def Listar_proveedores(request):
+    Seguimiento_paginas("Modulo Proveedores - Listar Proveedor", request.user)
 
     if request.POST.get('VerPerfil') is not None:
         request.session['_ver_perfil'] = request.POST
@@ -1903,6 +1934,7 @@ def Listar_proveedores(request):
 
 @login_required(login_url="ingreso")
 def Ver_proveedor(request):
+    Seguimiento_paginas("Modulo Proveedores - Ver Detalle Proveedor", request.user)
 
     if request.POST.get('VerPerfil') is not None:
         request.session['_ver_perfil'] = request.POST
@@ -1927,6 +1959,7 @@ def Ver_proveedor(request):
 
 @login_required(login_url="ingreso")
 def Editar_proveedor(request):
+    Seguimiento_paginas("Modulo Proveedores - Editar Proveedor", request.user)
 
     if request.POST.get('VerPerfil') is not None:
         request.session['_ver_perfil'] = request.POST
@@ -1985,6 +2018,7 @@ def Editar_proveedor(request):
 
 @login_required(login_url="ingreso")
 def Listar_empleados(request):
+    Seguimiento_paginas("Modulo Empleados - Listar Empleados", request.user)
 
     if request.POST.get('VerPerfil') is not None:
         request.session['_ver_perfil'] = request.POST
@@ -2026,6 +2060,7 @@ def Listar_empleados(request):
 
 @login_required(login_url="ingreso")
 def Agregar_empleado(request):
+    Seguimiento_paginas("Modulo Empleados - Agregar Empleado", request.user)
 
     if request.POST.get('VerPerfil') is not None:
         request.session['_ver_perfil'] = request.POST
@@ -2124,6 +2159,7 @@ def Agregar_empleado(request):
 
 @login_required(login_url="ingreso")
 def Ver_empleado(request):
+    Seguimiento_paginas("Modulo Empleados - Ver Detalle Empleado", request.user)
 
     if request.POST.get('VerPerfil') is not None:
         request.session['_ver_perfil'] = request.POST
@@ -2147,6 +2183,7 @@ def Ver_empleado(request):
 
 @login_required(login_url="ingreso")
 def Editar_empleado(request):
+    Seguimiento_paginas("Modulo Empleados - Editar Empleado", request.user)
 
     if request.POST.get('VerPerfil') is not None:
         request.session['_ver_perfil'] = request.POST
@@ -2248,6 +2285,7 @@ def Cambiar_estado_empleado(id_empleado):
 # *********************************Pedidos************************************************
 @csrf_exempt
 def Crear_pedido(request, id=None):
+    Seguimiento_paginas("Modulo Ordenes de Compra - Crear Pedido", request.user)
 
     if request.POST.get('VerPerfil') is not None:
         request.session['_ver_perfil'] = request.POST
@@ -2355,6 +2393,7 @@ def cambiar_estado_pedido(id_pedido):
 
 @login_required(login_url="ingreso")
 def Listar_pedidos(request):
+    Seguimiento_paginas("Modulo Ordenes de Compra - Listar Pedidos", request.user)
 
     if request.POST.get('VerPerfil') is not None:
         request.session['_ver_perfil'] = request.POST
@@ -2391,6 +2430,7 @@ def Listar_pedidos(request):
 
 @login_required(login_url="ingreso")
 def Ver_pedidos(request):
+    Seguimiento_paginas("Modulo Ordenes de Compra - Ver Detalle Pedido", request.user)
 
     if request.POST.get('VerPerfil') is not None:
         request.session['_ver_perfil'] = request.POST
@@ -2418,6 +2458,7 @@ def Ver_pedidos(request):
 
 @login_required(login_url="ingreso")
 def RecepcionPedido(request, id=None):
+    Seguimiento_paginas("Modulo Recepcion - Recepcionar un pedido", request.user)
 
     if request.POST.get('VerPerfil') is not None:
         request.session['_ver_perfil'] = request.POST
@@ -2492,6 +2533,7 @@ def RecepcionPedido(request, id=None):
 #****************************Boletas*******************************************************
 @login_required(login_url="ingreso")
 def Listar_boletas(request):
+    Seguimiento_paginas("Modulo Boletas - Listar Boletas", request.user)
 
     if request.POST.get('VerPerfil') is not None:
         request.session['_ver_perfil'] = request.POST
@@ -2520,6 +2562,7 @@ def Listar_boletas(request):
 
 @login_required(login_url="ingreso")
 def Ver_boleta(request):
+    Seguimiento_paginas("Modulo Boletas - Ver Detalle Boleta", request.user)
 
     if request.POST.get('VerPerfil') is not None:
         request.session['_ver_perfil'] = request.POST
@@ -2739,6 +2782,7 @@ def Cambiar_estado_boleta(id_boleta):
 #****************************Despacho*******************************************************
 
 def Listar_despacho(request):
+    Seguimiento_paginas("Modulo Despachos - Listar Despachos", request.user)
 
     if request.POST.get('VerPerfil') is not None:
         request.session['_ver_perfil'] = request.POST
@@ -2773,6 +2817,7 @@ def Listar_despacho(request):
     return render(request, 'despacho/listar_despacho.html', context)
 
 def Ver_despacho(request):
+    Seguimiento_paginas("Modulo Despachos - Ver Detalle Despacho", request.user)
 
     if request.POST.get('VerPerfil') is not None:
         request.session['_ver_perfil'] = request.POST
@@ -2852,6 +2897,7 @@ def Cambiar_estado_despacho(despachoId,estado_id,estado):
 #****************************Orden Proveedor******************************************
 
 def Ver_Orden(request):
+    Seguimiento_paginas("Modulo Despachos - Ver Despacho", request.user)
 
     if request.POST.get('VerPerfil') is not None:
         request.session['_ver_perfil'] = request.POST
@@ -3081,7 +3127,7 @@ def generar_factura(c, venta, documento, detalle_venta, direccion_cliente, giro,
         c.drawString(1.1*inch, 7.5*inch, f"{str(venta.clienteid.personaid.telefono)}")
         c.drawString(1.05*inch, 8.3*inch, f"{str(venta.clienteid).lower().capitalize()}")
         
-        neto = round(int(documento.totalboleta)-(int(documento.totalboleta)*0.19))
+        neto = round(int(documento.totalboleta)*0.81)
         iva = round(int(documento.totalboleta)*0.19)
 
         c.drawRightString(6.5*inch,1.7*inch,f'{neto}') #  
@@ -3116,8 +3162,8 @@ def generar_factura(c, venta, documento, detalle_venta, direccion_cliente, giro,
 
         try:
             documento_venta = Factura.objects.get(nroventa=venta.nroventa)
-            c.drawRightString(6.5*inch,1.7*inch,f'{str(documento_venta.neto)}') # Total 
-            c.drawRightString(6.5*inch,1.5*inch,f'{str(documento_venta.iva)}') # Total 
+            c.drawRightString(6.5*inch,1.7*inch,f'{round(documento_venta.neto)}') # Total 
+            c.drawRightString(6.5*inch,1.5*inch,f'{round(documento_venta.iva)}') # Total 
             c.drawRightString(6.5*inch,1.3*inch,f'{str(documento_venta.totalfactura)}') # Total 
         except Factura.DoesNotExist:
             documento_venta = Boleta.objects.get(nroventa=venta.nroventa)
@@ -3235,6 +3281,7 @@ def generar_factura(c, venta, documento, detalle_venta, direccion_cliente, giro,
 
 @login_required(login_url="ingreso")
 def crear_venta(request):
+    Seguimiento_paginas("Modulo Ventas - Crear Venta", request.user)
 
     if request.POST.get('VerPerfil') is not None:
         request.session['_ver_perfil'] = request.POST
@@ -3314,7 +3361,7 @@ def crear_venta(request):
             if documento_venta.tipodocumentoid == 2:
                 Factura.objects.create(
                     fechafactura = datetime.now().date(),
-                    neto = int(total_venta)-(int(total_venta)*0.19),
+                    neto = int(total_venta)*0.81,
                     iva = int(total_venta)*0.19,
                     totalfactura = total_venta,
                     nroventa = ultima_ventas,
@@ -3435,6 +3482,7 @@ def crear_venta(request):
 
 @login_required(login_url="ingreso")
 def listar_ventas(request):
+    Seguimiento_paginas("Modulo Ventas - Listar Ventas", request.user)
     
     if request.POST.get('VerPerfil') is not None:
         request.session['_ver_perfil'] = request.POST
@@ -3462,6 +3510,7 @@ def listar_ventas(request):
 
 @login_required(login_url="ingreso")
 def ver_venta(request):
+    Seguimiento_paginas("Modulo Ventas - Ver Detalle Venta", request.user)
 
     if request.POST.get('VerPerfil') is not None:
         request.session['_ver_perfil'] = request.POST
@@ -3496,6 +3545,7 @@ def ver_venta(request):
 
 @login_required(login_url="ingreso")
 def listar_facturas(request):
+    Seguimiento_paginas("Modulo Facturas - Listar Facturas", request.user)
     
     if request.POST.get('VerPerfil') is not None:
         request.session['_ver_perfil'] = request.POST
@@ -3526,6 +3576,8 @@ def listar_facturas(request):
 
 @login_required(login_url="ingreso")
 def ver_factura(request):
+    Seguimiento_paginas("Modulo Facturas - Ver Detalle Factura", request.user)
+
     if request.POST.get('VerPerfil') is not None:
         request.session['_ver_perfil'] = request.POST
         return redirect('ver_perfil')
@@ -3730,6 +3782,7 @@ def ver_factura(request):
 
 # @login_required(login_url="ingreso")
 def Listar_notas_credito(request):
+    Seguimiento_paginas("Modulo Notas de Credito - Listar Notas de Credito", request.user)
 
     if request.POST.get('VerPerfil') is not None:
         request.session['_ver_perfil'] = request.POST
@@ -3758,6 +3811,7 @@ def Listar_notas_credito(request):
 
 # @login_required(login_url="ingreso")
 def Ver_nota_credito(request):
+    Seguimiento_paginas("Modulo Notas de Credito - Ver Detalle Nota de Credito", request.user)
 
     if request.POST.get('VerPerfil') is not None:
         request.session['_ver_perfil'] = request.POST
@@ -3926,6 +3980,7 @@ def Listar_documentos(request):
 
 # @login_required(login_url="ingreso")
 def Crear_nota_credito(request):
+    Seguimiento_paginas("Modulo Notas de Credito - Crear Nota de Credito", request.user)
 
     if request.POST.get('VerPerfil') is not None:
         request.session['_ver_perfil'] = request.POST
@@ -4026,6 +4081,7 @@ def Crear_nota_credito(request):
 
 @login_required(login_url="ingreso")
 def listar_guias_despacho(request):
+    Seguimiento_paginas("Modulo Guias de Despacho - Lista Guias de Despacho", request.user)
     
     if request.POST.get('VerPerfil') is not None:
         request.session['_ver_perfil'] = request.POST
@@ -4051,6 +4107,7 @@ def listar_guias_despacho(request):
     return render(request, 'guias_despacho/listar_guias_despacho.html', context)
 
 def ver_guia_despacho(request):
+    Seguimiento_paginas("Modulo Guias de Despacho - Detalle Guia de Despacho", request.user)
 
     if request.POST.get('VerPerfil') is not None:
         request.session['_ver_perfil'] = request.POST
@@ -4216,6 +4273,12 @@ def ver_guia_despacho(request):
     return render(request, 'guias_despacho/ver_guia_despacho.html', context)
 
 def informe_productos(request):
+    if Usuario.objects.filter(nombreusuario=request.user).exists():
+        tipo_usuario = Usuario.objects.get(nombreusuario=request.user)
+        tipo_usuario = tipo_usuario.rolid.descripcion
+    else: 
+        tipo_usuario = None
+    Seguimiento_paginas("Informe Productos", request.user)
     
     form1 = addproductsForm(request.POST)
 
@@ -4383,7 +4446,14 @@ def informe_productos(request):
     return render(request, 'informes/informe_productos.html', context)
 
 def informe_proveedores(request):
+    if Usuario.objects.filter(nombreusuario=request.user).exists():
+        tipo_usuario = Usuario.objects.get(nombreusuario=request.user)
+        tipo_usuario = tipo_usuario.rolid.descripcion
+    else: 
+        tipo_usuario = None
+    
     form1 = FormProveedor(request.POST)
+    Seguimiento_paginas("Informe Proveedores", request.user)
 
     if request.method == 'POST':
         vistaPrevia = request.POST.get('vistaPrevia')
@@ -4505,8 +4575,15 @@ def informe_proveedores(request):
     return render(request, 'informes/informe_proveedores.html', context)
 
 def informe_pedidos(request):
-    
-    form1 = FormEstadoorden(request.POST)
+    if Usuario.objects.filter(nombreusuario=request.user).exists():
+        tipo_usuario = Usuario.objects.get(nombreusuario=request.user)
+        tipo_usuario = tipo_usuario.rolid.descripcion
+    else: 
+        tipo_usuario = None
+
+    Seguimiento_paginas("Informe Pedidos", request.user)
+
+    form1 = FormOrdencompra(request.POST)
 
     if request.method == 'POST':
         ordenes = request.POST.get('ordenes')
@@ -4516,9 +4593,10 @@ def informe_pedidos(request):
         horaRecepOrdenP = request.POST.get('horaRecepOrdenP')
         cantidadOrdenP = request.POST.get('cantidadOrdenP')
         productoOrdenP = request.POST.get('productoOrdenP')
+        estadoordenid = request.POST.get('estadoordenid')
+        proveedorid = request.POST.get('proveedorid')
 
         estadoRecepcionO = request.POST.get('estadoRecepcionO')
-        estadoOrdenPCheck = request.POST.get('estadoOrdenPCheck')
         razonSocialOrdenP = request.POST.get('razonSocialOrdenP')
         razonSocialOrdenPCheck = request.POST.get('razonSocialOrdenPCheck')
         nomProveedor = request.POST.get('proveedor')
@@ -4534,57 +4612,54 @@ def informe_pedidos(request):
         print(f"horaRecepOrdenP: {horaRecepOrdenP}" )
         print(f"cantidadOrdenP: {cantidadOrdenP}" )
         print(f"productoOrdenP: {productoOrdenP}" )
+
         print(f"estadoRecepcionO: {estadoRecepcionO}" )
-        print(f"estadoOrdenPCheck: {estadoOrdenPCheck}" )
+
         print(f"razonSocialOrdenP: {razonSocialOrdenP}" )
         print(f"razonSocialOrdenPCheck: {razonSocialOrdenPCheck}" )
+        print(f"estadoordenid: {estadoordenid}" )
+        print(f"proveedorid: {proveedorid}" )
+
         print(f"nomProveedor: {nomProveedor}" )
         print(f"tipoInforme: {tipoInforme}" )
-
-        nomProveedor = Proveedor.objects.filter(proveedorid = nomProveedor)
-        for us in nomProveedor:
-            nomProveedor = us.razonsocial
         
         lista = []
         visitas = []
 
-        tipoInforme = request.POST.get('informeCheck')
-        
         np_array = []
         np_array = np.array(lista)
 
         if ordenes == "on":
             ordenes = Detalleorden.objects.all().values_list("ordenid__proveedorid__razonsocial","ordenid__fechapedido","ordenid__estadoordenid__descripcion","productoid__nombre","cantidad").order_by("detalleid")
-            # ("orden_pedido__fecha_llegada","orden_pedido__fecha_recepcion","orden_pedido__hora_recepcion","cantidad").order_by("id")
             columnas = (["Razon Social","Fecha Pedido", "Estado", "Producto", "Cantidad"])
-
-            if estadoOrdenPCheck == "enEsperaOrden":
-                ordenes1 = ordenes.filter(ordenid__estadoordenid__descripcion="Solicitado")
-                ordenes = ordenes.filter(ordenid__estadoordenid__descripcion="Productos Pendientes") 
-                ordenes+=ordenes1
-            if estadoOrdenPCheck == "recepcionadoOrden":
-                ordenes = ordenes.filter(ordenid__estadoordenid__descripcion="Aceptado")
+            if estadoRecepcionO == "on":   
+                ordenes = ordenes.filter(ordenid__estadoordenid = estadoordenid)
             if razonSocialOrdenPCheck == "porRazonSocialOrdenP":
-                ordenes = ordenes.order_by("ordenid__proveedorid__razonsocial")
+                ordenes = ordenes.filter(ordenid__proveedorid = proveedorid)
 
-            np_array = np.array(ordenes)
-            df = pd.DataFrame(np_array, columns = columnas)
-            print(df)
+            if len(ordenes) < 1:
+                sweetify.warning(request, 'No existen registros con los parámetros seleccionados')
+                return redirect('informe_pedidos')
+            else:
+                np_array = np.array(ordenes)
+                df = pd.DataFrame(np_array, columns = columnas)
 
-            if cantidadOrdenP == None:
-                df = df.drop(['Cantidad'], axis=1)
-            if productoOrdenP == None:
-                df = df.drop(['Producto'], axis=1)
+                if cantidadOrdenP == None:
+                    df = df.drop(['Cantidad'], axis=1)
+                if productoOrdenP == None:
+                    df = df.drop(['Producto'], axis=1)
 
-            lista_proveedores = df.values.tolist() 
-            columnas_df = df.columns.values.tolist() 
-            lista_proveedores.insert(0, columnas_df)
+                lista_proveedores = df.values.tolist() 
+                columnas_df = df.columns.values.tolist() 
+                lista_proveedores.insert(0, columnas_df)
+            
             if tipoInforme == "informeExcel":
                 nombre_archivo = "Pedidos"
                 if visitas == []:
                     return  creacion_excel(nombre_archivo, lista_proveedores)
                 else:
                     return  creacion_excel(nombre_archivo, lista_proveedores, visitas)
+
             if tipoInforme == "informePdf":
                 tipo_doc = 'pdf'
                 extension = 'pdf'
@@ -4612,462 +4687,300 @@ def informe_pedidos(request):
 
     return render(request, 'informes/informe_pedidos.html', context)
 
-# @login_required(login_url="login")
-# def CreacionInformesProductos(request):
+def informe_ventas(request):
+    if Usuario.objects.filter(nombreusuario=request.user).exists():
+        tipo_usuario = Usuario.objects.get(nombreusuario=request.user)
+        tipo_usuario = tipo_usuario.rolid.descripcion
+    else: 
+        tipo_usuario = None
 
-#     usuario = request.user
-#     usuario = User.objects.get(username=usuario)
+    form1 = FormVenta(request.POST)
 
-#     seguimientoPag = SEGUIMIENTO_PAGINA.objects.create(
-#         pagina_visitada = "Crear informe de productos",
-#         usuario = usuario
-#     )
-#     seguimientoPag.save()
-
-#     formP = FormProducto()
-#     formT = FormFamiliaProd()
-#     formU = FormBoleta()
-#     formC = FormClientesParaVenta()
-#     formCliente = FormClientesInforme()
-#     formProveedor = FormProductoProv()
-#     formCatProv = FormProveedor()
-#     formProveeOrden = FormInformeOrdenPedido()
-#     FormSeg = FormSeguimientoPagina()
-
-#     if request.method == 'POST':
-
-#         vistaPrevia = request.POST.get('vistaPrevia')
-#         descargarInforme = request.POST.get('descargarInforme')
- 
-#         productos = request.POST.get('productos')
-#         precio = request.POST.get('precio')
-#         descripcion = request.POST.get('descripcion')
-#         nombre = request.POST.get('nombre')
-#         precioCompra = request.POST.get('precioCompra')
-#         stockCritico = request.POST.get('stockCritico')
+    Seguimiento_paginas("Informe Ventas", request.user)
     
-#         fechaVencimiento = request.POST.get('fechaVencimiento')
-#         codigoBarra = request.POST.get('codigoBarra')
+    if request.method == 'POST':
 
-#         stock = request.POST.get('stock')
-#         stockCheck = request.POST.get('stockCheck')
+        ventas = request.POST.get('ventas')
+        fechaVenta = request.POST.get('fechaVenta')
+        montoTotal = request.POST.get('montoTotal')
+        nombreCliente = request.POST.get('nombreCliente')
+        nombreProducto = request.POST.get('nombreProducto')
+        cantidadVenta = request.POST.get('cantidadVenta')
+        subTotal = request.POST.get('subTotal')
 
-#         estado = request.POST.get('estado')
-#         estadoCheck = request.POST.get('estadoCheck')
+        DocuTributario = request.POST.get('DocuTributario')
+        docuTributarioCheck = request.POST.get('docuTributarioCheck')
+        tipodocumentoid = request.POST.get('tipodocumentoid')
+        tipoPago = request.POST.get('tipoPago')
+        TipoPagoCheck = request.POST.get('TipoPagoCheck')
+        tipopagoid = request.POST.get('tipopagoid')
 
-#         familiaProducto = request.POST.get('familiaProducto')
-#         familiaProductoCheck = request.POST.get('familiaProductoCheck')
-#         nomFamiliaProducto = request.POST.get('familia_producto')
-#         nomFamiliaProducto = FAMILIA_PRODUCTO.objects.filter(id = nomFamiliaProducto)
-#         for fam in nomFamiliaProducto:
-#             nomFamiliaProducto = fam.descripcion
+        tipoInforme = request.POST.get('informeCheck')
+        vistaPrevia = request.POST.get('vistaPrevia')
+  
+        print("-----VALORES PRODUCTOS-----")
+        print(f"ventas: {ventas}" )
+        print(f"fechaVenta: {fechaVenta}" )
+        print(f"montoTotal: {montoTotal}" )
+
+        print(f"nombreCliente: {nombreCliente}" )
         
-#         tipoProducto = request.POST.get('tipoProducto')
-#         tipoProductoCheck = request.POST.get('tipoProductoCheck')
-#         nomTipoProducto = request.POST.get('tipo_producto')
-#         nomTipoProducto = TIPO_PRODUCTO.objects.filter(id = nomTipoProducto)
-#         for tip in nomTipoProducto:
-#             nomTipoProducto = tip.descripcion
-
-#         visitasPagina = request.POST.get('visitas')
-
-#         lista = []
-#         visitas = []
-
-#         tipoInforme = request.POST.get('informeCheck')
-
-#         if productos == "on":
-#             val = PRODUCTO.objects.all().values_list("id","nombre","precio","descripcion","precio_compra","stock", "stock_critico","estado","fecha_vencimiento","codigo_barra","familia_producto__descripcion","familia_producto__tipo_producto__descripcion").order_by("id")
-#             lista.append(["id","nombre","precio","descripcion","precio_compra","stock", "stock_critico","estado","fecha_vencimiento","codigo_barra","familia_producto","tipo_producto"])
-
-#             for valores in val:
-
-#                 lista.append(list(valores))
-
-#             if nombre == None:
-#                 np_array = np.array(lista)
-#                 val = np.where(np_array == "nombre")
-#                 val = int(val[1])
-
-#                 for valor in lista:
-
-#                     valor.pop(val)
-
-
-#             if descripcion == None:
-
-#                 np_array = np.array(lista)
-#                 val = np.where(np_array == "descripcion")
-#                 val = int(val[1])
-
-#                 for valor in lista:
-
-#                     valor.pop(val)
-
-#             if precio == None:
-
-#                 np_array = np.array(lista)
-#                 val = np.where(np_array == "precio")
-#                 val = int(val[1])
-
-#                 for valor in lista:
-
-#                     valor.pop(val)
-
-
-#             if precioCompra == None:
-
-#                 np_array = np.array(lista)
-#                 val = np.where(np_array == "precio_compra")
-#                 val = int(val[1])
-
-#                 for valor in lista:
-
-#                     valor.pop(val)
-
-#             if stockCritico == None:
-#                 np_array = np.array(lista)
-#                 val = np.where(np_array == "stock_critico")
-#                 val = int(val[1])
-                
-#                 for valor in lista:
-
-#                     valor.pop(val)
-
-#             if estado == None:
-#                 np_array = np.array(lista)
-#                 val = np.where(np_array == "estado")
-#                 val = int(val[1])
-                
-#                 for valor in lista:
-
-#                     valor.pop(val)
-
-#             if fechaVencimiento == None:
-
-#                 np_array = np.array(lista)
-#                 val = np.where(np_array == "fecha_vencimiento")
-#                 val = int(val[1])
-
-#                 for valor in lista:
-
-#                     valor.pop(val)
-
-#             if codigoBarra == None:
-
-#                 np_array = np.array(lista)
-#                 val = np.where(np_array == "codigo_barra")
-#                 val = int(val[1])
-
-#                 for valor in lista:
-
-#                     valor.pop(val)
-
-#             if stock == None:
-#                 np_array = np.array(lista)
-#                 val = np.where(np_array == "stock")
-#                 val = int(val[1])
-#                 for valor in lista:
-
-#                     valor.pop(val)
-
-#             if familiaProducto == None:
-
-#                 np_array = np.array(lista)
-#                 val = np.where(np_array == "familia_producto")
-#                 val = int(val[1])
-
-#                 for valor in lista:
-
-#                     valor.pop(val)
-
-#             if tipoProducto == None:
-
-#                 np_array = np.array(lista)
-#                 val = np.where(np_array == "tipo_producto")
-#                 val = int(val[1])
-
-#                 for valor in lista:
-
-#                     valor.pop(val)
-
-#             np_array = []
-#             np_array = np.array(lista)
-#             np_arrayProd = np.array(lista)
-
-#             if stockCheck == "conStock":
-#                 np_array = np.array(lista)
-#                 val = np.where(np_array == "stock")
-#                 val = int(val[1])
-#                 cont = 0
-
-#                 for valores in lista:
-#                     numero = np_arrayProd[cont][val]
-#                     print(numero)
-#                     if cont > 0:
-
-#                         if int(numero) < 1:
-                           
-#                             np_arrayProd = np.delete(np_arrayProd, cont, axis=0)
-#                             cont = cont - 1
-                            
-#                     cont += 1
-
-#             lista = []
-#             np_array = []
-#             lista = np_arrayProd.tolist()
-#             np_arrayProd = np.array(lista)
-#             np_array = np.array(lista)
-
-#             if stockCheck == "sinStock":
-#                 np_array = np.array(lista)
-#                 val = np.where(np_array == "stock")
-#                 val = int(val[1])
-#                 cont = 0
-                
-#                 for valores in lista:
-                    
-#                     numero = np_arrayProd[cont][val]
-                    
-#                     if cont > 0:
-
-#                         if int(numero) > 0:
-                            
-#                             np_arrayProd = np.delete(np_arrayProd, cont, axis=0)
-#                             cont = cont - 1 
-                            
-#                     cont += 1
-                            
-#             lista = []
-#             np_array = []
-#             lista = np_arrayProd.tolist()
-#             np_arrayProd = np.array(lista)
-
-#             if estadoCheck == "disponible":
-#                 np_array = np.array(lista)
-#                 val = np.where(np_array == "estado")
-#                 val = int(val[1])
-#                 cont = 0
-
-#                 for valores in lista:
-                    
-#                     numero = np_arrayProd[cont][val]
-                    
-#                     if cont > 0:
-
-#                         if int(numero) < 1:
-                            
-#                             np_arrayProd = np.delete(np_arrayProd, cont, axis=0)
-#                             cont = cont - 1 
-                            
-#                     cont += 1
-                            
-#             lista = []
-#             np_array = []
-#             lista = np_arrayProd.tolist()
-#             np_arrayProd = np.array(lista)
-
-#             if estadoCheck == "noDisponible":
-#                 np_array = np.array(lista)
-#                 val = np.where(np_array == "estado")
-#                 val = int(val[1])
-#                 cont = 0
-
-#                 for valores in lista:
-                    
-#                     numero = np_arrayProd[cont][val]
-                    
-#                     if cont > 0:
-
-#                         if int(numero) > 0:
-                            
-#                             np_arrayProd = np.delete(np_arrayProd, cont, axis=0)
-#                             cont = cont - 1 
-                            
-#                     cont += 1
-                            
-#             lista = []
-#             np_array = []
-#             lista = np_arrayProd.tolist()
-#             np_arrayProd = np.array(lista)
-
-#             if familiaProductoCheck == "porNombreF":
-#                 np_array = np.array(lista)
-#                 val = np.where(np_array == "familia_producto")
-#                 val = int(val[1])
-#                 cont = 0
-
-#                 for valores in lista:
-                    
-#                     nombre = np_arrayProd[cont][val]
-                    
-#                     if cont > 0:
-
-#                         if nombre != nomFamiliaProducto:
-                            
-#                             np_arrayProd = np.delete(np_arrayProd, cont, axis=0)
-#                             cont = cont - 1 
-                            
-#                     cont += 1
-                            
-#             lista = []
-#             np_array = []
-#             lista = np_arrayProd.tolist()
-#             np_arrayProd = np.array(lista)
-
-#             if tipoProductoCheck == "porNombreT":
-#                 np_array = np.array(lista)
-#                 val = np.where(np_array == "tipo_producto")
-#                 val = int(val[1])
-#                 cont = 0
-
-#                 for valores in lista:
-                    
-#                     nombre = np_arrayProd[cont][val]
-                    
-#                     if cont > 0:
-
-#                         if nombre != nomTipoProducto:
-                            
-#                             np_arrayProd = np.delete(np_arrayProd, cont, axis=0)
-#                             cont = cont - 1 
-                            
-#                     cont += 1
-                            
-#             lista = []
-#             np_array = []
-#             lista = np_arrayProd.tolist()
-#             np_arrayProd = np.array(lista)
-
-#         if visitasPagina == "on":
-            
-#             paginaVisitada = request.POST.get('paginaVisitada')
-#             fechaVisitasP = request.POST.get('fechaVisitasP')
-
-#             usuarioVisitasPagina = request.POST.get('usuarioPaginaVisitada')
-#             usuarioVisitas = request.POST.get('usuarioVisitasPaginasCheck')
-#             nomUsuario = request.POST.get('usuario')
-#             nomUsuario = User.objects.filter(id = nomUsuario)
-#             for us in nomUsuario:
-#                 nomUsuario = us.username
-
-#             val = SEGUIMIENTO_PAGINA.objects.all().values_list("id","pagina_visitada","fecha_ingreso","usuario__username").order_by("id")
-#             visitas.append(["id","pagina_visitada","fecha_ingreso","usuario"])
-            
-#             for valores in val:
-
-#                 visitas.append(list(valores))
-
-#             if paginaVisitada == None:
-#                 np_array = np.array(visitas)
-#                 val = np.where(np_array == "pagina_visitada")
-#                 val = int(val[1])
-
-#                 for valor in visitas:
-
-#                     valor.pop(val)
-
-#             if fechaVisitasP == None:
-#                 np_array = np.array(visitas)
-#                 val = np.where(np_array == "fecha_ingreso")
-#                 val = int(val[1])
-
-#                 for valor in visitas:
-
-#                     valor.pop(val)
-
-#             if usuarioVisitasPagina == None:
-#                 np_array = np.array(visitas)
-#                 val = np.where(np_array == "usuario")
-#                 val = int(val[1])
-
-#                 for valor in visitas:
-
-#                     valor.pop(val)
-
-#             np_array = []
-#             np_array = np.array(visitas)
-#             np_arrayProd = np.array(visitas)
-            
-#             if usuarioVisitas == "porNombreVisitasP":
-#                 np_array = np.array(visitas)
-#                 val = np.where(np_array == "usuario")
-#                 val = int(val[1])
-#                 cont = 0
-
-#                 for valores in visitas:
-                    
-#                     nombre = np_arrayProd[cont][val]
-                    
-#                     if cont > 0:
-
-#                         if nombre != nomUsuario:
-                            
-#                             np_arrayProd = np.delete(np_arrayProd, cont, axis=0)
-#                             cont = cont - 1 
-                            
-#                     cont += 1
-
-#             visitas = []
-#             np_array = []
-#             visitas = np_arrayProd.tolist()
-#             np_arrayProd = np.array(visitas)
-
-#         if tipoInforme == "informeExcel":
-            
-#             nombre_archivo = "Productos"
-#             if visitas == []:
-#                 return  creacion_excel(nombre_archivo, lista)
-#             else:
-#                 return  creacion_excel(nombre_archivo, lista, visitas)
-            
-
-#         if tipoInforme == "informePdf":
-
-#             tipo_doc = 'pdf'
-#             extension = 'pdf'
-            
-#             nombre = 'Productos'
-            
-#             if vistaPrevia:
-#                 if visitas == []:
-#                     return creacion_doc(lista,tipo_doc,A2,nombre,extension, valor=False)
-#                 else:
-#                     return creacion_doc(lista,tipo_doc,A2,nombre,extension, valor=False, visitas=visitas)
-#             else:
-#                 if visitas == []:
-#                     return creacion_doc(lista,tipo_doc,A2,nombre,extension, valor=True)
-#                 else:
-#                     return creacion_doc(lista,tipo_doc,A2,nombre,extension, valor=True, visitas=visitas)
- 
-#         if tipoInforme == "informeWord": 
-
-#             tipo_doc = 'ms-word'
-#             extension = 'docx'
-            
-#             nombre = 'Productos'
-#             if vistaPrevia:
-#                 if visitas == []:
-#                     return creacion_doc(lista,tipo_doc,A2,nombre,extension, valor=False)
-#                 else:
-#                     return creacion_doc(lista,tipo_doc,A2,nombre,extension, valor=False, visitas=visitas)
-#             else:
-#                 if visitas == []:
-#                     return creacion_doc(lista,tipo_doc,A2,nombre,extension, valor=True)
-#                 else:
-#                     return creacion_doc(lista,tipo_doc,A2,nombre,extension, valor=True, visitas=visitas)
-
-#     context = {
-#         'formP':formP,
-#         'formT':formT,
-#         'formU':formU,
-#         'formC':formC,
-#         'formCliente':formCliente,
-#         'formProveedor':formProveedor,
-#         'formCatProv':formCatProv,
-#         'formProveeOrden':formProveeOrden,
+        print(f"nombreProducto: {nombreProducto}" )
+        print(f"cantidadVenta: {cantidadVenta}" )
+        print(f"subTotal: {subTotal}" )
+
+        print(f"DocuTributario: {DocuTributario}" )
+        print(f"docuTributarioCheck: {docuTributarioCheck}" )
+        print(f"tipodocumentoid: {tipodocumentoid}" )
+
+        print(f"tipoPago: {tipoPago}" )
+        print(f"TipoPagoCheck: {TipoPagoCheck}" )
+        print(f"tipopagoid: {tipopagoid}" )
+
+        print(f"tipoInforme: {tipoInforme}" )
         
-#         'FormSeg':FormSeg,
+        lista = []
+        visitas = []
 
-#     }
-#     return render(request, 'informes/informe_productos.html', context)
+        tipoInforme = request.POST.get('informeCheck')
+        
+        np_array = []
+        np_array = np.array(lista)
+
+        if ventas == "on":
+            ventas = Detalleventa.objects.all().values_list("nroventa","nroventa__fechaventa","nroventa__totalventa","nroventa__clienteid__personaid__nombres","nroventa__clienteid__empresaid__razonsocial", "productoid__nombre","cantidad","subtotal","nroventa__tipodocumentoid__descripcion","nroventa__tipopagoid__descripcion").order_by("nroventa")
+
+            columnas = (["Nro Venta","Fecha Venta", "Valor Total", "Cliente", "Empresa", "Nombre Producto", "Cantidad", "Sub Total", "Documento Venta", "Tipo de Pago"])
+            
+            if docuTributarioCheck == "porDocuTributario":   
+                ventas = ventas.filter(nroventa__tipodocumentoid = tipodocumentoid)
+            if TipoPagoCheck == "porTipoPago":
+                ventas = ventas.filter(nroventa__tipopagoid = tipopagoid)
+
+            if len(ventas) < 1:
+                sweetify.warning(request, 'No existen registros con los parámetros seleccionados')
+                return redirect('informe_ventas')
+            else:
+                np_array = np.array(ventas)
+                df = pd.DataFrame(np_array, columns = columnas)
+
+                df["Nombre Cliente"] = df["Cliente"] + df["Empresa"]
+                df = df.drop(['Cliente'], axis=1)
+                df = df.drop(['Empresa'], axis=1)
+
+                if fechaVenta == None:
+                    df = df.drop(['Fecha Venta'], axis=1)
+                if montoTotal == None:
+                    df = df.drop(['Valor Total'], axis=1)
+                if nombreCliente == None:
+                    df = df.drop(['Nombre Cliente'], axis=1)
+                if nombreProducto == None:
+                    df = df.drop(['Nombre Producto'], axis=1)
+                if cantidadVenta == None:
+                    df = df.drop(['Cantidad'], axis=1)
+                if subTotal == None:
+                    df = df.drop(['Sub Total'], axis=1)
+
+                if DocuTributario == None:
+                    df = df.drop(['Documento Venta'], axis=1)
+                if tipoPago == None:
+                    df = df.drop(['Tipo de Pago'], axis=1)
+            print(df)
+
+            if df.shape[1] > 5:
+                length_dataframe = df.shape[1]
+                df2= df.iloc[:, 6:int(length_dataframe)] 
+                df= df.iloc[:, 0:6]
+
+                lista_ventas2 = df2.values.tolist() 
+                columnas_df2 = df2.columns.values.tolist() 
+                lista_ventas2.insert(0, columnas_df2)
+
+                lista_ventas = df.values.tolist() 
+                columnas_df = df.columns.values.tolist() 
+                lista_ventas.insert(0, columnas_df)
+            else:
+                lista_ventas = df.values.tolist() 
+                columnas_df = df.columns.values.tolist() 
+                lista_ventas.insert(0, columnas_df)
+
+            if tipoInforme == "informeExcel":
+                nombre_archivo = "Informe Detallado Ventas"
+                if visitas == []:
+                    return  creacion_excel(nombre_archivo, lista_ventas)
+                else:
+                    return  creacion_excel(nombre_archivo, lista_ventas, visitas)
+
+            if tipoInforme == "informePdf":
+                tipo_doc = 'pdf'
+                extension = 'pdf'
+                nombre = 'Informe Detallado Ventas'
+                if df.shape[1] > 5:
+                    return creacion_pdf(lista_ventas,tipo_doc,A4,nombre,extension, lista_ventas2, valor=False)
+                else:
+                    return creacion_pdf(lista_ventas,tipo_doc,A4,nombre,extension,valor=False)
+
+            if tipoInforme == "informeWord": 
+                tipo_doc = 'ms-word'
+                extension = 'docx'
+                nombre = 'Informe Detallado Ventas'
+                if vistaPrevia:
+                    if visitas == []:
+                        return creacion_doc(lista_ventas,nombre)
+                    else:
+                        return creacion_doc(lista_ventas,nombre)
+                else:
+                    if visitas == []:
+                        return creacion_doc(lista_ventas,nombre)
+                    else:
+                        return creacion_doc(lista_ventas,nombre)
+
+    context = {
+        'form1':form1
+    }
+
+    return render(request, 'informes/informe_ventas.html', context)
+
+def informe_visitas(request):
+    if Usuario.objects.filter(nombreusuario=request.user).exists():
+        tipo_usuario = Usuario.objects.get(nombreusuario=request.user)
+        tipo_usuario = tipo_usuario.rolid.descripcion
+    else: 
+        tipo_usuario = None
+
+    Seguimiento_paginas("Informe Visitas", request.user)
+
+    form1 = FormAccionpagina(request.POST)
+
+    if request.method == 'POST':
+
+        visitas = request.POST.get('visitas')
+        fechaIn = request.POST.get('fechaIn')
+        nombreModulo = request.POST.get('nombreModulo')
+        fechain = request.POST.get('fechain')
+        fechaInicio = request.POST.get('fechaInicio')
+
+        porModuloCheck = request.POST.get('porModuloCheck')
+        moduloCheck = request.POST.get('moduloCheck')
+
+        detalleUsuario = request.POST.get('detalleUsuario')
+        nombreUsuario = request.POST.get('nombreUsuario')
+        correoUsuario = request.POST.get('correoUsuario')
+        rolUsuario = request.POST.get('rolUsuario')
+
+        tipoInforme = request.POST.get('informeCheck')
+        vistaPrevia = request.POST.get('vistaPrevia')
+  
+        print("-----VALORES PRODUCTOS-----")
+        print(f"visitas: {visitas}" )
+        print(f"fechaIn: {fechaIn}" )
+        print(f"nombreModulo: {nombreModulo}" )
+        
+        print(f"porModuloCheck: {porModuloCheck}" )
+        print(f"moduloCheck: {moduloCheck}" ) #value
+        
+        print(f"fechaInicio: {fechaInicio}" )
+        print(f"fechain: {fechain}" )
+
+        print(f"detalleUsuario: {detalleUsuario}" )
+        print(f"nombreUsuario: {nombreUsuario}" )
+        print(f"correoUsuario: {correoUsuario}" )
+        print(f"rolUsuario: {rolUsuario}" )
+        print(f"tipoInforme: {tipoInforme}" )
+        
+        lista = []
+
+        np_array = []
+        np_array = np.array(lista)
+
+        if visitas == "on":
+            visitas = Accionpagina.objects.all().values_list("modulo","fechain","usuarioid__empresaid__razonsocial","usuarioid__personaid__nombres","usuarioid__email","usuarioid__rolid__descripcion").order_by("-fechain")
+            
+            columnas = (["Modulo", "Fecha Registro", "Empresa", "Persona", "Correo","Cargo"])
+            print(visitas)
+            if porModuloCheck == "porModulo":   
+                visitas = visitas.filter(modulo__icontains = moduloCheck)
+                print(visitas)
+
+            if fechaInicio == "on":
+                visitas = visitas.filter(fechain__gte = fechain)
+
+            if len(visitas) < 1:
+                sweetify.warning(request, 'No existen registros con los parámetros seleccionados')
+                return redirect('informe_visitas')
+            else:
+
+                np_array = np.array(visitas)
+                df = pd.DataFrame(np_array, columns = columnas)
+
+                df["Usuario"] = df["Empresa"] + df["Persona"] 
+                df = df.drop(['Empresa'], axis=1)
+                df = df.drop(['Persona'], axis=1)
+
+                df['Fecha Registro'] = df['Fecha Registro'].astype(str).str.slice(0, 19)
+
+                if fechaIn == None:
+                    df = df.drop(['Fecha Registro'], axis=1)
+                if nombreModulo == None:
+                    df = df.drop(['Modulo'], axis=1)
+                if nombreUsuario == None:
+                    df = df.drop(['Usuario'], axis=1)
+                if correoUsuario == None:
+                    df = df.drop(['Correo'], axis=1)
+                if rolUsuario == None:
+                    df = df.drop(['Cargo'], axis=1)
+                
+                print(df)
+                if df.shape[1] > 6:
+                    length_dataframe = df.shape[1]
+                    df2 = df.iloc[:, 6:int(length_dataframe)] 
+                    df = df.iloc[:, 0:6]
+
+                    lista_visitas2 = df2.values.tolist() 
+                    columnas_df2 = df2.columns.values.tolist() 
+                    lista_visitas2.insert(0, columnas_df2)
+
+                    lista_visitas = df.values.tolist() 
+                    columnas_df = df.columns.values.tolist() 
+                    lista_visitas.insert(0, columnas_df)
+                else:
+                    lista_visitas = df.values.tolist() 
+                    columnas_df = df.columns.values.tolist() 
+                    lista_visitas.insert(0, columnas_df)
+                
+            if tipoInforme == "informeExcel":
+                nombre_archivo = "Pedidos"
+                if visitas == []:
+                    return  creacion_excel(nombre_archivo, lista_visitas)
+                else:
+                    return  creacion_excel(nombre_archivo, lista_visitas, visitas)
+
+            if tipoInforme == "informePdf":
+                tipo_doc = 'pdf'
+                extension = 'pdf'
+                nombre = 'Informe Pedidos'
+                if df.shape[1] > 6:
+                    return creacion_pdf(lista_visitas,tipo_doc,A4,nombre,extension, lista_visitas2, valor=False)
+                else:
+                    return creacion_pdf(lista_visitas,tipo_doc,A4,nombre,extension,valor=False)
+
+            if tipoInforme == "informeWord": 
+                tipo_doc = 'ms-word'
+                extension = 'docx'
+                nombre = 'Pedidos'
+                if vistaPrevia:
+                    if visitas == []:
+                        return creacion_doc(lista_visitas,nombre)
+                    else:
+                        return creacion_doc(lista_visitas,nombre)
+                else:
+                    if visitas == []:
+                        return creacion_doc(lista_visitas,nombre)
+                    else:
+                        return creacion_doc(lista_visitas,nombre)
+
+    context = {
+        'form1':form1
+    }
+
+    return render(request, 'informes/informe_visitas.html', context)
