@@ -62,5 +62,20 @@
         <a href="{% url 'listar_productos' %}" type="submit" class="btn">Volver</a>
 
     </div>
+    <script>
+        function manual(){
+          Swal.fire({
+            title: 'Manual',
+            html: `Esta interfaz permiste visualizar todos los detalles del producto seleccionado..
+            <br><br>
+            Aca podremos ver desde su nombre hasta el stock, stock critico, precio, etc.
+            <br><br>                    
+            `,
+            showConfirmButton: true,
+            confirmButtonText: 'Continuar',
+          })
+        }
+    </script>
+    
     
 {% endblock %}

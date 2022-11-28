@@ -89,4 +89,20 @@
         }
 </script>
 
+<script>
+    function manual(){
+      Swal.fire({
+        title: 'Manual',
+        html: `Al ingresar a esta interfaz, seremos capaces de crear un nuevo proveedor.
+        <br><br>
+        Para  dejar activo el nuevo proveedor es necesario llenar todos los campos en blanco, 
+        por ejemplo: Rut, Razon Social, Fono, Rubro, etc..
+        <br><br> 
+        `,
+        showConfirmButton: true,
+        confirmButtonText: 'Continuar',
+      })
+    }
+</script>
+
 {% endblock %}

@@ -52,4 +52,22 @@
   
     </div>
 
+    <script>
+        function manual(){
+          Swal.fire({
+            title: 'Manual',
+            html: `Como lo hemos visto en interfaces anteriores, aca se viualizan todos los clientes registrados.
+            <br><br>
+            Podermos ver que nos aparecen los datos mas relevantes, asi como: Run, Nombres y Apellidos.
+            <br><br> 
+            Tambien vemos que tenemos las opciones para ver los datos de un cliente seleccionado, editar sus datos,
+            <br><br>
+            o simplemente desactivando al Cliente.
+            `,
+            showConfirmButton: true,
+            confirmButtonText: 'Continuar',
+          })
+        }
+    </script>
+
 {% endblock %}

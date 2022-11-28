@@ -52,4 +52,21 @@
     </div>
     <script src="{% static 'js/buscador_tabla.js' %}"></script>
 
+    <script>
+        function manual(){
+          Swal.fire({
+            title: 'Manual',
+            html: `En esta interfaz, estamos visualizando las boletas ya emitidas y registradas..
+            <br><br>
+            Podemos ver los datos mas importantes de las boletas, tales como: N° de Boleta, Fecha de Venta,
+            Monto (de la venta) y el N° de la venta. Tambien tenemos la posibilidad de visualizar en detalle
+            una boleta en especifico.
+            <br><br> 
+            `,
+            showConfirmButton: true,
+            confirmButtonText: 'Continuar',
+          })
+        }
+    </script>
+
 {% endblock %}

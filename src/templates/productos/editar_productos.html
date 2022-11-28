@@ -58,4 +58,19 @@
 
     <script src="{% static 'js/editar_productos.js' %}"></script>
 
+    <script>
+        function manual(){
+          Swal.fire({
+            title: 'Manual',
+            html: `Esta interfaz nos permitira editar los campos del producto seleccionado.
+            <br><br>
+            Podremos editar los campos, por ejemplo: Nombre, precio, familia, imagen referencial, etc.
+            <br><br>                    
+            `,
+            showConfirmButton: true,
+            confirmButtonText: 'Continuar',
+          })
+        }
+    </script>
+
 {% endblock %}

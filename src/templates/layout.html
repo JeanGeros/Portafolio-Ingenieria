@@ -176,6 +176,18 @@
                 <!--codigo que viene de templates-->
             {% endblock %}
         </div>
+        <button disabled type="button" class="btn-flotante-ayuda" data-bs-toggle="tooltip" data-bs-placement="top" title="holaaaa">
+            Te ayudo?
+        </button>
+    
+        <div class="barra">
+            <span class="esquina-izquierda"></span>
+        </div>
+    
+        <button type="button" class="btn-flotante" onclick="manual()">
+            <i class="fas fa-question fa-1x"></i>
+        </button>
+        <!--aca termina el boton de ayuda-->
         <script src="{% static 'js/jquery-3.6.0.min.js' %}"></script>
         <script src="{% static 'js/jquery-ui-1.12.1/jquery-ui.js' %}"></script>
         <script src="{% static 'js/custom.js' %}"></script>

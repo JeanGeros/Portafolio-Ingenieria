@@ -49,5 +49,23 @@
             </div>
 
     </div>
+
+    <script>
+        function manual(){
+        Swal.fire({
+            title: 'Manual',
+            html: `En esta interfaz podemos ver el listado de Ventas realizadas, junto con sus datos 
+            asociados, por ejemplo: El nombre del Cliente que realizo la venta, La fecha de la Venta, 
+            el tipo de documento (Boleta o Factura), etc. 
+            <br><br>
+            Tambien tenemos la posibilidad de ver en detalle dicha venta, al presionar el bon "Ver" que
+            esta se asocia a cada venta.
+            <br><br> 
+            `,
+            showConfirmButton: true,
+            confirmButtonText: 'Continuar',
+        })
+        }
+    </script>
     {% endlocalize %}
     {% endblock %}

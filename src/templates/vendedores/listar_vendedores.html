@@ -51,5 +51,25 @@
         </div>
   
     </div>
+    <script>
+        function manual(){
+          Swal.fire({
+            title: 'Manual',
+            html: `Usted se encuentra en el mantenedor de Vendedores, 
+            la cual contiene un breve mensaje de bienvenida.
+            <br><br>
+            Dentro de esta interfaz podremos navegar dentro del mantendor de
+            Vendedores.
+            <br><br>
+            Esta interfaz nos permitira la creacion como tal de un vendedor, 
+            la visualizacion de sus datos personales, la edicion de sus datos, y
+            si fuese necesaro la desactivacion de su rol como vendedor.
+            <br><br>            
+            `,
+            showConfirmButton: true,
+            confirmButtonText: 'Continuar',
+          })
+        }
+    </script>
 
 {% endblock %}
