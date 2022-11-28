@@ -70,6 +70,13 @@
                 {% endfor %}
             </tbody>
         </table>
+        <td>
+            <div class="btn-group">
+                {% if despacho.tipodespacho  == 'Despacho' %}
+                    <button type="submit" id="GeneraGuia" name="GeneraGuia"  class="btn btn_aceptar" value="GeneraGuia">Generar guia de despacho</button>
+                {% endif %}
+            </div>
+        </td>
         
         <a href="{% url 'listar_despacho' %}" type="submit" class="btn btn_aceptar border border-secondary text-black">Volver</a>
         <button type="submit" id="boton_aceptar" name="btnAccion"  class="btn btn_aceptar" value="Despachar">Aceptar</button>

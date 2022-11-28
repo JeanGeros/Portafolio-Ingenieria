@@ -25,4 +25,5 @@ django-pwa==1.0.10
 openpyxl==3.0.10
 python-docx==0.8.11
 reportlab==3.6.11
+pandas==1.5.1
 

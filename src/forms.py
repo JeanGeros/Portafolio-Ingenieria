@@ -3,7 +3,7 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 
-from .models import Producto, Persona, Direccion, Proveedor, Usuario, Cliente, Empleado, Productoproveedor, Bodega, Empresa, Tipodocumento, Venta
+from .models import Producto, Persona, Direccion, Proveedor, Usuario, Cliente, Empleado, Productoproveedor, Bodega, Empresa, Tipodocumento, Venta, Familiaproducto, Detalleorden,Estadoorden, Ordencompra, Accionpagina
 
 class FormRegistroUsuario(UserCreationForm):
 
@@ -56,8 +56,20 @@ class FormProveedor(forms.ModelForm):
     class Meta:
         model = Proveedor
         fields = '__all__'
-class FormVendedorPersona(forms.ModelForm):
 
+class FormProveedorUsuario(forms.ModelForm):
+
+    class Meta:
+        model = Usuario
+        fields = ("email", "nombreusuario","password")
+
+class FormDireProvee(forms.ModelForm):
+
+    class Meta:
+        model = Direccion
+        fields = ("calle", "numero", "comunaid", "tipoviviendaid", "tipobarrioid","nombresector")
+
+class FormVendedorPersona(forms.ModelForm):
     class Meta:
         model = Persona
         fields = ("runcuerpo", "dv", "apellidopaterno", "apellidomaterno", "nombres", "telefono")
@@ -99,6 +111,7 @@ class FormProductoproveedor(forms.ModelForm):
         fields = '__all__'
     
 
+
 class FormBodega(forms.ModelForm):
     class Meta:
         model = Bodega
@@ -136,3 +149,26 @@ class FormDocu(forms.Form):
             })  
 
     Tipo_documento= forms.ChoiceField(choices = opciones_documentos)
+
+
+class FormFamiliaProduct(forms.ModelForm):
+    class Meta:
+        model = Familiaproducto
+        fields = '__all__'
+
+class FormDetalleorden(forms.ModelForm):
+    class Meta:
+        model = Detalleorden
+        fields = '__all__'
+
+class FormOrdencompra(forms.ModelForm):
+    class Meta:
+        model = Ordencompra
+        fields = '__all__'    
+
+class FormAccionpagina(forms.ModelForm):
+    class Meta:
+        model = Accionpagina
+        fields = '__all__'    
+        
+        

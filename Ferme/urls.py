@@ -58,6 +58,8 @@ urlpatterns = [
     path('proveedores/agregar_proveedor/', views.Agregar_proveedor, name="agregar_proveedor"),
     path('proveedores/ver_proveedor', views.Ver_proveedor, name="ver_proveedor"),
     path('proveedores/editar_proveedor', views.Editar_proveedor, name="editar_proveedor"),
+    path('proveedores/listar_ordenes/', views.Listar_orden, name="orden_compra"),
+    path('proveedores/listar_ordenes/ver_orden', views.Ver_orden, name="ver_orden"),
     
     path('empleados/', views.Listar_empleados, name="listar_empleados"),
     path('empleados/agregar_empleado', views.Agregar_empleado, name="agregar_empleado"),
@@ -92,7 +94,16 @@ urlpatterns = [
 
     path('comprar/', views.Comprar, name="comprar"),
     path('comprar/procesar_compra', views.Procesar_compra, name="procesar_compra"),
-    
+
+    path('guias_despacho/', views.listar_guias_despacho, name="listar_guias_despacho"),
+    path('guias_despacho/ver_guia_despacho', views.ver_guia_despacho, name="ver_guia_despacho"),
+
+    path('informes/productos', views.informe_productos, name="informe_productos"),
+    path('informes/proveedores', views.informe_proveedores, name="informe_proveedores"),
+    path('informes/pedidos', views.informe_pedidos, name="informe_pedidos"),
+    path('informes/ventas', views.informe_ventas, name="informe_ventas"),
+    path('informes/visitas', views.informe_visitas, name="informe_visitas"),
+    path('informes', views.Seleccion_informe, name="informes"),
 
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
