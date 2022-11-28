@@ -11,6 +11,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.db import connection
 import cx_Oracle
 from datetime import datetime
+import string
 
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
@@ -35,6 +36,7 @@ from django.template.loader import get_template
 from django.template import loader
 import smtplib
 from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 from docx import Document
 from django.http import HttpResponse
 
@@ -2886,6 +2888,8 @@ def generar_factura(c, venta, documento, detalle_venta, direccion_cliente, giro,
 
         c.setFillColorRGB(0,0,0) # font colour
         c.setFont("Arial", 11)
+
+        print(venta)
         c.drawString(1.1*inch, 7.5*inch, f"{str(venta.clienteid.personaid.telefono)}")
         c.drawString(1.05*inch, 8.3*inch, f"{str(venta.clienteid).lower().capitalize()}")
         
@@ -3015,7 +3019,7 @@ def generar_factura(c, venta, documento, detalle_venta, direccion_cliente, giro,
         c.drawString(0.1*inch,line_y*inch,str(producto.productoid).lower().capitalize()) # p Name
         c.drawRightString(4.5*inch,line_y*inch,f'${str(producto.productoid.precio)}') # p Price
         c.drawRightString(5.5*inch,line_y*inch,str(producto.cantidad)) # p Qunt 
-        c.drawRightString(6.5*inch,line_y*inch,f'${str(producto.subtotal)}') # Sub Total 
+        c.drawRightString(6.5*inch,line_y*inch,f'${str(producto.subtotal * producto.cantidad)}') # Sub Total 
         line_y=line_y-row_gap
 
     return c
@@ -3787,37 +3791,179 @@ def Comprar(request):
 
 def Procesar_compra(request):
 
+    if request.POST.get('VerPerfil') is not None:
+        request.session['_ver_perfil'] = request.POST
+        return redirect('ver_perfil')
+
+    if Usuario.objects.filter(nombreusuario=request.user).exists():
+        tipo_usuario = Usuario.objects.get(nombreusuario=request.user)
+        tipo_usuario = tipo_usuario.rolid.descripcion
+    else: 
+        tipo_usuario = None
+
+    if request.user:
+        if Usuario.objects.filter(nombreusuario=request.user).values('empresaid'):
+            cliente_empresa_existe = 'si'
+        else:
+            cliente_empresa_existe = None
+    # if Usuario.objects.filter(nombreusuario=request.user).exists():
+    #     tipo_usuario = Usuario.objects.get(nombreusuario=request.user)
+
     if request.method == 'POST': 
         cont = 0
+        cont2 = 0
+        detalle = []
+        venta = []
+        correo = []
+        tipo_documento = []
+
         for key,value in request.POST.items():
-            print(key)
-            print(value)
-            print("---------")
-            prodNombre = f'producto_nombre{cont}'
-            prodPrecio = f'producto_precio{cont}'
-            prodCantidad = f'producto_precio{cont}'
-            if key == prodNombre:
-                producto = Producto.objects.get(Nombre = value)
-            if key == prodPrecio:
-                precio += value 
-            if key == prodCantidad:
-                cantidad = value
+            cont2 += 1
 
-            now = datetime.now()
+        for key,value in request.POST.items():
 
-            # Venta.objects.create(
-            #     fechaventa = now,
-            #     total venta
-            # )
+            if cont > 0 and cont < (cont2 - 4): 
+                detalle.append({key:value})
             
-            # Detalleventa.objects.create(
-            #     cantidad = cantidad,
-            #     subtotal = precio,
-            #     productoid = producto,
-            #     nroventa = venta
-            # )
+            if cont >= (cont2 - 4) and cont < (cont2 - 2): 
+                venta.append({key:value})
 
-        # if request.POST.get('boleta') is not None:
-        #     request.session['_documento'] = request.POST
-        #     return HttpResponseRedirect('listar_documentos')
-    return render(request, 'compras/procesar_compra.html')
+            if cont == (cont2 -2): 
+                tipo_documento.append({key:value})
+            
+            if cont == (cont2 -1): 
+                correo.append({key:value})
+                
+            cont += 1
+
+        now = datetime.now()
+        doc = ''
+        giro = ''
+        if tipo_documento[0]['documentoCheck'] == 'boleta':
+            documento = Tipodocumento.objects.get(descripcion = 'Boleta')
+            doc = 0
+            giro = 'Persona natural'
+        else:
+            documento = Tipodocumento.objects.get(descripcion = 'Factura')
+            doc = 1
+            giro = 'Persona natural'
+
+        tipo_pago = Tipopago.objects.get(descripcion = 'Debito')
+
+        total = (venta[1]['total_peso']).translate(str.maketrans('', '', string.punctuation))
+        Venta.objects.create(
+            fechaventa = now,
+            totalventa = int(total),
+            tipodocumentoid = documento,
+            clienteid = Cliente.objects.get(clienteid = 266),
+            tipopagoid = tipo_pago
+        )
+
+        cont = 0
+        cont2 = 0
+
+        venta_id = Venta.objects.filter(
+            fechaventa = now,
+            totalventa = int(total),
+            tipodocumentoid = documento,
+            tipopagoid = tipo_pago
+        ).values('nroventa').last()
+
+        for value in detalle:
+            cont += 1
+            
+            if cont == 4:
+                cont2 += 1
+                cont= 0
+        
+        cont_valores = 0
+        for x in range(cont2):
+            
+            if x > 0:
+                cont_valores += 4
+
+            Detalleventa.objects.create(
+                cantidad = int(detalle[3 + cont_valores][f'producto_cantidad{x}']),
+                subtotal = int((detalle[2 + cont_valores][f'producto_precio{x}'])[1:]),
+                productoid = Producto.objects.get(productoid = int(detalle[0 + cont_valores][f'producto_id{x}'])),
+                nroventa = Venta.objects.get(nroventa = venta_id['nroventa'])
+            )
+
+            cont += 1
+
+        doc_adjunto = ''
+
+        if tipo_documento[0]['documentoCheck'] == 'boleta':
+            Boleta.objects.create(
+                fechaboleta = now,
+                totalboleta = int(total),
+                nroventa = Venta.objects.get(nroventa = venta_id['nroventa']),
+                estadoid = Estado.objects.get(descripcion = 'Activo')
+            )
+            doc_adjunto = Boleta.objects.get(nroventa = venta_id['nroventa'])
+        else:
+            Factura.objects.create(
+                fechafactura = now,
+                neto = int(total)-(int(total)*0.19),
+                iva = int(total)*0.19,
+                totalfactura = int(total),
+                nroventa = Venta.objects.get(nroventa = venta_id['nroventa']),
+                estadoid = Estado.objects.get(descripcion = 'Activo')
+            )
+            doc_adjunto = Factura.objects.get(nroventa = venta_id['nroventa'])
+
+        
+        venta_correo = Venta.objects.filter(nroventa = venta_id['nroventa']).values_list('nroventa', 'fechaventa', 'totalventa')
+        detalle_venta_correo = Detalleventa.objects.filter(nroventa = venta_id['nroventa']).values_list('productoid__nombre', 'cantidad', 'subtotal')
+
+        message = loader.render_to_string(
+            'compras/enviar_detalle.html',
+            {
+                'venta': venta_correo,
+                'detalle_venta': detalle_venta_correo
+            }
+        )
+
+        de_email = settings.EMAIL_HOST_USER
+        para_email = correo[0]['correo']
+        # mime_message = MIMEMultipart()
+        mime_message = MIMEText(message, "html", _charset="utf-8")
+        mime_message["From"] = de_email
+        mime_message["To"] = para_email
+        mime_message["Subject"] = "Detalle de la compra realizada"
+
+        response = HttpResponse(content_type=f'application/pdf') 
+        contenido = "attachment; filename = {0}.{1}".format('Documento', '.pdf')
+        response["Content-Disposition"] = contenido 
+
+        buff = BytesIO()  
+
+        c = canvas.Canvas(buff, pagesize=letter)
+
+        venta_adjunto = Venta.objects.get(nroventa = venta_id['nroventa'])
+        
+        productos_adjunto = Detalleventa.objects.filter(nroventa = venta_id['nroventa'])
+        direccion_cliente = Direccioncliente.objects.get(clienteid=266)
+
+        c= generar_factura(c, venta_adjunto, doc_adjunto, productos_adjunto, direccion_cliente, giro, doc)
+        c.showPage()
+        c.save()
+
+        response.write(buff.getvalue())   
+        buff.seek(0)
+
+        smtpObj = smtplib.SMTP(settings.EMAIL_HOST, 587)
+        smtpObj.login(de_email, settings.EMAIL_HOST_PASSWORD)
+        smtpObj.sendmail(de_email, para_email, mime_message.as_string())
+        
+        sweetify.success(request, "Venta realizada con exito")
+
+        return response
+        
+    context = {
+        'tipo_usuario': tipo_usuario,
+        'cliente_empresa_existe': cliente_empresa_existe
+    }
+        
+
+    return render(request, 'compras/procesar_compra.html', context)

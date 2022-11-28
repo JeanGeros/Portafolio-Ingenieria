@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+    <head>
+        <meta charset="UTF-8">
+
+    </head>
+    <body>
+        <h1 class="text-center pt-4">Mi compra</h1>
+
+        <table class="table table-striped table-hover" style="background-color: white;">
+            <thead class="table-dark" style="text-align:center; background-color: black;">
+                <tr>
+                    <th style="color: white;">Nro Venta</th>
+                    <th style="color: white;">Fecha</th>
+                    <th style="color: white;">Total</th>
+                </tr>
+            </thead>
+            <tbody style="text-align:center;">
+          
+                {% for vc in venta %}
+                    <tr style="background-color: rgb(228, 228, 228);">
+                        {% for c in vc %}
+                            <td>{{ c }}</td>
+                            
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <br><br>
+        <table class="table table-striped table-hover" style="background-color: white;">
+            <thead class="table-dark" style="text-align:center; background-color: black;">
+                <tr>
+                    <th style="color: white;">Producto</th>
+                    <th style="color: white;">Cantidad</th>
+                    <th style="color: white;">Subtotal</th>
+                </tr>
+            </thead>
+            <tbody style="text-align:center;">
+          
+                {% for dvc in detalle_venta %}
+                    <tr style="background-color: rgb(228, 228, 228);">
+                        {% for d in dvc %}
+                            <td>{{ d }}</td>
+                            
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </body>
+</html>

@@ -31,6 +31,7 @@ function leerLocalStorageCompra(){
         <td>
             <img src="${producto.imagen}" width=100>
         </td>
+        <input type="hidden" name="producto_id${cont}" value="${producto.id}">
         <td>
             ${producto.nombre}
         </td>
@@ -69,6 +70,8 @@ function calcularTotal(){
         }
         totalDolar = roundTo(total / 941.8, 2);
     }
+
+    
     const total_dolar = totalDolar.toLocaleString('en-US');
     const total_peso = total.toLocaleString();
 

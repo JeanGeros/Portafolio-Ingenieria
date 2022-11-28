@@ -4,7 +4,7 @@
 
 {% block content %}
 <link rel="stylesheet" href="{% static 'css/procesar_compra.css' %}">
-    
+<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <div class="container p-5 caja rounded">
         <div class="row mt-3">
             <div class="col">
@@ -45,38 +45,51 @@
                                 <!-- <th scope="col"></th> -->
                             </tr>
                             
+                            
                         </table>
                     </div>
-
-                    <!-- <div class="row justify-content-center" id="loaders">
-                        <img id="cargando" src="{% static 'images/cargando.gif' %}" width="220">
-                    </div> -->
+                    
+                    {% if cliente_empresa_existe != None %}
+                        <div class="row" id="documento">
+                            <div class="col-md-4"></div>
+                            <div class="col-md-4 border border-dark rounded text-center">
+                                <label for="">Seleccione como desea realizar su compra:</label></br></br>
+                                <input type="radio" name="documentoCheck" value="boleta" id="boleta" onclick="checkeado(this.form)"> Boleta</br></br>
+                                <input type="radio" name="documentoCheck" value="factura" id="factura" onclick="checkeado(this.form)"> Factura</br></br>
+                            </div>
+                            <div class="col-md-4"></div>
+                        </div>
+                    {% else %}
+                        <input type="hidden" name="documentoCheck" value="boleta">
+                    {% endif %}
+                    <div class="container text-center" style="padding-bottom: 30px;" id="correo_compra">
+                        <span id="email" class="p-3 text-center font-weight-bold border border-secondary">Indicanos un correo para enviar el detalle de tu compra: </span>
+                        <input type="email" class="form-control border border-secondary m-4" name="correo" placeholder="nombre@ejemplo.com" width="10rem" style="width: 18rem;display: inline-flex;" onkeyup="validarEmail(this)">
+                    </div>
 
                 </form>
-
             </div>
         </div>
     
-        <div class="container text-center" style="padding-bottom: 30px;">
-            <span id="email" class="p-3 text-center font-weight-bold border border-secondary">Enviaremos el resumen de tu compra al correo: {{request.user.email}}</span>
-        </div>
-
-        <h1 class="text-center">Realiza tu pago con PayPal</h1>
         <div class="container pt-3 pb-2 text-center">
-        {% comment %} <h1>Realizar Pago</div> {% endcomment %}
+        {% comment %} <h1>Realizar Pago</div> {% endcomment %}    
         
-        <div class="container p-3 text-center" id="paypal-button-container"></div>
+        <div id="contenedor_carga">
+            <div id="carga"></div>
+
+        </div>
+        
     </div>
 
     <script src="{% static 'js/procesar_compra.js' %}"></script>
 
-    <div class="container p-3 text-center" id="paypal-button-container"></div>
+    <div class="container p-3 text-center habilitar-paypal" id="paypal-button-container">
+        <h1 class="text-center">Realiza tu pago con PayPal</h1>
+
         <script src="https://www.paypal.com/sdk/js?client-id=AaFsPq2UDLSQ893pug798ZtxfL5tWsgU3x2gzaGoL6mu9ZITTIZ55lwMq3YWegB3JU4Jjwub3Htt5oCG"></script>
         <script>
-            
             paypal.Buttons({
                 createOrder: function(data, actions) {
-                // This function sets up the details of the transaction, including the amount and line item details.
                     return actions.order.create({
                         purchase_units: [{
                             amount: {
@@ -87,59 +100,87 @@
                     });
                 },
                 onApprove: function(data, actions) {
-                // This function captures the funds from the transaction.
                     
                     return actions.order.capture().then(function(details) {
-                        console.log('realizada')
+                        
                         document.formulario.submit();
                         
                         vaciarLocalStorage();
-                        // This function shows a transaction success message to your buyer.
-                        //alert('Transaction completed by ' + details.payer.name.given_name);
-                        // const compra = new Carrito();
-                        
-                        //const boleta = 'Hola \n' + document.getElementById('username').textContent.substr(11) +
-                        //'El total de su compra es: ' + document.getElementById('dolar').textContent;
-                        // const username = document.getElementById('username').textContent.substr(11);
-                        // const total = document.getElementById('total').textContent;
-                        // const totalDolar = document.getElementById('dolar').textContent;
-                        // const correo = document.getElementById('email').textContent.substr(11);
-                        
-                        // Email.send({
-                        //     Host : "smtp.gmail.com",
-                        //     Username : "elkioskitoltda@gmail.com",
-                        //     Password : "kioskito1234",
-                        //     From : "elkioskitoltda@gmail.com",
-                        //     To : correo,
-                        //     Subject : "Detalle de compra, El Kioskito",
-                        //     Body : `<p>Hola ${username}</p><br>
-                        //     <p>el total de tu compra es: $${total}</p><br>
-                        //     <p>el total de tu compra en dolares es: $${totalDolar}</p><br>
-                        //     <p>Proximamente agregaremos el detalle completo de tu compra.</p><br><br>
-                        //     <p>Saludos.</p><br>
-                        //     `
-                        // });
+                        let timerInterval
+                        Swal.fire({
+                        title: 'Cargando Compra',
+                        html: 'Sera redirigido en un momento',
+                        allowOutsideClick: false,
+                        timer: 15000,
+                        timerProgressBar: true,
+                        didOpen: () => {
+                            Swal.showLoading()
+                            const b = Swal.getHtmlContainer().querySelector('b')
+                            timerInterval = setInterval(() => {
+                            b.textContent = Swal.getTimerLeft()
+                            }, 100)
+                        },
+                        willClose: () => {
+                            clearInterval(timerInterval)
+                        }
+                        }).then((result) => {
+                        /* Read more about handling dismissals below */
+                        if (result.dismiss === Swal.DismissReason.timer) {
+                            console.log('I was closed by the timer')
+                            location.href = "../comprar";
+                        }
+                        })
 
-                        // Swal.fire({
-                        //     type: 'success',
-                        //     title: 'El pago se ha realizado con exito',
-                        //     text: 'Lo redigiremos en un momento',
-                        //     showConfirmButton: false,
-                        //     timer: 4000
-                        // })
-                        // setTimeout(() => {
-                        //     window.location = "../../venta/";
-                        // }, 5000);
                         
-                        
-                        // formulario.submit();
-                        // vaciarLocalStorage();
                     });
                 }
             }).render('#paypal-button-container');
-            //This function displays Smart Payment Buttons on your web page.
         </script>
     </div>
-    
+    <script>
+
+        paypal = document.getElementById("paypal-button-container");
+        paypal.style.display = "none";
+
+        function validarEmail(elemento) {
+
+            var texto = elemento.value;
+            var regex = /^[-\w.%+]{1,64}@(?:[A-Z0-9-]{1,63}\.){1,125}[A-Z]{2,63}$/i;
+            var x = document.getElementById("paypal-button-container");
+
+            if (regex.test(texto)) {
+                x.style.display = "block";
+                
+            } else {
+                x.style.display = "none";
+            }
+
+        }
+
+        correo_compra = document.getElementById("correo_compra");
+        
+        existe = !!document.getElementById("documento");
+        if (existe){
+            correo_compra.style.display = "none";
+            
+        }else{
+            correo_compra.style.display = "block";
+        }
+
+        dolar = document.getElementById('dolar').textContent
+        let con_iva =`${(parseFloat(dolar) + (parseFloat(dolar) * 0.19)).toFixed(2)}`
+        function checkeado(form)
+        {
+            if (form.boleta.checked == true || form.factura.checked == true){
+                correo_compra.style.display = "block";
+            }
+            if (form.factura.checked){
+                document.getElementById('dolar').innerHTML = con_iva;
+            }else{
+                document.getElementById('dolar').innerHTML = dolar;
+            }
+
+        }
+    </script>
 
 {% endblock %}

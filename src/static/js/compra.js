@@ -23,12 +23,6 @@ function cargarEventos(){
      
 }
 
-function BotonProcesar(){
-    if (obtenerProductosLocalStorage()){
-        console.log('1')
-    }
-    // procesar-pedido 
-}
 
 function comprarProducto(e){
     e.preventDefault();
