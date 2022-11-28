@@ -2577,7 +2577,7 @@ def Ver_boleta(request):
     ver_boleta = request.session.get('_ver_boleta')
 
     boleta = Boleta.objects.get(nroboleta = ver_boleta['VerBoleta'])
-    productos_boleta = Detalleventa.objects.filter(nroventa = boleta.nroboleta)
+    productos_boleta = Detalleventa.objects.filter(nroventa = boleta.nroventa)
     venta = Venta.objects.get(nroventa = boleta.nroventa.nroventa)
     direccion_cliente = Direccioncliente.objects.get(clienteid=venta.clienteid)
     if venta.clienteid.personaid != None:
@@ -2832,14 +2832,44 @@ def Ver_despacho(request):
     ver_despacho = request.session.get('_ver_despacho')
     despacho = Despacho.objects.get(despachoid = ver_despacho['VerDespacho'])
     productos_despacho = Detalleventa.objects.filter(nroventa = despacho.nroventa.nroventa)
+    venta = Venta.objects.get(nroventa = despacho.nroventa.nroventa)
+    direccion_cliente = Direccioncliente.objects.get(clienteid= venta.clienteid)
+    guia = Guiadespacho.objects.get(despachoid = despacho.despachoid)
+    print(guia)
+
+    if venta.clienteid.personaid != None:
+        giro = "persona natural"
+    else:
+        giro = "Distribuidor Ferreteria"
+
+    print(giro)
 
     if request.method == 'POST':
 
-        despachoId = request.POST.get('despacho_id')
-        estado_id = request.POST.get('estado_id')
-        estado = request.POST.get('btnAccion')
-        Cambiar_estado_despacho(despachoId,estado_id,estado)
-        return redirect('listar_despacho')
+        if request.POST.get('GeneraGuia'):
+            response = HttpResponse(content_type=f'application/pdf')  
+            buff = BytesIO()  
+            c = canvas.Canvas(buff, pagesize=letter)
+            c= generar_factura(c, venta, guia, productos_despacho, direccion_cliente, giro, 2)
+            c.showPage()
+            c.save()
+
+            response.write(buff.getvalue())   
+            buff.seek(0)
+
+            return FileResponse(buff, as_attachment=False, filename=f'boleta.pdf')
+            
+        else:
+            response.write(buff.getvalue())   
+            buff.seek(0)
+            despachoId = request.POST.get('despacho_id')
+            estado_id = request.POST.get('estado_id')
+            estado = request.POST.get('btnAccion')
+            Cambiar_estado_despacho(despachoId,estado_id,estado)
+            return redirect('listar_despacho')
+
+
+        
 
     context = {
         'despacho': despacho,
@@ -3351,7 +3381,8 @@ def crear_venta(request):
                         fechasolicitud = datetime.now().date(),
                         fechadespacho =  datetime.now().date(),
                         nroventa = ultima_ventas,
-                        estadoid = Estado.objects.get(descripcion="Activo")
+                        estadoid = Estado.objects.get(descripcion="Activo"),
+                        tipodespacho = "Despacho"
                     )
 
                     ultimo_despacho = Despacho.objects.order_by('despachoid').last()
@@ -3361,7 +3392,15 @@ def crear_venta(request):
                         fechaguia = datetime.now().date(),
                         despachoid = ultimo_despacho,
                         iddircliente = direccion_cliente
-                    )  
+                    )
+                else: 
+                     Despacho.objects.create(
+                        fechasolicitud = datetime.now().date(),
+                        fechadespacho =  datetime.now().date(),
+                        nroventa = ultima_ventas,
+                        estadoid = Estado.objects.get(descripcion="Activo"),
+                        tipodespacho = "Retiro")
+                      
                 messages.warning(request, 'Venta realizada con exito')
                 productos_venta.insert(0 , ["Nombre Producto", "Cantidad", "Total"]) 
 
@@ -3385,7 +3424,8 @@ def crear_venta(request):
                         fechasolicitud = datetime.now().date(),
                         fechadespacho =  datetime.now().date(),
                         nroventa = ultima_ventas,
-                        estadoid = Estado.objects.get(descripcion="Activo")
+                        estadoid = Estado.objects.get(descripcion="Activo"),
+                        tipodespacho = "Despacho"
                     )
 
                     ultimo_despacho = Despacho.objects.order_by('despachoid').last()
@@ -3396,6 +3436,14 @@ def crear_venta(request):
                         despachoid = ultimo_despacho,
                         iddircliente = direccion_cliente
                     )  
+
+                else: 
+                     Despacho.objects.create(
+                        fechasolicitud = datetime.now().date(),
+                        fechadespacho =  datetime.now().date(),
+                        nroventa = ultima_ventas,
+                        estadoid = Estado.objects.get(descripcion="Activo"),
+                        tipodespacho = "Retiro")
            
                 Boleta.objects.create(
                     fechaboleta = datetime.now().date(),
@@ -3408,7 +3456,7 @@ def crear_venta(request):
                 productos_venta.insert(0 , ["Nombre Producto", "Cantidad", "Total"]) 
 
                 ultima_boleta = Boleta.objects.order_by('nroboleta').last()
-                detalle_venta = Detalleventa.objects.filter(nroventa = ultima_boleta.nroboleta)
+                detalle_venta = Detalleventa.objects.filter(nroventa = ultima_boleta.nroventa)
                 direccion_cliente = Direccioncliente.objects.get(clienteid=ultima_ventas.clienteid)
                 if ultima_ventas.clienteid.personaid != None:
                     giro = "persona natural"
@@ -3446,7 +3494,7 @@ def listar_ventas(request):
     else: 
         tipo_usuario = None
 
-    ventas = Venta.objects.all()
+    ventas = Venta.objects.all().order_by('nroventa').reverse
 
     if request.method == 'POST':
         if request.POST.get('VerVenta') is not None:
