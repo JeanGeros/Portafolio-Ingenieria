@@ -1,4 +1,3 @@
-<<<<<<< HEAD:requirements.txt
 Django==3.2.0
 bootstrap-py==1.0.2
 charset-normalizer==2.1.1
@@ -11,7 +10,6 @@ zipp==3.8.1
 sweetify==2.3.1
 django-pwa==1.0.10
 qrcode==7.3.1
-=======
 Django==3.2.0
 bootstrap-py==1.0.2
 charset-normalizer==2.1.1
@@ -27,4 +25,5 @@ django-pwa==1.0.10
 openpyxl==3.0.10
 python-docx==0.8.11
 reportlab==3.6.11
->>>>>>> master:requeriments.txt
+pandas==1.5.1
+

@@ -1,0 +1,248 @@
+{% extends 'layout.html' %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/informes.css' %}">
+<div class="container caja rounded mt-5">
+    <h1 class="text-center pb-3 pt-5">Crear Informe de productos</h1>
+    <form method="post" action="" class="multipart/form-data">
+        {% csrf_token %}
+        <div class="container border border-primary rounded">
+            <label for="productos" class="p-2">Productos:</label>
+            <input type="checkbox" class="productos" name="productos" id="productos" onclick="checkeado(this.form)"/></br>
+                <div class="row row-cols-5">
+            
+                <div class="col border border-primary rounded">
+                    <label class="p-2">Nombre:</label>
+                    <input type="checkbox" class="nombre" name="nombre" id="nombre"/></br>
+
+                    <label class="p-2">Precio:</label>
+                    <input type="checkbox" class="precio" name="precio" id="precio"/></br>
+
+                    <label class="p-2">Stock Critico:</label>
+                    <input type="checkbox" class="stockCritico" name="stockCritico" id="stockCritico"/></br>
+
+                    <label class="p-2">Fecha Vencimiento:</label>
+                    <input type="checkbox" class="fechaVencimiento" name="fechaVencimiento" id="fechaVencimiento"/></br>
+
+                    <label class="p-2">Codigo Barras:</label>
+                    <input type="checkbox" class="codigoBarra" name="codigoBarra" id="codigoBarra"/>
+                    <br>
+                    <label class="p-2">Bodega:</label>
+                    <input type="checkbox" class="Bodega" name="Bodega" id="Bodega"/>
+
+                </div>
+
+                <div class="col border border-primary rounded" >
+                    <label class="p-2">Stock:</label>
+                    <input type="checkbox" class="stock" name="stock" id="stock" onclick="checkeado(this.form)"/> </br></br>
+                    <div class="inputFilter" id="stockSelect" style="display:none;">
+                        <select class="form-select" type="text" name="stockCheck" aria-label="Default select example">
+                            <option selected>----------</option>
+                            <option value="todos">Todos</option>
+                            <option value="conStock">Con stock</option>
+                            <option value="sinStock">Sin stock</option>
+                            </select>
+                    </div>
+                </div>
+
+                <div class="col border border-primary rounded">
+                    <label class="p-2">Estado del producto:</label>
+                    <input type="checkbox" class="estado" name="estado" id="estado" onclick="checkeado(this.form)"/></br></br>
+
+                    <div class="inputFilter" id="estadoSelect" style="display:none;">
+                        <select class="form-select" type="text" name="estadoCheck" aria-label="Default select example">
+                            <option selected>----------</option>
+                            <option value="todos">Todos</option>
+                            <option value="disponible">Disponible</option>
+                            <option value="noDisponible">No disponible</option>
+                            </select>
+                    </div>
+                </div>
+
+                <div class="col border border-primary rounded">
+                    <label class="p-2">Familia producto:</label>
+                    <input type="checkbox" class="familiaProducto" name="familiaProducto" id="familiaProducto" onclick="checkeado(this.form)"/></br></br>
+
+                    <div class="inputFilter" id="familiaProductoSelect" style="display:none;">
+                        <select class="form-select" type="text"  id="familiaProductoCheck" name="familiaProductoCheck" aria-label="Default select example" onchange="showDivAttid2('familiaProductoCheck','familiaproid', 'porNombreF')">
+                            <option selected>----------</option>
+                            <option value="todosF">Todos</option>
+                            <option value="porNombreF">Por nombre</option>
+                            </select>
+                    </div>
+                    <br>
+                        {% render_field form1.familiaproid class="form-control input border border-secondary" disabled="disabled" name="familiaproid" id="familiaproid" style="opacity:0"%}
+                </div>
+
+                <div class="col border border-primary rounded">
+                    <label class="p-2">Tipo producto:</label>
+                    <input type="checkbox" class="tipoProducto" name="tipoProducto" id="tipoProducto" onclick="checkeado(this.form)"/></br></br>
+                    <div class="inputFilter" id="tipoProductoSelect" style="display:none;">
+                        <select class="form-select" type="text" id="tipoProductoCheck" name="tipoProductoCheck" aria-label="Default select example"  onchange="showDivAttid2('tipoProductoCheck','tipoproductoid', 'porNombreT')">
+                            <option selected>----------</option>
+                            <option value="todosT">Todos</option>
+                            <option value="porNombreT">Por nombre</option>
+                            </select>
+                    </div>
+                    <br>
+                        {% render_field form1.tipoproductoid class="form-control input border border-secondary"  disabled="disabled" name="tipoproductoid" id="tipoproductoid" style="opacity:0"%}
+                </div>
+            </div>
+        </div>
+        
+        <div class="container p-3">
+            <div class="row">
+                <div class="col-md-2">
+                </div>
+                <div class="col-md-4 text-center border border-dark rounded">
+                    <br>
+                    <label for="">Exportar a documento tipo:</label></br></br>
+                    <input type="radio" name="informeCheck" value="informeExcel" id="informeCheck1" onclick="checkeado(this.form)"> Excel</br></br>
+                    <input type="radio" name="informeCheck" value="informeWord" id="informeCheck2" onclick="checkeado(this.form)"> Word</br></br>
+                    <input type="radio" name="informeCheck" value="informePdf" id="informeCheck3" onclick="checkeado(this.form)"> PDF</br><br>
+                </div>
+
+                <div class="col-md-4 text-center border border-dark rounded">
+                    <br>
+                    <label for="">Para descargar el informe debe seleccionar un formato de documento, para obtener una vista previa del informe solo se puede en formato PDF:</label></br></br>
+                    <button type="submit" name="vistaPrevia" value="vistaPrevia" id="vistaPrevia" class="btn btn-primary">Vista previa</button><br><br>
+                    <button type="submit" name="descargarInforme" value="descargarInforme" id="descargarInforme" class="btn btn-primary">Descargar</button><br><br>
+                </div>
+                <div class="col-md-2">
+                </div>
+            </div>
+        </div> 
+
+    </form>
+    <div>
+        <a href="/informes" type="submit" class="btn btn_aceptar border border-secondary text-black">Volver</a>
+    </div>
+</div> 
+<script>
+
+    function showDivAttid(value , status){
+        status === true ? document.getElementById(`${value}`).style.display = 'inline' :  document.getElementById(`${value}`).style.display = 'none'
+    }
+
+    function showDivAttid2(value, idshow, field){
+        console.log(document.getElementById(`${value}`).value)
+        if(document.getElementById(`${value}`).value === field){
+            document.getElementById(`${idshow}`).disabled = false
+            document.getElementById(`${idshow}`).style.opacity = '1'
+        }else{
+            document.getElementById(`${idshow}`).disabled = true
+            document.getElementById(`${idshow}`).style.opacity = '0'
+        }
+    }
+
+</script>
+
+<script language="JavaScript">
+   
+    document.getElementById("precio").disabled=true;
+    document.getElementById("stockCritico").disabled=true;
+    document.getElementById("fechaVencimiento").disabled=true;
+    document.getElementById("codigoBarra").disabled=true;
+    document.getElementById("Bodega").disabled=true;
+    document.getElementById("stock").disabled=true;
+    document.getElementById("nombre").disabled=true;
+    document.getElementById("estado").disabled=true;
+    document.getElementById("familiaProducto").disabled=true;
+    document.getElementById("tipoProducto").disabled=true;
+    document.getElementById("informeCheck1").disabled=true;
+    document.getElementById("informeCheck2").disabled=true;
+    document.getElementById("informeCheck3").disabled=true;
+
+    document.getElementById("descargarInforme").disabled=true;
+
+    function checkeado(form)
+    {
+        if (form.productos.checked == true)
+        {
+            form.precio.disabled = false;
+            form.stockCritico.disabled = false;
+            form.fechaVencimiento.disabled = false;
+            form.codigoBarra.disabled = false;
+            form.Bodega.disabled = false;
+            form.stock.disabled = false;
+            form.estado.disabled = false;
+            form.familiaProducto.disabled = false;
+            form.tipoProducto.disabled = false;
+            form.nombre.disabled = false;
+            form.informeCheck1.disabled = false;
+            form.informeCheck2.disabled = false;
+            form.informeCheck3.disabled = false;
+            form.informeCheck3.disabled = false;
+        }
+
+        if (form.productos.checked == false)
+        {
+            form.precio.disabled = true;
+            form.stockCritico.disabled = true;
+            form.fechaVencimiento.disabled = true;
+            form.codigoBarra.disabled = true;
+            form.Bodega.disabled = true;
+            form.stock.disabled = true;
+            form.estado.disabled = true;
+            form.familiaProducto.disabled = true;
+            form.nombre.disabled = true;
+            form.informeCheck1.disabled = true;
+            form.informeCheck2.disabled = true;
+            form.informeCheck3.disabled = true;
+            
+        }
+
+        if (form.stock.checked == true){
+            showDivAttid('stockSelect', true)
+        }
+
+        if (form.stock.checked == false || form.stock.disabled == true){
+            showDivAttid('stockSelect', false)
+        }
+
+        if (form.estado.checked == true){
+            showDivAttid('estadoSelect', true)
+        }
+
+        if (form.estado.checked == false || form.estado.disabled == true){
+            showDivAttid('estadoSelect', false)
+        }
+       
+        if (form.familiaProducto.checked == true){
+            showDivAttid('familiaProductoSelect', true)
+        }
+      
+        if (form.familiaProducto.checked == false || form.familiaProducto.disabled == true){
+            showDivAttid('familiaProductoSelect', false)
+        }
+        
+        if (form.tipoProducto.checked == true){
+            showDivAttid('tipoProductoSelect', true)
+        }
+
+        if (form.tipoProducto.checked == false || form.tipoProducto.disabled == true){
+            showDivAttid('tipoProductoSelect', false)
+        }
+        //informes
+
+        if (form.informeCheck3.checked == true ){
+            form.descargarInforme.disabled = false;
+            form.vistaPrevia.disabled = false;
+        }
+
+        if (form.informeCheck1.checked == true || form.informeCheck2.checked == true){
+            form.descargarInforme.disabled = false;
+        }
+
+        if (form.informeCheck1.checked == true || form.informeCheck2.checked == true){
+            form.vistaPrevia.disabled = true;
+        }
+    }
+    
+    
+</script>
+
+<script src="{% static 'js/informes.js' %}"></script>
+{% endblock %}

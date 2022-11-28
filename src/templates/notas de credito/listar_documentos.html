@@ -66,8 +66,8 @@
                     {% for factura in facturas %}
                         <tr>
                             <td>{{ factura.fechafactura }}</td>
-                            <td>${{ factura.neto }}</td>
-                            <td>${{ factura.iva }}</td>
+                            <td>${{ factura.neto|floatformat:"0"}}</td>
+                            <td>${{ factura.iva|floatformat:"0" }}</td>
                             <td>${{ factura.totalfactura }}</td>
                             <td>{{ factura.nroventa.nroventa }}</td>
                             <td>

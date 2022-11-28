@@ -58,6 +58,8 @@ urlpatterns = [
     path('proveedores/agregar_proveedor/', views.Agregar_proveedor, name="agregar_proveedor"),
     path('proveedores/ver_proveedor', views.Ver_proveedor, name="ver_proveedor"),
     path('proveedores/editar_proveedor', views.Editar_proveedor, name="editar_proveedor"),
+    path('proveedores/listar_ordenes/', views.Listar_orden, name="orden_compra"),
+    path('proveedores/listar_ordenes/ver_orden', views.Ver_orden, name="ver_orden"),
     
     path('empleados/', views.Listar_empleados, name="listar_empleados"),
     path('empleados/agregar_empleado', views.Agregar_empleado, name="agregar_empleado"),
@@ -81,14 +83,27 @@ urlpatterns = [
     path('facturas/', views.listar_facturas, name="listar_facturas"),
     path('facturas/ver_factura', views.ver_factura, name="ver_factura"),
 
-    path('guias_despacho/', views.listar_guias_despacho, name="listar_guias_despacho"),
-    path('guias_despacho/ver_guia_despacho', views.ver_guia_despacho, name="ver_guia_despacho"),
+    path('despacho/', views.Listar_despacho, name="listar_despacho"),
+    path('despacho/ver_despacho', views.Ver_despacho, name="ver_despacho"),
 
     path('notas_credito/', views.Listar_notas_credito, name="listar_notas_credito"),
     path('notas_credito/ver_nota_credito', views.Ver_nota_credito, name="ver_nota_credito"),
     path('notas_credito/seleccion_documento', views.Seleccion_documento, name="seleccion_documento"),
     path('notas_credito/crear_nota_credito', views.Crear_nota_credito, name="crear_nota_credito"),
     path('notas_credito/listar_documentos', views.Listar_documentos, name="listar_documentos"),
+
+    path('guias_despacho/', views.listar_guias_despacho, name="listar_guias_despacho"),
+    path('guias_despacho/ver_guia_despacho', views.ver_guia_despacho, name="ver_guia_despacho"),
+
+
+    path('informes/productos', views.informe_productos, name="informe_productos"),
+    path('informes/proveedores', views.informe_proveedores, name="informe_proveedores"),
+    path('informes/pedidos', views.informe_pedidos, name="informe_pedidos"),
+    path('informes/ventas', views.informe_ventas, name="informe_ventas"),
+    path('informes/visitas', views.informe_visitas, name="informe_visitas"),
+    path('informes', views.Seleccion_informe, name="informes"),
+
+    # path('informes/ventas', views.generar_informes, name="informe_productos"),
 
 
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

@@ -31,8 +31,8 @@
             {% for factura in facturas %}
                 <tr>
                     <td>{{ factura.fechafactura|date:"SHORT_DATE_FORMAT"}}</td>
-                    <td>${{ factura.neto|localize |intcomma }}</td>
-                    <td>${{ factura.iva|localize |intcomma }}</td>
+                    <td>${{ factura.neto|floatformat:"0" |localize |intcomma }}</td>
+                    <td>${{ factura.iva|floatformat:"0"|localize |intcomma }}</td>
                     <td>${{ factura.totalfactura|localize |intcomma }}</td>
                     <td>{{ factura.nroventa.nroventa    }}</td>
 
