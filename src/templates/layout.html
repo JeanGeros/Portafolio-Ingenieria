@@ -62,23 +62,34 @@
                                     <a href="/proveedores" class="nav-link fw-bolder text-black">Proveedores</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a href="{% url 'listar_boletas' %}" class="nav-link fw-bolder text-black">Administracion <br> de boletas</a>
+                                    <a href="/pedidos" class="nav-link fw-bolder text-black">Orden de compra</a>
                                 </li>
+                                <!-- <li class="nav-item">
+                                    <a href="{% url 'listar_boletas' %}" class="nav-link fw-bolder text-black">Administracion <br> de boletas</a>
+                                </li> -->
+                                <li class="nav-item">
+                                    <a href="/despacho" class="nav-link fw-bolder text-black">Administración <br> de despachos</a>
+                                </li>
+                                <!-- <li class="nav-item">
+                                    <a href="{% url 'listar_facturas' %}" class="nav-link fw-bolder text-black">Administración <br> de Facturas</a>
+                                </li> -->
                                 <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle fw-bolder text-black" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    Facturación
+                                    Documentos
                                     </a>
                                     <ul class="dropdown-menu">
-                                        <li><a class="dropdown-item fw-bolder text-black" href="#">Dato 1</a></li>
-                                        <li><a class="dropdown-item fw-bolder text-black" href="#">Dato 2</a></li>
-                                        <li><hr class="dropdown-divider fw-bolder text-black"></li>
-                                        <li><a class="dropdown-item fw-bolder text-black" href="#">Ejemplo</a></li>
+                                        <li><a class="dropdown-item fw-bolder text-black" href="{% url 'listar_boletas' %}">Administracion <br> de boletas</a></li>
+                                        <li><a class="dropdown-item fw-bolder text-black" href="{% url 'listar_facturas' %}">Administración <br> de Facturas</a></li>
+                                        <li><a class="dropdown-item fw-bolder text-black" href="/notas_credito">Notas de <br> credito</a></li>
+                                        <li><a class="dropdown-item fw-bolder text-black" href="{% url 'listar_guias_despacho' %}">Guias de <br> despacho</a></li>
                                     </ul>
                                 </li>
                                 <li class="nav-item">
                                     <a href="/ventas" class="nav-link fw-bolder text-black">Ventas</a>
                                 </li>
-                                
+                                <!-- <li class="nav-item">
+                                    <a href="/notas_credito" class="nav-link fw-bolder text-black">Notas de <br> credito</a>
+                                </li> -->
                             {% endif %}  
                             {% if tipo_usuario == 'Vendedor' and tipo_usuario != None %}
                                 <li class="nav-item">
@@ -103,6 +114,9 @@
                                 </li> 
                                 <li class="nav-item">
                                     <a href="/ventas" class="nav-link fw-bolder text-black">Ventas</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="/notas_credito" class="nav-link fw-bolder text-black">Notas de <br> credito</a>
                                 </li>
                             {% endif %}
                             {% if tipo_usuario == 'Empleado' and tipo_usuario != None %}
@@ -130,7 +144,7 @@
                             {% if tipo_usuario == 'Proveedor' and tipo_usuario != None %}
                                 
                                 <li class="nav-item">
-                                    <a href="#" class="nav-link fw-bolder text-black">Ordenes de compras</a>
+                                    <a href="{% url 'orden_compra' %}" class="nav-link fw-bolder text-black">Mis ordenes de compra</a>
                                 </li>
                             {% endif %}
                         {% else %}
@@ -139,7 +153,7 @@
                             </li>
                             <li class="nav-item">
                                 <a href="#" class="nav-link fw-bolder text-black">Compra <br> con nosotros</a>
-                        </li>
+                            </li>                            
                         {% endif %}
                     </ul>
                     
@@ -164,6 +178,7 @@
                     {% else %}
                         <a href="{% url 'ingreso' %}" type="button" class="btn ingresar fw-bolder m-1">Ingresar</a>
                     {% endif %}
+                    
                 
                     <a href="{% url 'seleccion_registro' %}" type="button" class="btn registrarme fw-bolder m-1">Registrarme</a>
                     <i class="fa-solid fa-cart-arrow-down text-black fa-2x p-2"></i>

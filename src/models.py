@@ -3,9 +3,8 @@ from django.db import models
 
 class Accionpagina(models.Model):
     accionid = models.BigIntegerField(primary_key=True)
-    fechain = models.DateField()
+    fechain = models.DateTimeField()
     modulo = models.CharField(max_length=100)
-    fechaout = models.DateField(blank=True, null=True)
     usuarioid = models.ForeignKey('Usuario', models.DO_NOTHING, db_column='usuarioid')
     
     def __str__(self):
@@ -100,7 +99,6 @@ class Bodega(models.Model):
     casillero = models.CharField(max_length=6)
     def __str__(self):
         return f"Pasillo:{self.pasillo} Estante:{self.estante} casillero:{self.casillero}"
-
     class Meta:
         managed = False
         db_table = 'bodega'
@@ -163,6 +161,7 @@ class Despacho(models.Model):
     fechadespacho = models.DateField(blank=True, null=True)
     nroventa = models.ForeignKey('Venta', models.DO_NOTHING, db_column='nroventa')
     estadoid = models.ForeignKey('Estado', models.DO_NOTHING, db_column='estadoid')
+    tipodespacho = models.CharField(max_length=10)
 
     def __str__(self):
         return f"{self.despachoid}"
@@ -179,7 +178,7 @@ class Detalleorden(models.Model):
     estadoid = models.ForeignKey('Estado', models.DO_NOTHING, db_column='estadoid', blank=True, null=True)
 
     def __str__(self):
-        return f"{self.detalleid} {self.productoid}"
+        return f"{self.detalleid}"
 
     class Meta:
         managed = False
@@ -194,7 +193,7 @@ class Detalleventa(models.Model):
     nroventa = models.ForeignKey('Venta', models.DO_NOTHING, db_column='nroventa')
 
     def __str__(self):
-        return f"{self.nroventa} {self.productoid}"
+        return f"{self.detalleventaid}"
 
     class Meta:
         managed = False
@@ -342,11 +341,14 @@ class Estadoorden(models.Model):
 class Factura(models.Model):
     numerofactura = models.BigIntegerField(primary_key=True)
     fechafactura = models.DateField()
-    neto = models.BigIntegerField()
-    iva = models.BigIntegerField()
-    totalfactura = models.BigIntegerField()
+    neto = models.FloatField()
+    iva = models.FloatField()
+    totalfactura = models.FloatField()
     nroventa = models.ForeignKey('Venta', models.DO_NOTHING, db_column='nroventa')
     estadoid = models.ForeignKey(Estado, models.DO_NOTHING, db_column='estadoid')
+
+    def __str__(self):
+        return f"{self.numerofactura}"
 
     class Meta:
         managed = False
@@ -389,7 +391,7 @@ class Notacredito(models.Model):
     nroboleta = models.BigIntegerField(blank=True, null=True)
 
     def __str__(self):
-        return self.numero
+        return f'{self.nronota}'
 
     class Meta:
         managed = False
@@ -441,7 +443,8 @@ class Producto(models.Model):
     estadoid = models.ForeignKey(Estado, models.DO_NOTHING, db_column='estadoid')
     imagen = models.CharField(max_length=256, blank=True, null=True)
     bodegaid = models.ForeignKey(Bodega, models.DO_NOTHING, db_column='bodegaid', blank=True, null=True)
-
+    
+  
     def __str__(self):
         return f"{self.nombre}"
 
@@ -602,6 +605,7 @@ class Usuario(models.Model):
     nombreusuario = models.CharField(max_length=50)
     empresaid = models.ForeignKey(Empresa, models.DO_NOTHING, db_column='empresaid', blank=True, null=True)
     personaid = models.ForeignKey(Persona, models.DO_NOTHING, db_column='personaid', blank=True, null=True)
+    proveedorid = models.ForeignKey(Proveedor, models.DO_NOTHING, db_column='proveedorid', blank=True, null=True)
     rolid = models.ForeignKey(Rolusuario, models.DO_NOTHING, db_column='rolid')
 																										   
     def __str__(self):
