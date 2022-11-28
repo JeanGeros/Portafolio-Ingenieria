@@ -45,3 +45,19 @@ footer {
     padding-left: 5px!important;
 }
 
+#carrito {
+    background-color: #909090;
+    overflow:scroll;
+    height:200px;
+    width:500px;
+}
+
+.borrar-producto{
+    top: -4px;
+    right: 6px;
+    cursor: pointer;
+    color: rgb(0, 0, 0);
+    text-decoration: none;
+    font-weight: 700;
+    background-color: rgb(252, 0, 0);
+}
