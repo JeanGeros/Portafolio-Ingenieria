@@ -2834,15 +2834,15 @@ def Ver_despacho(request):
     productos_despacho = Detalleventa.objects.filter(nroventa = despacho.nroventa.nroventa)
     venta = Venta.objects.get(nroventa = despacho.nroventa.nroventa)
     direccion_cliente = Direccioncliente.objects.get(clienteid= venta.clienteid)
-    guia = Guiadespacho.objects.get(despachoid = despacho.despachoid)
-    print(guia)
+    
+    if despacho.tipodespacho == 'Despacho':
+        guia = Guiadespacho.objects.get(despachoid = despacho.despachoid)
 
     if venta.clienteid.personaid != None:
         giro = "persona natural"
     else:
         giro = "Distribuidor Ferreteria"
 
-    print(giro)
 
     if request.method == 'POST':
 
