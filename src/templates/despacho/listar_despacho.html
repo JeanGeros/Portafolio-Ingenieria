@@ -19,6 +19,7 @@
                     <th>Fecha Despacho</th>
                     <th>Nro Venta</th>
                     <th>Estado</th>
+                    <th>Tipo despacho</th>
                     <th>Acciones</th>
                 </tr>
             </thead>
@@ -31,6 +32,7 @@
                         <td>{{ despacho.fechadespacho }}</td>
                         <td>{{ despacho.nroventa }}</td>
                         <td>{{ despacho.estadoid.descripcion }}</td>
+                        <td>{{ despacho.tipodespacho }}</td>
                         <td>
                             <form method="POST" action="">
                                 {% csrf_token %}
