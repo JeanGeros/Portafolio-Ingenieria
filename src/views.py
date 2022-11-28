@@ -4811,10 +4811,8 @@ def informe_visitas(request):
         nombreModulo = request.POST.get('nombreModulo')
         fechain = request.POST.get('fechain')
         fechaInicio = request.POST.get('fechaInicio')
-
         porModuloCheck = request.POST.get('porModuloCheck')
         moduloCheck = request.POST.get('moduloCheck')
-
         detalleUsuario = request.POST.get('detalleUsuario')
         nombreUsuario = request.POST.get('nombreUsuario')
         correoUsuario = request.POST.get('correoUsuario')
@@ -4827,10 +4825,8 @@ def informe_visitas(request):
         print(f"visitas: {visitas}" )
         print(f"fechaIn: {fechaIn}" )
         print(f"nombreModulo: {nombreModulo}" )
-        
         print(f"porModuloCheck: {porModuloCheck}" )
         print(f"moduloCheck: {moduloCheck}" ) #value
-        
         print(f"fechaInicio: {fechaInicio}" )
         print(f"fechain: {fechain}" )
 
