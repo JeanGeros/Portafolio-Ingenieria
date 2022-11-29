@@ -179,13 +179,15 @@ def Agregar_productos(request):
         tipoproductoid = request.POST.get('tipoproductoid')
         familiaproid = request.POST.get('familiaproid')
         estadoid = request.POST.get('estadoid')
-        bodega_id = request.POST.get('BodegaId')
+        bodega_id = request.POST.get('bodegaid')
 
+        print(bodega_id)
         tipo_producto = Tipoproducto.objects.get(tipoproductoid=tipoproductoid)
         familia_producto = Familiaproducto.objects.get(familiaproid=familiaproid)
         estado_producto = Estado.objects.get(estadoid=estadoid)
         proveedor = Proveedor.objects.get(proveedorid=proveedorid)
         bodega = Bodega.objects.get(bodegaId=bodega_id)
+        print(bodega)
 
         if len(fechavencimiento) == 10:
             fecha = fechavencimiento.split("/")
@@ -208,12 +210,11 @@ def Agregar_productos(request):
                 tipoproductoid=tipo_producto,
                 familiaproid=familia_producto,
                 estadoid=estado_producto,
-                BodegaId=bodega
+                bodegaid=bodega
             )
 
             ultimo_producto = Producto.objects.order_by('productoid').last()
             prov_producto = Productoproveedor.objects.create(
-                ProId=2,
                 productoid=ultimo_producto,
                 proveedorid=proveedor
             )
@@ -5156,7 +5157,8 @@ def dashboard(request):
 
     for despacho in despachos:
         despachos_total+=1
-
+    print(f"total ventas {ventas_total}")
+    print(f"total ventas length {len(ventas)}")
     total_ventas_despachos = [ventas_total-despachos_total,despachos_total]
     import json
 
@@ -5173,8 +5175,6 @@ def dashboard(request):
                 producto_found["cantidad"] = producto_found["cantidad"] +c_producto
             else:
                 productos_vendidos.append({"nombre": n_producto, "cantidad":c_producto})
-        
-    # productos_vendidos = json.dumps(productos_vendidos)
 
     nombre_productos = []
     cantidad_productos = []
@@ -5186,10 +5186,12 @@ def dashboard(request):
     productos_vendidos.append(cantidad_productos)
     productos_vendidos = json.dumps(productos_vendidos)
 
+    print(productos_vendidos)
     context = {
         'ventasXDocumento': ventas_tipodocumento,
         'ventasXDespacho': total_ventas_despachos,
         'productosXcantidad': productos_vendidos,
+        'totalVentas':ventas_total
     }
 
     return render(request, 'dashboard.html', context)
