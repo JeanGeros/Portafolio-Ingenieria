@@ -50,5 +50,20 @@
         <a href="{% url 'listar_empleados' %}" type="submit" class="btn btn_aceptar border border-secondary text-black">Volver</a>
 
     </div>
+
+    <script>
+        function manual(){
+          Swal.fire({
+            title: 'Manual',
+            html: `Esta interfaz solo nos permite visualizar los campos ingresados al crear el empleado.  
+            <br><br>
+            Podemos que que aparecn los campos: Run, Nombre, Fecha de Ingreso, etc.
+            <br><br>               
+            `,
+            showConfirmButton: true,
+            confirmButtonText: 'Continuar',
+          })
+        }
+    </script>
     
 {% endblock %}

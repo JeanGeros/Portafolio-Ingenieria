@@ -51,5 +51,19 @@
     </div>
 
     <script src="{% static 'js/editar_vendedor.js' %}"></script>
+    <script>
+        function manual(){
+          Swal.fire({
+            title: 'Manual',
+            html: `En esta interfaz sera posible editar los datos personales del vendedor seleccionado..
+            <br><br>
+            Podremos editar los campos, tales como: Nombre, telefono, correo, etc.
+            <br><br>                    
+            `,
+            showConfirmButton: true,
+            confirmButtonText: 'Continuar',
+          })
+        }
+    </script>
 
 {% endblock %}

@@ -79,4 +79,19 @@
         }
     
     </script>
+
+<script>
+    function manual(){
+      Swal.fire({
+        title: 'Manual',
+        html: `Ya dentro de esta inerfaz, estamos habilitados para poder editar los datos del proveedor.
+        <br><br>
+        Podremos editar los campos que aparecen, por ejemplo: Rut, Razon Social, etc.
+        <br><br> 
+        `,
+        showConfirmButton: true,
+        confirmButtonText: 'Continuar',
+      })
+    }
+</script>
 {% endblock %}
