@@ -38,11 +38,11 @@
                             {% csrf_token %}
                             <div class="btn-group">
                                 <button  id="" name="VerGuiaDespacho" value="{{ guias.nroguia }}" class="btn btn_aceptar border border-secondary">Ver</button>
-                                <!-- {% if producto.productoid.estadoid.descripcion == 'Activo' %}
-                                    <button type="submit" id="" name="CambiarEstado" value="{{producto.productoid.productoid}}" class="btn btn_aceptar border border-secondary">Desactivar Producto</button>
+                                {% if guias.despachoid.estadoid.descripcion == 'Activo' %}
+                                    <button type="submit" id="" name="CambiarEstado" value="{{producto.productoid.productoid}}" class="btn btn_aceptar border border-secondary">Desactivar Guia</button>
                                 {% else %}
-                                    <button type="submit" id="" name="CambiarEstado" value="{{producto.productoid.productoid}}" class="btn btn_aceptar border border-secondary">Activar Producto</button>
-                                {% endif %} -->
+                                    <button type="submit" id="" name="CambiarEstado" value="{{producto.productoid.productoid}}" class="btn btn_aceptar border border-secondary">Activar Guia</button>
+                                {% endif %}
                             </div>
                         </form>
                     </td>

@@ -1,106 +1,106 @@
 {% extends 'layout.html' %}
 {% load static %}
 {% load widget_tweaks %}
-
 {% block content %}
 <link rel="stylesheet" href="{% static 'css/informes.css' %}">
-<h1 class="text-center pb-3 pt-5">Crear Informe de Visitas</h1>
 
-
-<form method="post" action="" class="">
+<div class="container caja rounded mt-5">
+    <h1 class="text-center pb-3 pt-5">Crear Informe de Visitas</h1>
+    <form method="post" action="" class="">
     {% csrf_token %}
-    <div class="container border border-primary rounded">
-        <label for="visitas" class="p-2 ">Registro de Visitas:</label>
-        <input type="checkbox" class="visitas" name="visitas" id="visitas" onclick="checkeado(this.form)"/></br>
-         
-        <div class="row row-cols-4">
-            <div class="col border border-primary rounded">
-                <label for="visitas" class="p-2">Fecha Registro:</label>
-                <input type="checkbox" class="fechaIn" name="fechaIn" id="fechaIn"/></br>
-                
-                <label for="visitas" class="p-2">Nombre Modulo:</label>
-                <input type="checkbox" class="nombreModulo" name="nombreModulo" id="nombreModulo"/></br>
-            </div>
+        <div class="container border border-primary rounded">
+            <label for="visitas" class="p-2 ">Registro de Visitas:</label>
+            <input type="checkbox" class="visitas" name="visitas" id="visitas" onclick="checkeado(this.form)"/></br>
             
-            <div class="col border border-primary rounded">
-                <label for="visitas" class="p-2">Modulo:</label>
-                <input type="checkbox" class="modulo" name="modulo" id="modulo" onclick="checkeado(this.form)"/></br>
-
-                <div class="inputFilter" id="porModuloSelect" style="display:none;">
-                    <select class="form-select" type="text" id="porModuloCheck" name="porModuloCheck" aria-label="Default select example" onchange="showDivAttid4('porModuloCheck','moduloSelect', 'porModulo')">
-                        <option selected>----------</option>
-                        <option value="todosLosModulos">Todos los modulos</option>
-                        <option value="porModulo">Por Modulo</option>
-                        </select>
+            <div class="row row-cols-4">
+                <div class="col border border-primary rounded">
+                    <label for="visitas" class="p-2">Fecha Registro:</label>
+                    <input type="checkbox" class="fechaIn" name="fechaIn" id="fechaIn"/></br>
+                    
+                    <label for="visitas" class="p-2">Nombre Modulo:</label>
+                    <input type="checkbox" class="nombreModulo" name="nombreModulo" id="nombreModulo"/></br>
                 </div>
-                <br>
-                <div class="inputFilter" id="moduloSelect" style="display:none;">
-                    <select class="form-select" type="text" id="moduloCheck" name="moduloCheck" aria-label="Default select example">
-                        <option selected>----------</option>
-                        <option value="producto">Productos</option>
-                        <option value="proveedore">Proveedores</option>
-                        <option value="factura">Facturas</option>
-                        <option value="boleta">Boletas</option>
-                        <option value="venta">Venta</option>
-                        <option value="informe">Informes</option>
-                        <option value="cliente">Clientes</option>
-                        <option value="empleado">Empleados</option>
-                        <option value="vendedore">Vendedores</option>
-                        </select>
+                
+                <div class="col border border-primary rounded">
+                    <label for="visitas" class="p-2">Modulo:</label>
+                    <input type="checkbox" class="modulo" name="modulo" id="modulo" onclick="checkeado(this.form)"/></br>
+
+                    <div class="inputFilter" id="porModuloSelect" style="display:none;">
+                        <select class="form-select" type="text" id="porModuloCheck" name="porModuloCheck" aria-label="Default select example" onchange="showDivAttid4('porModuloCheck','moduloSelect', 'porModulo')">
+                            <option selected>----------</option>
+                            <option value="todosLosModulos">Todos los modulos</option>
+                            <option value="porModulo">Por Modulo</option>
+                            </select>
+                    </div>
+                    <br>
+                    <div class="inputFilter" id="moduloSelect" style="display:none;">
+                        <select class="form-select" type="text" id="moduloCheck" name="moduloCheck" aria-label="Default select example">
+                            <option selected>----------</option>
+                            <option value="producto">Productos</option>
+                            <option value="proveedore">Proveedores</option>
+                            <option value="factura">Facturas</option>
+                            <option value="boleta">Boletas</option>
+                            <option value="venta">Venta</option>
+                            <option value="informe">Informes</option>
+                            <option value="cliente">Clientes</option>
+                            <option value="empleado">Empleados</option>
+                            <option value="vendedore">Vendedores</option>
+                            </select>
+                    </div>
+
                 </div>
 
-            </div>
+                <div class="col border border-primary rounded">
+                    <label for="visitas" class="p-2">Fecha Comienzo:</label>
+                    <input type="checkbox" class="fechaInicio" name="fechaInicio" id="fechaInicio" onclick="checkeado(this.form)"/></br></br>
+                    {% render_field form1.fechain class="form-control dateinput border border-secondary" disabled="disabled" name="fechain" id="fechain" style="opacity:0"%}
+                </div>
 
-            <div class="col border border-primary rounded">
-                <label for="visitas" class="p-2">Fecha Comienzo:</label>
-                <input type="checkbox" class="fechaInicio" name="fechaInicio" id="fechaInicio" onclick="checkeado(this.form)"/></br></br>
-                {% render_field form1.fechain class="form-control dateinput border border-secondary" disabled="disabled" name="fechain" id="fechain" style="opacity:0"%}
-            </div>
+                <div class="col border border-primary rounded">
+                    <!-- usuarioid -->
+                    <label for="visitas" class="p-2">Información Usuario</label>
+                    <input type="checkbox" class="detalleUsuario" name="detalleUsuario" id="detalleUsuario" onclick="checkeado(this.form)"/></br></br>
+                    
+                    <label for="visitas" class="p-2">Nombre:</label>
+                    <input type="checkbox" class="nombreUsuario" name="nombreUsuario" id="nombreUsuario"/></br>
 
-            <div class="col border border-primary rounded">
-                <!-- usuarioid -->
-                <label for="visitas" class="p-2">Información Usuario</label>
-                <input type="checkbox" class="detalleUsuario" name="detalleUsuario" id="detalleUsuario" onclick="checkeado(this.form)"/></br></br>
+                    <label for="visitas" class="p-2">Correo Electronico:</label>
+                    <input type="checkbox" class="correoUsuario" name="correoUsuario" id="correoUsuario"/></br>
                 
-                <label for="visitas" class="p-2">Nombre:</label>
-                <input type="checkbox" class="nombreUsuario" name="nombreUsuario" id="nombreUsuario"/></br>
+                    <label for="visitas" class="p-2">Rol / Cargo:</label>
+                    <input type="checkbox" class="rolUsuario" name="rolUsuario" id="rolUsuario"/></br>
+                
+                </div>
 
-                <label for="visitas" class="p-2">Correo Electronico:</label>
-                <input type="checkbox" class="correoUsuario" name="correoUsuario" id="correoUsuario"/></br>
-            
-                <label for="visitas" class="p-2">Rol / Cargo:</label>
-                <input type="checkbox" class="rolUsuario" name="rolUsuario" id="rolUsuario"/></br>
-            
+    
             </div>
-
-  
         </div>
+        <div class="container p-3">
+            <div class="row">
+                <div class="col-md-2">
+                </div>
+                <div class="col-md-4 text-center border border-dark rounded">
+                    <br>
+                    <label for="">Exportar a documento tipo:</label></br></br>
+                    <input type="radio" name="informeCheck" value="informeExcel" id="informeCheck1" onclick="checkeado(this.form)"> Excel</br></br>
+                    <input type="radio" name="informeCheck" value="informeWord" id="informeCheck2" onclick="checkeado(this.form)"> Word</br></br>
+                    <input type="radio" name="informeCheck" value="informePdf" id="informeCheck3" onclick="checkeado(this.form)"> PDF</br><br>
+                </div>
+
+                <div class="col-md-4 text-center border border-dark rounded">
+                    <br>
+                    <label for="">Para descargar el informe debe seleccionar un formato de documento, para obtener una vista previa del informe solo se puede en formato PDF:</label></br></br>
+                    <button type="submit" name="vistaPrevia" value="vistaPrevia" id="vistaPrevia" class="btn btn-primary">Vista previa</button><br><br>
+                    <button type="submit" name="descargarInforme" value="descargarInforme" id="descargarInforme" class="btn btn-primary">Descargar</button><br><br>
+                </div>
+            </div>
+        </div> 
+
+    </form>
+    <div>
+        <a href="/informes" type="submit" class="btn btn_aceptar border border-secondary text-black">Volver</a>
     </div>
-    <div class="container p-3">
-        <div class="row">
-            <div class="col-md-2">
-            </div>
-            <div class="col-md-4 text-center border border-dark rounded">
-                <br>
-                <label for="">Exportar a documento tipo:</label></br></br>
-                <input type="radio" name="informeCheck" value="informeExcel" id="informeCheck1" onclick="checkeado(this.form)"> Excel</br></br>
-                <input type="radio" name="informeCheck" value="informeWord" id="informeCheck2" onclick="checkeado(this.form)"> Word</br></br>
-                <input type="radio" name="informeCheck" value="informePdf" id="informeCheck3" onclick="checkeado(this.form)"> PDF</br><br>
-            </div>
-
-            <div class="col-md-4 text-center border border-dark rounded">
-                <br>
-                <label for="">Para descargar el informe debe seleccionar un formato de documento, para obtener una vista previa del informe solo se puede en formato PDF:</label></br></br>
-                <button type="submit" name="vistaPrevia" value="vistaPrevia" id="vistaPrevia" class="btn btn-primary">Vista previa</button><br><br>
-                <button type="submit" name="descargarInforme" value="descargarInforme" id="descargarInforme" class="btn btn-primary">Descargar</button><br><br>
-            </div>
-            <div class="col-md-2">
-            </div>
-        </div>
-    </div> 
-
-</form>
-
+</div>
 <script>
 
     function showDivAttid(value , status){
