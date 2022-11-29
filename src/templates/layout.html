@@ -47,32 +47,29 @@
                             
                             {% if user.is_superuser and tipo_usuario != None and tipo_usuario == 'Administrador Sistema' %}
                                 <li class="nav-item">
-                                    <a class="nav-link fw-bolder text-black" href="/productos">Administración <br> de productos</a>
+                                    <a class="nav-link fw-bolder text-black" href="/productos">Productos</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a href="/vendedores" class="nav-link fw-bolder text-black">Administración <br> de vendedores</a>
+                                    <a href="/vendedores" class="nav-link fw-bolder text-black">Vendedores</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a href="/empleados" class="nav-link fw-bolder text-black">Administración <br> de empleados</a>
+                                    <a href="/empleados" class="nav-link fw-bolder text-black">Empleados</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a href="/clientes" class="nav-link fw-bolder text-black">Administración <br> de clientes</a>
+                                    <a href="/clientes" class="nav-link fw-bolder text-black">Clientes</a>
                                 </li>
                                 <li class="nav-item">
                                     <a href="/proveedores" class="nav-link fw-bolder text-black">Proveedores</a>
                                 </li>
                                 <li class="nav-item">
+                                    <a href="{% url 'listar_boletas' %}" class="nav-link fw-bolder text-black">Boletas</a>
+                                </li>
+                                <li class="nav-item"></li>
                                     <a href="/pedidos" class="nav-link fw-bolder text-black">Orden de compra</a>
                                 </li>
-                                <!-- <li class="nav-item">
-                                    <a href="{% url 'listar_boletas' %}" class="nav-link fw-bolder text-black">Administracion <br> de boletas</a>
-                                </li> -->
                                 <li class="nav-item">
-                                    <a href="/despacho" class="nav-link fw-bolder text-black">Administración <br> de despachos</a>
+                                    <a href="/despacho" class="nav-link fw-bolder text-black">Despachos</a>
                                 </li>
-                                <!-- <li class="nav-item">
-                                    <a href="{% url 'listar_facturas' %}" class="nav-link fw-bolder text-black">Administración <br> de Facturas</a>
-                                </li> -->
                                 <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle fw-bolder text-black" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                     Documentos
@@ -90,13 +87,16 @@
                                 <li class="nav-item">
                                     <a href="/informes" class="nav-link fw-bolder text-black">Informes</a>
                                 </li>
+                                <li class="nav-item">
+                                    <a href="/comprar" class="nav-link fw-bolder text-black">Compra <br> con nosotros</a>
+                                </li> 
                             {% endif %}  
                             {% if tipo_usuario == 'Vendedor' and tipo_usuario != None %}
                                 <li class="nav-item">
-                                    <a class="nav-link fw-bolder text-black" href="/productos">Administración <br> de productos</a>
+                                    <a class="nav-link fw-bolder text-black" href="/productos">Productos</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a href="{% url 'listar_clientes_vendedor' %}" class="nav-link fw-bolder text-black">Administración <br> de clientes</a>
+                                    <a href="{% url 'listar_clientes_vendedor' %}" class="nav-link fw-bolder text-black">Clientes</a>
                                 </li>
                                 <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle fw-bolder text-black" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -110,7 +110,7 @@
                                     </ul>
                                 </li>  
                                 <li class="nav-item">
-                                    <a href="{% url 'listar_boletas' %}" class="nav-link fw-bolder text-black">Administracion <br> de boletas</a>
+                                    <a href="{% url 'listar_boletas' %}" class="nav-link fw-bolder text-black">Boletas</a>
                                 </li> 
                                 <li class="nav-item">
                                     <a href="/ventas" class="nav-link fw-bolder text-black">Ventas</a>
@@ -124,10 +124,10 @@
                                     <a class="nav-link fw-bolder text-black" href="/productos">Ordenes <br> de compras</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a href="/productos" class="nav-link fw-bolder text-black">Administración <br> de productos</a>
+                                    <a href="/productos" class="nav-link fw-bolder text-black">Productos</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a href="#" class="nav-link fw-bolder text-black">Administración <br> de proveedor</a>
+                                    <a href="#" class="nav-link fw-bolder text-black">Proveedor</a>
                                 </li>
                             {% endif %}
                             {% if tipo_usuario == 'Cliente' and tipo_usuario != None %}
@@ -140,6 +140,9 @@
                                 <li class="nav-item">
                                     <a href="#" class="nav-link fw-bolder text-black">Boleta</a>
                                 </li>
+                                <li class="nav-item">
+                                    <a href="/comprar" class="nav-link fw-bolder text-black">Compra <br> con nosotros</a>
+                                </li> 
                             {% endif %}
                             {% if tipo_usuario == 'Proveedor' and tipo_usuario != None %}
                                 
@@ -152,7 +155,7 @@
                                 <a href="/" class="nav-link fw-bolder text-black">Inicio</a>
                             </li>
                             <li class="nav-item">
-                                <a href="#" class="nav-link fw-bolder text-black">Compra <br> con nosotros</a>
+                                <a href="/comprar" class="nav-link fw-bolder text-black">Compra <br> con nosotros</a>
                             </li>                            
                         {% endif %}
                     </ul>
@@ -181,9 +184,33 @@
                     
                 
                     <a href="{% url 'seleccion_registro' %}" type="button" class="btn registrarme fw-bolder m-1">Registrarme</a>
-                    <i class="fa-solid fa-cart-arrow-down text-black fa-2x p-2"></i>
-                
-                </div>
+                    
+                    <!-- <i class="fa-solid fa-cart-arrow-down text-black fa-2x p-2"></i> -->
+                    <div class="btn-group dropstart">
+                        <a href="" type="button" class="btn-2 btn-secondary" data-bs-toggle="dropdown" aria-expanded="false" onclick="BotonProcesar()"><i class="fa-solid fa-cart-arrow-down text-black fa-2x p-2"></i></a>
+                        
+                            <div id="carrito" class="dropdown-menu text-center" aria-labelledby="navbarDropdown">
+                                <table id="lista-carrito" class="table">
+                                    <thead>
+                                        <tr>
+                                            <th class="text-white">Imagen</th>
+                                            <th class="text-white">Nombre</th>
+                                            <th class="text-white">Precio</th>
+                                            <th class="text-white">Cantidad</th>
+                                            <th class="text-white"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="text-white"></tbody>
+                                </table>
+                                <div id="total"></div>
+                                <div class="text-center">
+                                    <a href="#" id="vaciar-carrito" class="btn btn-primary m-2">Vaciar carrito</a>
+                                    <a href="#" id="procesar-pedido" class="btn btn-danger m-2">Procesar compra</a>
+                                </div>
+                            </div>
+                            
+                    </div>
+                    
             </div>
         </nav>
         <div id="content" class="pt-5">
@@ -191,6 +218,18 @@
                 <!--codigo que viene de templates-->
             {% endblock %}
         </div>
+        <button disabled type="button" class="btn-flotante-ayuda" data-bs-toggle="tooltip" data-bs-placement="top" title="holaaaa">
+            Te ayudo?
+        </button>
+    
+        <div class="barra">
+            <span class="esquina-izquierda"></span>
+        </div>
+    
+        <button type="button" class="btn-flotante" onclick="manual()">
+            <i class="fas fa-question fa-1x"></i>
+        </button>
+        <!--aca termina el boton de ayuda-->
         <script src="{% static 'js/jquery-3.6.0.min.js' %}"></script>
         <script src="{% static 'js/jquery-ui-1.12.1/jquery-ui.js' %}"></script>
         <script src="{% static 'js/custom.js' %}"></script>
@@ -212,5 +251,7 @@
         <script src="//cdnjs.cloudflare.com/ajax/libs/timepicker/1.3.5/jquery.timepicker.min.js"></script>
         {% load sweetify %}
         {% sweetify %}
+        
+        <!-- <script src="{% static 'js/compra.js' %}"></script> -->
     </body>
 </html>

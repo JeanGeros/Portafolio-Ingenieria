@@ -145,6 +145,22 @@
             }
         }
     </script>
+
+<script>
+    function manual(){
+      Swal.fire({
+        title: 'Manual',
+        html: `En esta interfaz se podra visualizar el listado de proveedores vigentes.
+        <br><br>
+        Tambien tenemos la posibilidad de ver en detalle el proveedor seleccionado. De igual manera
+        tenemos la posibilidad de editar los datos de este proveedor o simplemente desactivar su cuenta.
+        <br><br> 
+        `,
+        showConfirmButton: true,
+        confirmButtonText: 'Continuar',
+      })
+    }
+</script>
     {% endlocalize %}
     {% endblock %}
 

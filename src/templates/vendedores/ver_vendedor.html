@@ -50,5 +50,20 @@
         <a href="{% url 'listar_vendedores' %}" type="submit" class="btn btn_aceptar border border-secondary text-black">Volver</a>
 
     </div>
+    <script>
+        function manual(){
+          Swal.fire({
+            title: 'Manual',
+            html: `Esta interfaz permite visualizar los detalles del vendedor.
+            <br><br>
+            Los datos que nos mostrara son: Run, Nombre, Telefono, fecha de Ingreso 
+            Fecha de Desvinculacion, Cargo y Estado del Vendedor(Activo o Desactivado).
+            <br><br>                       
+            `,
+            showConfirmButton: true,
+            confirmButtonText: 'Continuar',
+          })
+        }
+    </script>
     
 {% endblock %}

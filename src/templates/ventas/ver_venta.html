@@ -85,5 +85,24 @@
     <a href="{% url 'listar_ventas' %}" type="submit" class="btn">Volver</a>
 
     </div>
+
+    <script>
+        function manual(){
+        Swal.fire({
+            title: 'Manual',
+            html: `Ya ingresado a esta opcion, tenemos la posibilidad de ver en mas detalle la informacion 
+            asociada a la venta.
+            <br><br>
+            Aca podremos ver si fue una venta con despacho a domicilio (direccion de despacho) o retiro en local.
+            Tambien se podra el producto comprado, su valor, tipo de pago (efectivo o con tarjeta), 
+            nombre del cliente que realiza la compra.
+            <br><br> 
+            `,
+            showConfirmButton: true,
+            confirmButtonText: 'Continuar',
+        })
+        }
+    </script>
+    
     {% endlocalize %}
     {% endblock %}

@@ -1,0 +1,40 @@
+{% extends 'layout.html' %}
+{% load widget_tweaks %}
+{% load static %}
+
+{% block content %}
+    <link rel="stylesheet" href="{% static 'css/compras.css' %}">
+
+    <div class="container text-end caja rounded mt-5">
+        <h1 class="text-center pt-4">Seleccione los productos para su compra</h1>
+        <div class="productos" id="lista-productos">
+            
+            {% for producto in productos %}
+            
+                <div class="card carta p-3 m-3 bg-white" style="width: 17rem;">
+                
+                <div class="card-body">
+                    <img src="/static/images/{{producto.imagen}}" class="card-img-top" alt="...">
+                    <h4 class="card-title text-center pt-3">Nombre: {{producto.nombre}}</h5>
+                    <hr>
+                    <div class="card-footer numero-cantidad">
+                        <span class="text-muted precio" id="precio">Precio: {{producto.precio}}</span>
+                    </div>
+                    
+                    <div class="text-center pb-3">
+                        <a href="" type="button" class="btn btn-outline-danger agregar-carrito" data-id="{{producto.productoid}}">Agregar al Carrito</a>
+                    </div>
+                </div>
+                </div>
+            {% empty %}
+                <p>no hay productos</p>
+            {% endfor %}
+        </div>
+        
+        <a href="{% url 'seleccion_documento' %}" type="submit" class="btn">Volver</a>
+  
+    </div>
+    <script src="{% static 'js/buscador_tabla.js' %}"></script>
+    <script src="{% static 'js/compra.js' %}"></script>
+
+{% endblock %}

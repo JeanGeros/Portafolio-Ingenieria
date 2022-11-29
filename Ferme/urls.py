@@ -92,9 +92,11 @@ urlpatterns = [
     path('notas_credito/crear_nota_credito', views.Crear_nota_credito, name="crear_nota_credito"),
     path('notas_credito/listar_documentos', views.Listar_documentos, name="listar_documentos"),
 
+    path('comprar/', views.Comprar, name="comprar"),
+    path('comprar/procesar_compra', views.Procesar_compra, name="procesar_compra"),
+
     path('guias_despacho/', views.listar_guias_despacho, name="listar_guias_despacho"),
     path('guias_despacho/ver_guia_despacho', views.ver_guia_despacho, name="ver_guia_despacho"),
-
 
     path('informes/productos', views.informe_productos, name="informe_productos"),
     path('informes/proveedores', views.informe_proveedores, name="informe_proveedores"),
@@ -102,9 +104,6 @@ urlpatterns = [
     path('informes/ventas', views.informe_ventas, name="informe_ventas"),
     path('informes/visitas', views.informe_visitas, name="informe_visitas"),
     path('informes', views.Seleccion_informe, name="informes"),
-
-    # path('informes/ventas', views.generar_informes, name="informe_productos"),
-
 
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 

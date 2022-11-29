@@ -37,5 +37,19 @@
         <a href="{% url 'listar_proveedores' %}" type="submit" class="btn">Volver</a>
 
     </div>
+    <script>
+        function manual(){
+          Swal.fire({
+            title: 'Manual',
+            html: `Una vez dentro de esta interfaz, estamos habilitados para la creacion de un nuevo cliente.
+            <br><br>
+            Se debera rellenar todos los campos que esten en blanco, asi como: Run, Nombres y Apellidos, etc..
+            <br><br> 
+            `,
+            showConfirmButton: true,
+            confirmButtonText: 'Continuar',
+          })
+        }
+    </script>
     
 {% endblock %}

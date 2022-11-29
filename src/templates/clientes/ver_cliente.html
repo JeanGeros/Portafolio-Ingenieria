@@ -46,5 +46,19 @@
         <a href="{% url 'listar_clientes' %}" type="submit" class="btn btn_aceptar border border-secondary text-black">Volver</a>
 
     </div>
+
+    <script>
+        function manual(){
+          Swal.fire({
+            title: 'Manual',
+            html: `Esta interfaz solo permite la visualizacion de la informacion completa de Cliente seleccionado.
+            <br><br>
+                       
+            `,
+            showConfirmButton: true,
+            confirmButtonText: 'Continuar',
+          })
+        }
+    </script>
     
 {% endblock %}
