@@ -1,0 +1,66 @@
+{% extends 'layout.html' %}
+{% load static %}
+
+{% block content %}
+    <link rel="stylesheet" href="{% static 'css/index.css' %}">
+
+    <div class="text-center p-4 pb-5 mb-5">
+        <h1>Panel de control Ferme</h1>
+            </div>
+    
+    <div class="row">
+        <div class="column w-50">
+            <canvas id="pieChart" style="width: 100px !important;"></canvas> 
+        </div>
+        <div class="column w-50">
+            <canvas id="doughnutChart"></canvas>
+        </div>
+    </div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@latest/dist/Chart.min.js"></script>
+
+
+<script>
+    let dataGraphic =  JSON.parse("{{ventasXDocumento}}"); 
+    let ctxD = document.getElementById("pieChart").getContext('2d');
+    let myLineChart = new Chart(ctxD, {
+        type: 'doughnut',
+        data: {
+        labels: ["Boletas", "Facturas"],
+        datasets: [{
+            data: dataGraphic,
+            backgroundColor: ["#F7464A", "#46BFBD"],
+            hoverBackgroundColor: ["#FF5A5E", "#5AD3D1"]
+        }]
+        },
+        options: {
+        responsive: true
+        }
+    });
+
+
+</script>
+
+<script>
+    let dataGraphic2 =  JSON.parse("{{ventasXDespacho}}"); 
+    
+    let ctxD2 = document.getElementById("doughnutChart").getContext('2d');
+    let myLineChart2 = new Chart(ctxD2, {
+        type: 'doughnut',
+        data: {
+        labels: ["Ventas sin Despacho", "Ventas Con Despacho"],
+        datasets: [{
+            data: dataGraphic2,
+            backgroundColor: ["#F7464A", "#46BFBD"],
+            hoverBackgroundColor: ["#FF5A5E", "#5AD3D1"]
+        }]
+        },
+        options: {
+        responsive: true
+        }
+    });
+</script>
+
+
+{% endblock %}

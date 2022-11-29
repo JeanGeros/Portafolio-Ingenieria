@@ -5101,6 +5101,7 @@ def Procesar_compra(request):
 
         buff = BytesIO()  
 
+
         c = canvas.Canvas(buff, pagesize=letter)
 
         venta_adjunto = Venta.objects.get(nroventa = venta_id['nroventa'])
@@ -5130,3 +5131,39 @@ def Procesar_compra(request):
         
 
     return render(request, 'compras/procesar_compra.html', context)
+
+def dashboard(request):
+
+    # 1 Boleta
+    # 2 Factura
+    ventas = Venta.objects.all()
+    boletas = 0
+    facturas = 0
+    for venta in ventas:
+        if venta.tipodocumentoid.tipodocumentoid == 1:
+            boletas+=1
+        else:
+            facturas+=1
+    ventas_tipodocumento = [boletas, facturas]
+
+    ventas = Venta.objects.all()
+    despachos = Despacho.objects.all()
+
+    ventas_total = 0
+    despachos_total = 0
+    for venta in ventas:
+        print(venta)
+        ventas_total+=1
+
+    for despacho in despachos:
+        despachos_total+=1
+
+    total_ventas_despachos = [ventas_total-despachos_total,despachos_total]
+
+
+    context = {
+        'ventasXDocumento': ventas_tipodocumento,
+        'ventasXDespacho': total_ventas_despachos
+    }
+
+    return render(request, 'dashboard.html', context)
