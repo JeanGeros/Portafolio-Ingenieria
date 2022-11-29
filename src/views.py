@@ -54,6 +54,8 @@ from reportlab.pdfbase.pdfmetrics import registerFont
 from reportlab.pdfbase.ttfonts import TTFont
 from  datetime import date
 from reportlab.lib.units import inch
+import reportlab
+reportlab.rl_config.TTFSearchPath.append(str(settings.BASE_DIR) + '/src/lib/reportlabs/fonts')
 
 from io import BytesIO
 import re
@@ -3050,7 +3052,7 @@ def creacion_doc(lista, nombre_archivo):
 
     return response
 
-registerFont(TTFont('Arial','ARIAL.ttf'))
+registerFont(TTFont('Arial','arial.ttf'))
 # tipo_tributario=0 BOLETA
 # tipo_tributario=1 FACTURA
 def generar_factura(c, venta, documento, detalle_venta, direccion_cliente, giro, tipo_tributario='1'):
