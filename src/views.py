@@ -66,6 +66,8 @@ from docx.oxml.ns import nsdecls
 from docx.oxml import parse_xml
 
 from django.contrib import messages
+
+from src.static import images
 from src.forms import (
     FormClienteNormal1, FormClienteNormal2, FormClienteNormal3, addproductsForm, FormVendedorPersona,
     FormVendedorUsuario, FormVendedorEmpleado, FormEmpleadoPersona, FormEmpleadoUsuario, FormEmpleadoEmpleado,
@@ -3063,7 +3065,7 @@ def generar_factura(c, venta, documento, detalle_venta, direccion_cliente, giro,
     c.setStrokeColorRGB(0.1,0.8,0.1)
     c.setFillColorRGB(0,0,1) # font colour
 
-    c.drawImage('src\static\images\Ferme-logo.jpg',0*inch,8.7*inch, width=70, height=70)
+    c.drawImage('src\Ferme-logo.jpg',0*inch,8.7*inch, width=70, height=70)    
 
     c.setFillColorRGB(255,0,0) # font colour
     c.setFont("Arial", 18)
