@@ -185,7 +185,7 @@ def Agregar_productos(request):
         familia_producto = Familiaproducto.objects.get(familiaproid=familiaproid)
         estado_producto = Estado.objects.get(estadoid=estadoid)
         proveedor = Proveedor.objects.get(proveedorid=proveedorid)
-        bodega = Bodega.objects.get(BodegaId=bodega_id)
+        bodega = Bodega.objects.get(bodegaId=bodega_id)
 
         if len(fechavencimiento) == 10:
             fecha = fechavencimiento.split("/")

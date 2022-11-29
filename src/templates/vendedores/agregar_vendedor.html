@@ -56,5 +56,20 @@
     </div>
     
     <script src="{% static 'js/agregar_vendedor.js' %}"></script>
+    
+    <script>
+        function manual(){
+          Swal.fire({
+            title: 'Manual',
+            html: `Al ingresar a esta vista, esta nos permite el generar un nuevo vendedor o vendedora.
+            <br><br>
+            Para esto, sera necesario llenar todos los campos que aparacen..
+            <br><br>                    
+            `,
+            showConfirmButton: true,
+            confirmButtonText: 'Continuar',
+          })
+        }
+    </script>
 
 {% endblock %}

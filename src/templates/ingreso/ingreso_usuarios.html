@@ -34,5 +34,22 @@
       }
     </script>
 
+<script>
+  function manual(){
+    Swal.fire({
+      title: 'Manual',
+      html: `Esta interfaz nos permite registrarnos con nuestro ususario y clave correspondiente.
+      <br><br>
+      Cabe destacar que para poder ingresar debes tener ya tu usuario y clave. Esto lo puedes hacer
+      ingresando por el boton "Registrame" que se encuentra junto al boton que utilizaste para
+      ingresar aca.
+      <br><br> 
+      `,
+      showConfirmButton: true,
+      confirmButtonText: 'Continuar',
+    })
+  }
+</script>
+
 {% endblock %}
 

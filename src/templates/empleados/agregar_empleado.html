@@ -57,4 +57,19 @@
     
     <script src="{% static 'js/agregar_empleado.js' %}"></script>
 
+    <script>
+        function manual(){
+          Swal.fire({
+            title: 'Manual',
+            html: `Al ingresar a esta interfaz, podremos crear un nuevo empleado.
+            <br><br>
+            Deberemos ir llenando los campos en blanco, tales como: Run, Nombes, Usuario, Clave de Usuario, etc.
+            <br><br>               
+            `,
+            showConfirmButton: true,
+            confirmButtonText: 'Continuar',
+          })
+        }
+    </script>
+
 {% endblock %}
