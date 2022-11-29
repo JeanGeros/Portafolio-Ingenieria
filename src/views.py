@@ -92,7 +92,7 @@ def Seguimiento_paginas(modulo, usuario):
     )
 
 def Index(request):
-    
+    # Seguimiento_paginas("Inicio", request.user)
     if request.POST.get('VerPerfil') is not None:
         request.session['_ver_perfil'] = request.POST
         return redirect('ver_perfil')
@@ -110,7 +110,7 @@ def Index(request):
     return render(request, 'index.html', context)
 
 def Ingreso(request):
-
+    # Seguimiento_paginas("Ingreso de usuarios", request.user)
     if request.POST.get('VerPerfil') is not None:
         request.session['_ver_perfil'] = request.POST
         return redirect('ver_perfil')
@@ -726,7 +726,7 @@ def Seleccion_registro(request):
 
 
 def Registro_clientes(request):
-    Seguimiento_paginas("Modulo Clientes - Registro Clientes", request.user)
+    # Seguimiento_paginas("Modulo Clientes - Registro Clientes", request.user)
 
     if request.POST.get('VerPerfil') is not None:
         request.session['_ver_perfil'] = request.POST
@@ -2284,7 +2284,7 @@ def Cambiar_estado_empleado(id_empleado):
 # *********************************Pedidos************************************************
 @csrf_exempt
 def Crear_pedido(request, id=None):
-    Seguimiento_paginas("Modulo Ordenes de Compra - Crear Pedido", request.user)
+    # Seguimiento_paginas("Modulo Ordenes de Compra - Crear Pedido", request.user)
 
     if request.POST.get('VerPerfil') is not None:
         request.session['_ver_perfil'] = request.POST
@@ -4933,7 +4933,7 @@ def informe_visitas(request):
 
 def Comprar(request):
 
-    Seguimiento_paginas("Compras - Cliente", request.user)
+    # Seguimiento_paginas("Compras - Cliente", request.user)
 
     if request.POST.get('VerPerfil') is not None:
         request.session['_ver_perfil'] = request.POST
@@ -4956,7 +4956,7 @@ def Comprar(request):
 
 def Procesar_compra(request):
 
-    Seguimiento_paginas("Procesar compra - Cliente", request.user)
+    # Seguimiento_paginas("Procesar compra - Cliente", request.user)
 
     if request.POST.get('VerPerfil') is not None:
         request.session['_ver_perfil'] = request.POST
