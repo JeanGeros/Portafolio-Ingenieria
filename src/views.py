@@ -5152,18 +5152,44 @@ def dashboard(request):
     ventas_total = 0
     despachos_total = 0
     for venta in ventas:
-        print(venta)
         ventas_total+=1
 
     for despacho in despachos:
         despachos_total+=1
 
     total_ventas_despachos = [ventas_total-despachos_total,despachos_total]
+    import json
 
+    detalle_ventas = Detalleventa.objects.all()
+    productos_vendidos = []
+    for detalle in detalle_ventas:
+        n_producto = str(detalle.productoid)
+        c_producto = int(detalle.cantidad)
+        if len(productos_vendidos) == 0:
+            productos_vendidos.append({"nombre": n_producto, "cantidad":c_producto})
+        else:
+            producto_found = next((product for product in productos_vendidos if product["nombre"] == n_producto), None)
+            if producto_found:
+                producto_found["cantidad"] = producto_found["cantidad"] +c_producto
+            else:
+                productos_vendidos.append({"nombre": n_producto, "cantidad":c_producto})
+        
+    # productos_vendidos = json.dumps(productos_vendidos)
+
+    nombre_productos = []
+    cantidad_productos = []
+    for producto in productos_vendidos:
+        nombre_productos.append(producto["nombre"]) 
+        cantidad_productos.append(producto["cantidad"]) 
+    productos_vendidos = []
+    productos_vendidos.append(nombre_productos)
+    productos_vendidos.append(cantidad_productos)
+    productos_vendidos = json.dumps(productos_vendidos)
 
     context = {
         'ventasXDocumento': ventas_tipodocumento,
-        'ventasXDespacho': total_ventas_despachos
+        'ventasXDespacho': total_ventas_despachos,
+        'productosXcantidad': productos_vendidos,
     }
 
     return render(request, 'dashboard.html', context)
