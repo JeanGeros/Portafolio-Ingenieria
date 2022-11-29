@@ -1,0 +1,129 @@
+{% extends 'layout.html' %}
+{% load static %}
+
+{% block content %}
+    <link rel="stylesheet" href="{% static 'css/index.css' %}">
+    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+
+
+    <div class="rounded mt-3">
+        <div class="text-center p-4">
+            <h1>Panel de control Ferme</h1>
+                </div>
+
+        <div class="row mx-5">
+            <div class="col-3 grafico">
+                <div class="card" style="">
+                    <div class="card-body">
+                      <h5 class="card-title">Título de la tarjeta</h5>
+                      <h5 >{{ventas_total}}</h5>
+                    </div>
+                  </div>
+    
+            </div>
+            <div class="col-8 grafico">
+                <canvas id="barChart"></canvas>
+    
+            </div>
+          </div>
+        <div class="container">
+            <div class="row">
+              <div class="col-sm">
+                One of three columns
+              </div>
+              <div class="col-sm">
+                <canvas id="pieChart" style="width: 100px !important;"></canvas> 
+              </div>
+              <div class="col-sm">
+                <canvas id="doughnutChart"></canvas>
+              </div>
+            </div>
+          </div>
+    </div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@latest/dist/Chart.min.js"></script>
+
+
+<script>
+    let dataGraphic =  JSON.parse("{{ventasXDocumento}}"); 
+    let ctxD = document.getElementById("pieChart").getContext('2d');
+    let myLineChart = new Chart(ctxD, {
+        type: 'doughnut',
+        data: {
+        labels: ["Boletas", "Facturas"],
+        datasets: [{
+            data: dataGraphic,
+            backgroundColor: ["#F7464A", "#46BFBD"],
+            hoverBackgroundColor: ["#FF5A5E", "#5AD3D1"]
+        }]
+        },
+        options: {
+        responsive: true
+        }
+    });
+
+    let dataGraphic2 =  JSON.parse("{{ventasXDespacho}}"); 
+    
+    let ctxD2 = document.getElementById("doughnutChart").getContext('2d');
+    let myLineChart2 = new Chart(ctxD2, {
+        type: 'doughnut',
+        data: {
+        labels: ["Ventas sin Despacho", "Ventas Con Despacho"],
+        datasets: [{
+            data: dataGraphic2,
+            backgroundColor: ["#F7464A", "#46BFBD"],
+            hoverBackgroundColor: ["#FF5A5E", "#5AD3D1"]
+        }]
+        },
+        options: {
+        responsive: true
+        }
+    });
+
+    let valuesGraphic = "{{productosXcantidad}}"; 
+    valuesGraphic = valuesGraphic.replace(/&quot;/g, '\"');
+
+    valuesGraphic =  JSON.parse(valuesGraphic); 
+    console.log(valuesGraphic[0])
+    console.log(valuesGraphic[1])
+    let ctxB = document.getElementById("barChart").getContext('2d');
+    let myBarChart = new Chart(ctxB, {
+    type: 'bar',
+    data: {
+        labels: valuesGraphic[0],
+        datasets: [{
+        label: 'Cantidad de Ventas',
+        data: valuesGraphic[1],
+        backgroundColor: [
+            'rgba(255, 99, 132, 0.2)',
+            'rgba(54, 162, 235, 0.2)',
+            'rgba(255, 206, 86, 0.2)',
+            'rgba(75, 192, 192, 0.2)',
+            'rgba(153, 102, 255, 0.2)',
+            'rgba(255, 159, 64, 0.2)'
+        ],
+        borderColor: [
+            'rgba(255,99,132,1)',
+            'rgba(54, 162, 235, 1)',
+            'rgba(255, 206, 86, 1)',
+            'rgba(75, 192, 192, 1)',
+            'rgba(153, 102, 255, 1)',
+            'rgba(255, 159, 64, 1)'
+        ],
+        borderWidth: 1
+        }]
+    },
+    options: {
+        scales: {
+        yAxes: [{
+            ticks: {
+            beginAtZero: true
+            }
+        }]
+        }
+    }
+    });
+</script>
+
+
+{% endblock %}
