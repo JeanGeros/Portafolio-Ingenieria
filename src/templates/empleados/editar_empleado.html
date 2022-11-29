@@ -52,4 +52,19 @@
 
     <script src="{% static 'js/editar_empleado.js' %}"></script>
 
+    <script>
+        function manual(){
+          Swal.fire({
+            title: 'Manual',
+            html: `Esta interfaz nos permiteeditar los campos del empleado antes seleccionado.
+            <br><br>
+            Podremos edir los campos entre otros: Nombre, Apellidos, telefono, correo, etc.
+            <br><br>               
+            `,
+            showConfirmButton: true,
+            confirmButtonText: 'Continuar',
+          })
+        }
+    </script>
+
 {% endblock %}

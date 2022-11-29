@@ -52,4 +52,20 @@
   
     </div>
 
+    <script>
+        function manual(){
+          Swal.fire({
+            title: 'Manual',
+            html: `En este modulo, se podra viualizar el listado de todos los empleados vigentes.
+            <br><br>
+            Tambien podemos seleccionar cualquier empleado de la lista y entrar a sus opciones, tales como:
+            <br><br>   
+            Ver, Editar y poder desactivarlo.                 
+            `,
+            showConfirmButton: true,
+            confirmButtonText: 'Continuar',
+          })
+        }
+    </script>
+
 {% endblock %}
