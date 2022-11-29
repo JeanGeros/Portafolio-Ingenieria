@@ -5161,6 +5161,7 @@ def dashboard(request):
 
     for despacho in despachos:
         despachos_total+=1
+        
     print(f"total ventas {ventas_total}")
     print(f"total ventas length {len(ventas)}")
     total_ventas_despachos = [ventas_total-despachos_total,despachos_total]
