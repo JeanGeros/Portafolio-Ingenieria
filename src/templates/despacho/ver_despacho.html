@@ -117,6 +117,21 @@
             
         }
     </script>
+
+<script>
+    function manual(){
+      Swal.fire({
+        title: 'Manual',
+        html: `En esta interfaz vemos con mas detalle el despacho antes seleccionado.
+        <br><br>   
+        Tambien tenemos la posibilidad de activar o desactivar el pedido.
+        <br><br>
+        `,
+        showConfirmButton: true,
+        confirmButtonText: 'Continuar',
+      })
+    }
+</script>
     
 
 {% endblock %}

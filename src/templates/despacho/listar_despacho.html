@@ -53,4 +53,18 @@
     </div>
     <script src="{% static 'js/buscador_tabla.js' %}"></script>
 
+    <script>
+        function manual(){
+          Swal.fire({
+            title: 'Manual',
+            html: `Aca podemos administrar los despachos que figuran en la actualidad. Ver en que
+            estado se encuentran, las fechas de realizacion y despacho, asi como el tipo de despacho.
+            <br><br>   
+            `,
+            showConfirmButton: true,
+            confirmButtonText: 'Continuar',
+          })
+        }
+    </script>
+
 {% endblock %}

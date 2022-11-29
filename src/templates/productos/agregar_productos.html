@@ -63,4 +63,20 @@
 
     <script src="{% static 'js/agregar_productos.js' %}"></script>
 
+    <script>
+        function manual(){
+          Swal.fire({
+            title: 'Manual',
+            html: `Al ingresar a esta interfaz, seremos capaces de registrar un nuevo producto.
+            <br><br>
+            Para  dejar activo el nuevo producto es necesario llenar todos los campos en blanco, 
+            por ejemplo: Nombre, Precio, Stock, Stock Crito, etc.
+            <br><br> 
+            `,
+            showConfirmButton: true,
+            confirmButtonText: 'Continuar',
+          })
+        }
+    </script>
+
 {% endblock %}

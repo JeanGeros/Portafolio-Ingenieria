@@ -210,5 +210,21 @@
         }
     }
 </script>
+<script>
+    function manual(){
+      Swal.fire({
+        title: 'Manual',
+        html: `Esta interfaz es importante, ya que aca podras recepcionar el pedido. Te apareceran
+        los detalles del pedido.
+        <br><br>
+        Tambien podras seleccionar los productos a recepcionar en casos de productos que no llegen 
+        su totalidad 
+        <br><br>     
+        `,
+        showConfirmButton: true,
+        confirmButtonText: 'Continuar',
+      })
+    }
+</script>
 
 {% endblock %}

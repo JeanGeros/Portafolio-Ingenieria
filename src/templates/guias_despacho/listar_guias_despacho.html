@@ -121,6 +121,20 @@
         }
     </script>
 
+    <script>
+        function manual(){
+        Swal.fire({
+            title: 'Manual',
+            html: `En este modulo podemos visualizar el listado de todas las Guias de Despacho 
+            ya generadas. Vemos sus detalles generales y al presionar el boton "Ver" sera 
+            posible visualizar en detalle la Guias d Despacho seleccionada.
+            <br><br>   
+            `,
+            showConfirmButton: true,
+            confirmButtonText: 'Continuar',
+        })
+        }
+    </script>
 
     {% endlocalize %}
     {% endblock %}
