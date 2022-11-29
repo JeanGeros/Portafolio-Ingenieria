@@ -3065,7 +3065,7 @@ def generar_factura(c, venta, documento, detalle_venta, direccion_cliente, giro,
     c.setStrokeColorRGB(0.1,0.8,0.1)
     c.setFillColorRGB(0,0,1) # font colour
 
-    c.drawImage('src\Ferme-logo.jpg',0*inch,8.7*inch, width=70, height=70)    
+    # c.drawImage('src\static\images\Ferme-logo.jpg',0*inch,8.7*inch, width=70, height=70)
 
     c.setFillColorRGB(255,0,0) # font colour
     c.setFont("Arial", 18)
