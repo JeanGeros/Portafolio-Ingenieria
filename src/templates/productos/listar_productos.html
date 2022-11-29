@@ -132,5 +132,21 @@
         }
     }
 </script>
+<script>
+    function manual(){
+      Swal.fire({
+        title: 'Manual',
+        html: `Esta interfaz nos permitira adminstrar los productos.
+        <br><br>
+        Aca podremos ingresar, editar, buscar productos. De igual manera
+        nos permitira la activación o desactivacion de un producto segun
+        en stock que se mantenga de él.
+        <br><br>                    
+        `,
+        showConfirmButton: true,
+        confirmButtonText: 'Continuar',
+      })
+    }
+</script>
     {% endlocalize %}
     {% endblock %}
