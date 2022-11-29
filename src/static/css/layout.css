@@ -45,6 +45,7 @@ footer {
     padding-left: 5px!important;
 }
 
+
 .btn-flotante {
 	
 	color: #ffffff; /* Color del texto */
@@ -87,5 +88,23 @@ footer {
 	right: 20px;
 	box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.1);
 	z-index: 99;
+}
+
+
+#carrito {
+    background-color: #909090;
+    overflow:scroll;
+    height:200px;
+    width:500px;
+}
+
+.borrar-producto{
+    top: -4px;
+    right: 6px;
+    cursor: pointer;
+    color: rgb(0, 0, 0);
+    text-decoration: none;
+    font-weight: 700;
+    background-color: rgb(252, 0, 0);
 }
 

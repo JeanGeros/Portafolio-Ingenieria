@@ -1,0 +1,29 @@
+.productos {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.caja {
+    padding-top: 2%;
+    padding-bottom: 3%;
+    padding-left: 4%;
+    padding-right: 4%;
+    margin-top: 5%!important;
+    margin-bottom: 6%!important;
+    background-color: #D9D9D9;
+}
+
+.btn {
+    background-color: #FF9550!important;
+}
+
+.swal2-cancel {
+    height: 86%;
+}
+
+.btn-2 {
+    background-color: #909090!important;
+    border-color: #909090!important;
+}
+
