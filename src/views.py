@@ -5054,7 +5054,10 @@ def Procesar_compra(request):
                 productoid = Producto.objects.get(productoid = int(detalle[0 + cont_valores][f'producto_id{x}'])),
                 nroventa = Venta.objects.get(nroventa = venta_id['nroventa'])
             )
-
+            producto_modificar = Producto.objects.get(productoid = int(detalle[0 + cont_valores][f'producto_id{x}']))
+            producto_vendido, created =  Producto.objects.get_or_create(productoid = producto_modificar.productoid)
+            producto_vendido.stock = producto_vendido.stock-int(detalle[3 + cont_valores][f'producto_cantidad{x}'])
+            producto_vendido.save()
             cont += 1
 
         doc_adjunto = ''

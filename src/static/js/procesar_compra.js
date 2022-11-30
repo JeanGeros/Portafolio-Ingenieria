@@ -61,8 +61,10 @@ function calcularTotal(){
     for(let i = 0; i < productoLS.length; i++){
        
         let num1 = Number(productoLS[i].precio);
-
-        let element = (num1);
+        let num2 = Number(productoLS[i].cantidad);
+        console.log(num1)
+        console.log(num2)
+        let element = (num1 * num2);
         total = total + element;
         function roundTo(value, places){
             var power = Math.pow(10, places);
