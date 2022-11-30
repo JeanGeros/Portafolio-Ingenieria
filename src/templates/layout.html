@@ -49,26 +49,22 @@
                                 <li class="nav-item">
                                     <a class="nav-link fw-bolder text-black" href="/productos">Productos</a>
                                 </li>
-                                <li class="nav-item">
-                                    <a href="/vendedores" class="nav-link fw-bolder text-black">Vendedores</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="/empleados" class="nav-link fw-bolder text-black">Empleados</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="/clientes" class="nav-link fw-bolder text-black">Clientes</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="/proveedores" class="nav-link fw-bolder text-black">Proveedores</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="{% url 'listar_boletas' %}" class="nav-link fw-bolder text-black">Boletas</a>
-                                </li>
                                 <li class="nav-item"></li>
                                     <a href="/pedidos" class="nav-link fw-bolder text-black">Orden de compra</a>
                                 </li>
                                 <li class="nav-item">
                                     <a href="/despacho" class="nav-link fw-bolder text-black">Despachos</a>
+                                </li>
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle fw-bolder text-black" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Personal
+                                    </a>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item fw-bolder text-black" href="/vendedores">Vendedores</a></li>
+                                        <li><a class="dropdown-item fw-bolder text-black" href="/empleados">Empleados</a></li>
+                                        <li><a class="dropdown-item fw-bolder text-black" href="/clientes">Clientes</a></li>
+                                        <li><a class="dropdown-item fw-bolder text-black" href="/proveedores">Proveedores</a></li>
+                                    </ul>
                                 </li>
                                 <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle fw-bolder text-black" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
