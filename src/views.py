@@ -185,13 +185,11 @@ def Agregar_productos(request):
         estadoid = request.POST.get('estadoid')
         bodega_id = request.POST.get('bodegaid')
 
-        print(bodega_id)
         tipo_producto = Tipoproducto.objects.get(tipoproductoid=tipoproductoid)
         familia_producto = Familiaproducto.objects.get(familiaproid=familiaproid)
         estado_producto = Estado.objects.get(estadoid=estadoid)
         proveedor = Proveedor.objects.get(proveedorid=proveedorid)
         bodega = Bodega.objects.get(bodegaId=bodega_id)
-        print(bodega)
 
         if len(fechavencimiento) == 10:
             fecha = fechavencimiento.split("/")
@@ -351,13 +349,13 @@ def Editar_producto(request):
         tipoproductoid = request.POST.get('tipoproductoid')
         familiaproid = request.POST.get('familiaproid')
         estadoid = request.POST.get('estadoid')
-        bodega_id = request.POST.get('BodegaId')
+        bodega_id = request.POST.get('bodegaid')
 
         proveedor = Proveedor.objects.get(proveedorid=proveedorid)
         tipo_producto = Tipoproducto.objects.get(tipoproductoid=tipoproductoid)
         familia_producto = Familiaproducto.objects.get(familiaproid=familiaproid)
         Estado_producto = Estado.objects.get(estadoid=estadoid)
-        bodega = Bodega.objects.get(BodegaId=bodega_id)
+        bodega = Bodega.objects.get(bodegaId=bodega_id)
 
         fecha = fechavencimiento.split("/")
         if len(fechavencimiento) == 10:
@@ -380,7 +378,7 @@ def Editar_producto(request):
             producto.familiaproid = familia_producto
             producto.estadoid = Estado_producto
             producto.codigo = codigo
-            producto.BodegaId = bodega
+            producto.bodegaid = bodega
 
             if imagen:
                 producto.imagen = imagen
@@ -5162,8 +5160,6 @@ def dashboard(request):
     for despacho in despachos:
         despachos_total+=1
         
-    print(f"total ventas {ventas_total}")
-    print(f"total ventas length {len(ventas)}")
     total_ventas_despachos = [ventas_total-despachos_total,despachos_total]
     import json
 
@@ -5191,12 +5187,25 @@ def dashboard(request):
     productos_vendidos.append(cantidad_productos)
     productos_vendidos = json.dumps(productos_vendidos)
 
-    print(productos_vendidos)
+    productos_stock = Producto.objects.all().order_by('stock')[:10]
+    productos_peligro_stock = [] 
+    nombre = []
+    stock = []
+    for pro_stock in productos_stock:
+        nombre.append(str(pro_stock.nombre))
+        stock.append(int(pro_stock.stock)-int(pro_stock.stockcritico))
+
+    productos_peligro_stock.append(nombre)
+    productos_peligro_stock.append(stock)
+    productos_peligro_stock = json.dumps(productos_peligro_stock)
+    
     context = {
         'ventasXDocumento': ventas_tipodocumento,
         'ventasXDespacho': total_ventas_despachos,
         'productosXcantidad': productos_vendidos,
-        'totalVentas':ventas_total
+        'totalVentas':ventas_total,
+        'productoStock':productos_peligro_stock,
+
     }
 
     return render(request, 'dashboard.html', context)
