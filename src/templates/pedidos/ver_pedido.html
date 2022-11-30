@@ -58,5 +58,19 @@
     <a href="{% url 'listar_pedidos' %}" type="submit" class="btn">Volver</a>
 
     </div>
+    <script>
+        function manual(){
+          Swal.fire({
+            title: 'Manual',
+            html: `En esta interfaz vemos los detalles de un pedido en especifico, por ejemplo vemos
+            la cantidad solicitada, el producto, el stock anual, tipo de producto, etc.
+            <br><br>      
+            `,
+            showConfirmButton: true,
+            confirmButtonText: 'Continuar',
+          })
+        }
+    </script>
+    
     
 {% endblock %}

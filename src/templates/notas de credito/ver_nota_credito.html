@@ -85,4 +85,20 @@
 
         }
     </script>
+
+<script>
+    function manual(){
+      Swal.fire({
+        title: 'Manual',
+        html: `Como se puede ver, aca vemos en detalle los datos de la nota de credito y tambien 
+        tenemos la posibilidad de decargar una copia en 3 distintos formatos: Excel - Word - PDF.
+        <br><br> 
+        Tambien tenemos la posibilidad de Anular la Nota de Credito seleccionada.
+        <br><br>   
+        `,
+        showConfirmButton: true,
+        confirmButtonText: 'Continuar',
+      })
+    }
+</script>
 {% endblock %}

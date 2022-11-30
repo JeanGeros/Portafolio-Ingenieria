@@ -314,4 +314,21 @@
         }
     }
 </script>
+
+<script>
+    function manual(){
+    Swal.fire({
+        title: 'Manual',
+        html: `Esta interfaz permiste generar la venta correspondiente. Se debe ingresar todos los datos
+        solicitados en pantalla, tal como: Cliente Comprador, Tipo de Entrega, Tipo de Pago, 
+        Tipo de Documento (Boleta o Factura), etc.
+        <br><br>
+        Tambien es necesario seleccionar el tipo de producto y la cantidad necesitada.
+        <br><br> 
+        `,
+        showConfirmButton: true,
+        confirmButtonText: 'Continuar',
+    })
+    }
+</script>
 {% endblock %}

@@ -60,4 +60,21 @@
     </div>
 
     <script src="{% static 'js/editar_cliente.js' %}"></script>
+
+    <script>
+        function manual(){
+          Swal.fire({
+            title: 'Manual',
+            html: `Una vez dentro de esta interfaz, se habilitan los campos para poder editar su valor
+            siempre que sea necesario.
+            <br><br>
+            Se debe modificar los campos necesarios, por ejemplo: Run, Nombres, Apellidos, etc.
+            <br><br> 
+            `,
+            showConfirmButton: true,
+            confirmButtonText: 'Continuar',
+          })
+        }
+    </script>
+
 {% endblock %}

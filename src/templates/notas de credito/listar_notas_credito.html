@@ -60,4 +60,19 @@
 
     <script src="{% static 'js/buscador_tabla.js' %}"></script>
 
+    <script>
+        function manual(){
+          Swal.fire({
+            title: 'Manual',
+            html: `En este modulo podemos visualizar el listado de todas las Notas de Credito ya 
+            generadas. Vemos sus detalles generales y al presionar el boton "Ver" sera posible 
+            visualizar en detalle la nota de credito seleccionada.
+            <br><br>   
+            `,
+            showConfirmButton: true,
+            confirmButtonText: 'Continuar',
+          })
+        }
+    </script>
+
 {% endblock %}
