@@ -6,39 +6,46 @@
     <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
 
 
-    <div class="rounded mt-3">
+    <div class=" div_container">
         <div class="text-center p-4">
             <h1>Panel de control Ferme</h1>
-                </div>
+        </div>
 
         <div class="row mx-5">
-            <div class="col-3 grafico">
-                <div class="card" style="">
-                    <div class="card-body">
-                      <h5 class="card-title">Título de la tarjeta</h5>
-                      <h5 >{{ventas_total}}</h5>
-                    </div>
-                  </div>
-    
+            <div class="col-3 grafico" style="background-color: white;">
+                    <canvas id="horizontalBar" style="height:100% ;"></canvas>
+
+                      <!-- <h5 class="card-title text-center">Total de Ventas</h5>
+                      <h5 class="text-center display-3" >{{totalVentas}}</h5>
+                   -->
+
             </div>
+            
             <div class="col-8 grafico">
-                <canvas id="barChart"></canvas>
-    
+                <canvas id="barChart" style="width: 100%; margin-block: 10px;"></canvas>
             </div>
-          </div>
-        <div class="container">
-            <div class="row">
-              <div class="col-sm">
-                One of three columns
-              </div>
-              <div class="col-sm">
-                <canvas id="pieChart" style="width: 100px !important;"></canvas> 
-              </div>
-              <div class="col-sm">
+            
+        </div>
+
+
+        <div class="row mx-5" style="margin-right: 4rem !important;">
+            <div class="col-3">
+                  <div class="card style_kpi2 grafico">
+                    <h5 class="card-title text-center">Total de Ventas</h5>
+                    <h5 class="text-center display-3" >{{totalVentas}}</h5>
+                </div>
+
+            </div>
+            
+            <div class="col-4 py-4 grafico">
+                <canvas id="pieChart" style="width: 100%;"></canvas> 
+
+            </div>
+            <div class="col-4 py-4 grafico">
                 <canvas id="doughnutChart"></canvas>
-              </div>
+
             </div>
-          </div>
+        </div>
     </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@latest/dist/Chart.min.js"></script>
@@ -58,6 +65,7 @@
         }]
         },
         options: {
+        maintainAspectRatio: false,
         responsive: true
         }
     });
@@ -76,7 +84,9 @@
         }]
         },
         options: {
+        maintainAspectRatio: false,
         responsive: true
+        
         }
     });
 
@@ -84,8 +94,6 @@
     valuesGraphic = valuesGraphic.replace(/&quot;/g, '\"');
 
     valuesGraphic =  JSON.parse(valuesGraphic); 
-    console.log(valuesGraphic[0])
-    console.log(valuesGraphic[1])
     let ctxB = document.getElementById("barChart").getContext('2d');
     let myBarChart = new Chart(ctxB, {
     type: 'bar',
@@ -114,6 +122,8 @@
         }]
     },
     options: {
+        responsive: true,
+        maintainAspectRatio: false,
         scales: {
         yAxes: [{
             ticks: {
@@ -123,6 +133,40 @@
         }
     }
     });
+
+    let dataGraphic4 =  "{{productoStock}}"; 
+    dataGraphic4 = dataGraphic4.replace(/&quot;/g, '\"');
+    dataGraphic4 =  JSON.parse(dataGraphic4); 
+    new Chart(document.getElementById("horizontalBar"), {
+    "type": "horizontalBar",
+    "data": {
+      "labels": dataGraphic4[0],
+      "datasets": [{
+        "label": "Stock disponible hasta Quebrar Stock",
+        "data": dataGraphic4[1],
+        "fill": false,
+        "backgroundColor": ["rgba(255, 99, 132, 0.2)", "rgba(255, 159, 64, 0.2)",
+          "rgba(255, 205, 86, 0.2)", "rgba(75, 192, 192, 0.2)", "rgba(54, 162, 235, 0.2)",
+          "rgba(153, 102, 255, 0.2)", "rgba(201, 203, 207, 0.2)"
+        ],
+        "borderColor": ["rgb(255, 99, 132)", "rgb(255, 159, 64)", "rgb(255, 205, 86)",
+          "rgb(75, 192, 192)", "rgb(54, 162, 235)", "rgb(153, 102, 255)", "rgb(201, 203, 207)"
+        ],
+        "borderWidth": 1
+      }]
+    },
+    "options": {
+        "maintainAspectRatio": false,
+      "scales": {
+        "xAxes": [{
+          "ticks": {
+            "beginAtZero": true
+          }
+        }]
+      }
+    }
+  });
+
 </script>
 
 

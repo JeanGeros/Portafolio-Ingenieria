@@ -1,5 +1,24 @@
 .grafico{
-    border: 1px solid;
+    /* border: 1px solid; */
     border-radius: 10px;
     margin: 10px;    
+    background-color: white;
+}
+
+.style_kpi{
+    height: 47%;
+    justify-content: center;
+    margin-block: 10px;
+}
+
+.style_kpi2{
+    height: 94%;
+    justify-content: center;
+    margin-block: 10px;
+}
+
+.div_container{
+    padding-top: 1.5rem;
+    padding-bottom: 5rem;
+    background-color: #CBCBCB;
 }
