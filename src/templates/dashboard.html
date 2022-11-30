@@ -1,0 +1,173 @@
+{% extends 'layout.html' %}
+{% load static %}
+
+{% block content %}
+    <link rel="stylesheet" href="{% static 'css/index.css' %}">
+    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+
+
+    <div class=" div_container">
+        <div class="text-center p-4">
+            <h1>Panel de control Ferme</h1>
+        </div>
+
+        <div class="row mx-5">
+            <div class="col-3 grafico" style="background-color: white;">
+                    <canvas id="horizontalBar" style="height:100% ;"></canvas>
+
+                      <!-- <h5 class="card-title text-center">Total de Ventas</h5>
+                      <h5 class="text-center display-3" >{{totalVentas}}</h5>
+                   -->
+
+            </div>
+            
+            <div class="col-8 grafico">
+                <canvas id="barChart" style="width: 100%; margin-block: 10px;"></canvas>
+            </div>
+            
+        </div>
+
+
+        <div class="row mx-5" style="margin-right: 4rem !important;">
+            <div class="col-3">
+                  <div class="card style_kpi2 grafico">
+                    <h5 class="card-title text-center">Total de Ventas</h5>
+                    <h5 class="text-center display-3" >{{totalVentas}}</h5>
+                </div>
+
+            </div>
+            
+            <div class="col-4 py-4 grafico">
+                <canvas id="pieChart" style="width: 100%;"></canvas> 
+
+            </div>
+            <div class="col-4 py-4 grafico">
+                <canvas id="doughnutChart"></canvas>
+
+            </div>
+        </div>
+    </div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@latest/dist/Chart.min.js"></script>
+
+
+<script>
+    let dataGraphic =  JSON.parse("{{ventasXDocumento}}"); 
+    let ctxD = document.getElementById("pieChart").getContext('2d');
+    let myLineChart = new Chart(ctxD, {
+        type: 'doughnut',
+        data: {
+        labels: ["Boletas", "Facturas"],
+        datasets: [{
+            data: dataGraphic,
+            backgroundColor: ["#F7464A", "#46BFBD"],
+            hoverBackgroundColor: ["#FF5A5E", "#5AD3D1"]
+        }]
+        },
+        options: {
+        maintainAspectRatio: false,
+        responsive: true
+        }
+    });
+
+    let dataGraphic2 =  JSON.parse("{{ventasXDespacho}}"); 
+    
+    let ctxD2 = document.getElementById("doughnutChart").getContext('2d');
+    let myLineChart2 = new Chart(ctxD2, {
+        type: 'doughnut',
+        data: {
+        labels: ["Ventas sin Despacho", "Ventas Con Despacho"],
+        datasets: [{
+            data: dataGraphic2,
+            backgroundColor: ["#F7464A", "#46BFBD"],
+            hoverBackgroundColor: ["#FF5A5E", "#5AD3D1"]
+        }]
+        },
+        options: {
+        maintainAspectRatio: false,
+        responsive: true
+        
+        }
+    });
+
+    let valuesGraphic = "{{productosXcantidad}}"; 
+    valuesGraphic = valuesGraphic.replace(/&quot;/g, '\"');
+
+    valuesGraphic =  JSON.parse(valuesGraphic); 
+    let ctxB = document.getElementById("barChart").getContext('2d');
+    let myBarChart = new Chart(ctxB, {
+    type: 'bar',
+    data: {
+        labels: valuesGraphic[0],
+        datasets: [{
+        label: 'Cantidad de Ventas',
+        data: valuesGraphic[1],
+        backgroundColor: [
+            'rgba(255, 99, 132, 0.2)',
+            'rgba(54, 162, 235, 0.2)',
+            'rgba(255, 206, 86, 0.2)',
+            'rgba(75, 192, 192, 0.2)',
+            'rgba(153, 102, 255, 0.2)',
+            'rgba(255, 159, 64, 0.2)'
+        ],
+        borderColor: [
+            'rgba(255,99,132,1)',
+            'rgba(54, 162, 235, 1)',
+            'rgba(255, 206, 86, 1)',
+            'rgba(75, 192, 192, 1)',
+            'rgba(153, 102, 255, 1)',
+            'rgba(255, 159, 64, 1)'
+        ],
+        borderWidth: 1
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+        yAxes: [{
+            ticks: {
+            beginAtZero: true
+            }
+        }]
+        }
+    }
+    });
+
+    let dataGraphic4 =  "{{productoStock}}"; 
+    dataGraphic4 = dataGraphic4.replace(/&quot;/g, '\"');
+    dataGraphic4 =  JSON.parse(dataGraphic4); 
+    new Chart(document.getElementById("horizontalBar"), {
+    "type": "horizontalBar",
+    "data": {
+      "labels": dataGraphic4[0],
+      "datasets": [{
+        "label": "Stock disponible hasta Quebrar Stock",
+        "data": dataGraphic4[1],
+        "fill": false,
+        "backgroundColor": ["rgba(255, 99, 132, 0.2)", "rgba(255, 159, 64, 0.2)",
+          "rgba(255, 205, 86, 0.2)", "rgba(75, 192, 192, 0.2)", "rgba(54, 162, 235, 0.2)",
+          "rgba(153, 102, 255, 0.2)", "rgba(201, 203, 207, 0.2)"
+        ],
+        "borderColor": ["rgb(255, 99, 132)", "rgb(255, 159, 64)", "rgb(255, 205, 86)",
+          "rgb(75, 192, 192)", "rgb(54, 162, 235)", "rgb(153, 102, 255)", "rgb(201, 203, 207)"
+        ],
+        "borderWidth": 1
+      }]
+    },
+    "options": {
+        "maintainAspectRatio": false,
+      "scales": {
+        "xAxes": [{
+          "ticks": {
+            "beginAtZero": true
+          }
+        }]
+      }
+    }
+  });
+
+</script>
+
+
+{% endblock %}
