@@ -107,21 +107,19 @@
         }
     </script>
 
-    <script>
-        function manual(){
-        Swal.fire({
-            title: 'Manual',
-            html: `Una vez dentro de esta interfaz, se logra ver en mas detalle los datos de la boleta
-            seleccionada.
-            <br><br>
-            Tambien tenemos la posibilidad de descargar una copia de la Boleta en formato PDF.
-            <br><br> 
-            `,
-            showConfirmButton: true,
-            confirmButtonText: 'Continuar',
-        })
-        }
-    </script>
+<script>
+    function manual(){
+      Swal.fire({
+        title: 'Manual',
+        html: `Como se puede ver, aca vemos en detalle los datos de la boleta y tambien 
+        tenemos la posibilidad de decargar una copia en 3 distintos formatos: Excel - Word - PDF.
+        <br><br>   
+        `,
+        showConfirmButton: true,
+        confirmButtonText: 'Continuar',
+      })
+    }
+</script>
 
     
 {% endblock %}

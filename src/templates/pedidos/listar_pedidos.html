@@ -55,6 +55,23 @@
             </div>
 
     </div>
+
+    <script>
+        function manual(){
+          Swal.fire({
+            title: 'Manual',
+            html: `Al ingresar a este modulo, sera posible ver el listado de los pedidos solicitados a los 
+            proveedores. Veremos en que estado se encuentra y las acciones que podremos hacer en base al 
+            pedido, por ejemplo: Ver, Recepcionar un pedido o Rechazar el pedido.
+            <br><br>
+            Tambien cabe destacar que desde aca, sera posible generar un nuevo pedido.
+            
+            `,
+            showConfirmButton: true,
+            confirmButtonText: 'Continuar',
+          })
+        }
+    </script>
     {% endlocalize %}
     {% endblock %}
 

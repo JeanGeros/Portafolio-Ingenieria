@@ -89,5 +89,19 @@
             }
         }
     </script>
+
+    <script>
+        function manual(){
+        Swal.fire({
+            title: 'Manual',
+            html: `Como se puede ver, aca vemos en detalle los datos de la Guia de depacho y tambien 
+            tenemos la posibilidad de decargar una copia en 3 distintos formatos: Excel - Word - PDF.
+            <br><br>   
+            `,
+            showConfirmButton: true,
+            confirmButtonText: 'Continuar',
+        })
+        }
+    </script>
 {% endlocalize %}
 {% endblock %}
