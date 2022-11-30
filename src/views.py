@@ -5137,6 +5137,16 @@ def Procesar_compra(request):
 
 def dashboard(request):
 
+    if request.POST.get('VerPerfil') is not None:
+        request.session['_ver_perfil'] = request.POST
+        return redirect('ver_perfil')
+
+    if Usuario.objects.filter(nombreusuario=request.user).exists():
+        tipo_usuario = Usuario.objects.get(nombreusuario=request.user)
+        tipo_usuario = tipo_usuario.rolid.descripcion
+    else: 
+        tipo_usuario = None
+
     # 1 Boleta
     # 2 Factura
     ventas = Venta.objects.all()
@@ -5205,6 +5215,7 @@ def dashboard(request):
         'productosXcantidad': productos_vendidos,
         'totalVentas':ventas_total,
         'productoStock':productos_peligro_stock,
+        'tipo_usuario': tipo_usuario,
 
     }
 
