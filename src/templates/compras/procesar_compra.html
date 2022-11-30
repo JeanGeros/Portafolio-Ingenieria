@@ -182,5 +182,22 @@
 
         }
     </script>
+    <script>
+        function manual(){
+          Swal.fire({
+            title: 'Procesar Compra',
+            html: `Al llegar a esta vista, tienes la opcion de realizar la compra con Boleta o Factura.
+            Tambien deberas ingresar un correo valido para asi generar el pago correspondiente.
+            Para poder procesar la compra, tienes 2 opciones para realizar esto. 
+            Via Pay Pal o con Tarjetas de Debito o Credito.
+            <br><br>
+            Si necesitas volver y seguir comprando, tienes la opcion con el boton "Seguir Comprando"
+            <br><br>
+            `,
+            showConfirmButton: true,
+            confirmButtonText: 'Continuar',
+          })
+        }
+    </script>
 
 {% endblock %}
