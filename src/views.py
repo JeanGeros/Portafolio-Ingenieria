@@ -183,7 +183,7 @@ def Agregar_productos(request):
         tipoproductoid = request.POST.get('tipoproductoid')
         familiaproid = request.POST.get('familiaproid')
         estadoid = request.POST.get('estadoid')
-        bodega_id = request.POST.get('BodegaId')
+        bodega_id = request.POST.get('bodegaid')
 
         tipo_producto = Tipoproducto.objects.get(tipoproductoid=tipoproductoid)
         familia_producto = Familiaproducto.objects.get(familiaproid=familiaproid)
@@ -212,12 +212,11 @@ def Agregar_productos(request):
                 tipoproductoid=tipo_producto,
                 familiaproid=familia_producto,
                 estadoid=estado_producto,
-                BodegaId=bodega
+                bodegaid=bodega
             )
 
             ultimo_producto = Producto.objects.order_by('productoid').last()
             prov_producto = Productoproveedor.objects.create(
-                ProId=2,
                 productoid=ultimo_producto,
                 proveedorid=proveedor
             )
@@ -350,13 +349,13 @@ def Editar_producto(request):
         tipoproductoid = request.POST.get('tipoproductoid')
         familiaproid = request.POST.get('familiaproid')
         estadoid = request.POST.get('estadoid')
-        bodega_id = request.POST.get('BodegaId')
+        bodega_id = request.POST.get('bodegaid')
 
         proveedor = Proveedor.objects.get(proveedorid=proveedorid)
         tipo_producto = Tipoproducto.objects.get(tipoproductoid=tipoproductoid)
         familia_producto = Familiaproducto.objects.get(familiaproid=familiaproid)
         Estado_producto = Estado.objects.get(estadoid=estadoid)
-        bodega = Bodega.objects.get(BodegaId=bodega_id)
+        bodega = Bodega.objects.get(bodegaId=bodega_id)
 
         fecha = fechavencimiento.split("/")
         if len(fechavencimiento) == 10:
@@ -379,7 +378,7 @@ def Editar_producto(request):
             producto.familiaproid = familia_producto
             producto.estadoid = Estado_producto
             producto.codigo = codigo
-            producto.BodegaId = bodega
+            producto.bodegaid = bodega
 
             if imagen:
                 producto.imagen = imagen
@@ -5105,6 +5104,7 @@ def Procesar_compra(request):
 
         buff = BytesIO()  
 
+
         c = canvas.Canvas(buff, pagesize=letter)
 
         venta_adjunto = Venta.objects.get(nroventa = venta_id['nroventa'])
@@ -5134,3 +5134,78 @@ def Procesar_compra(request):
         
 
     return render(request, 'compras/procesar_compra.html', context)
+
+def dashboard(request):
+
+    # 1 Boleta
+    # 2 Factura
+    ventas = Venta.objects.all()
+    boletas = 0
+    facturas = 0
+    for venta in ventas:
+        if venta.tipodocumentoid.tipodocumentoid == 1:
+            boletas+=1
+        else:
+            facturas+=1
+    ventas_tipodocumento = [boletas, facturas]
+
+    ventas = Venta.objects.all()
+    despachos = Despacho.objects.all()
+
+    ventas_total = 0
+    despachos_total = 0
+    for venta in ventas:
+        ventas_total+=1
+
+    for despacho in despachos:
+        despachos_total+=1
+        
+    total_ventas_despachos = [ventas_total-despachos_total,despachos_total]
+    import json
+
+    detalle_ventas = Detalleventa.objects.all()
+    productos_vendidos = []
+    for detalle in detalle_ventas:
+        n_producto = str(detalle.productoid)
+        c_producto = int(detalle.cantidad)
+        if len(productos_vendidos) == 0:
+            productos_vendidos.append({"nombre": n_producto, "cantidad":c_producto})
+        else:
+            producto_found = next((product for product in productos_vendidos if product["nombre"] == n_producto), None)
+            if producto_found:
+                producto_found["cantidad"] = producto_found["cantidad"] +c_producto
+            else:
+                productos_vendidos.append({"nombre": n_producto, "cantidad":c_producto})
+
+    nombre_productos = []
+    cantidad_productos = []
+    for producto in productos_vendidos:
+        nombre_productos.append(producto["nombre"]) 
+        cantidad_productos.append(producto["cantidad"]) 
+    productos_vendidos = []
+    productos_vendidos.append(nombre_productos)
+    productos_vendidos.append(cantidad_productos)
+    productos_vendidos = json.dumps(productos_vendidos)
+
+    productos_stock = Producto.objects.all().order_by('stock')[:10]
+    productos_peligro_stock = [] 
+    nombre = []
+    stock = []
+    for pro_stock in productos_stock:
+        nombre.append(str(pro_stock.nombre))
+        stock.append(int(pro_stock.stock)-int(pro_stock.stockcritico))
+
+    productos_peligro_stock.append(nombre)
+    productos_peligro_stock.append(stock)
+    productos_peligro_stock = json.dumps(productos_peligro_stock)
+    
+    context = {
+        'ventasXDocumento': ventas_tipodocumento,
+        'ventasXDespacho': total_ventas_despachos,
+        'productosXcantidad': productos_vendidos,
+        'totalVentas':ventas_total,
+        'productoStock':productos_peligro_stock,
+
+    }
+
+    return render(request, 'dashboard.html', context)
