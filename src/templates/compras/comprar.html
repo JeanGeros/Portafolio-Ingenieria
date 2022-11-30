@@ -43,4 +43,20 @@
         }
     </script>
 
+<script>
+    function manual(){
+      Swal.fire({
+        title: 'Generar Compras',
+        html: `Esta Interfaz te permitira realizar las compras de manera Online.
+        <br><br>
+        Solo debes seleccionar los productos que necesitas. Unas vez seleccionados todos los
+        productos, debes ir al carrito de compas y seleccionar el boton "Procesar Compra"
+        <br><br>
+        `,
+        showConfirmButton: true,
+        confirmButtonText: 'Continuar',
+      })
+    }
+</script>
+
 {% endblock %}
