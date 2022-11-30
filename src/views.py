@@ -54,6 +54,8 @@ from reportlab.pdfbase.pdfmetrics import registerFont
 from reportlab.pdfbase.ttfonts import TTFont
 from  datetime import date
 from reportlab.lib.units import inch
+import reportlab
+reportlab.rl_config.TTFSearchPath.append(str(settings.BASE_DIR) + '/src/lib/reportlabs/fonts')
 
 from io import BytesIO
 import re
@@ -64,6 +66,8 @@ from docx.oxml.ns import nsdecls
 from docx.oxml import parse_xml
 
 from django.contrib import messages
+
+from src.static import images
 from src.forms import (
     FormClienteNormal1, FormClienteNormal2, FormClienteNormal3, addproductsForm, FormVendedorPersona,
     FormVendedorUsuario, FormVendedorEmpleado, FormEmpleadoPersona, FormEmpleadoUsuario, FormEmpleadoEmpleado,
@@ -90,7 +94,7 @@ def Seguimiento_paginas(modulo, usuario):
     )
 
 def Index(request):
-    
+    # Seguimiento_paginas("Inicio", request.user)
     if request.POST.get('VerPerfil') is not None:
         request.session['_ver_perfil'] = request.POST
         return redirect('ver_perfil')
@@ -108,7 +112,7 @@ def Index(request):
     return render(request, 'index.html', context)
 
 def Ingreso(request):
-
+    # Seguimiento_paginas("Ingreso de usuarios", request.user)
     if request.POST.get('VerPerfil') is not None:
         request.session['_ver_perfil'] = request.POST
         return redirect('ver_perfil')
@@ -179,7 +183,7 @@ def Agregar_productos(request):
         tipoproductoid = request.POST.get('tipoproductoid')
         familiaproid = request.POST.get('familiaproid')
         estadoid = request.POST.get('estadoid')
-        bodega_id = request.POST.get('BodegaId')
+        bodega_id = request.POST.get('bodegaid')
 
         tipo_producto = Tipoproducto.objects.get(tipoproductoid=tipoproductoid)
         familia_producto = Familiaproducto.objects.get(familiaproid=familiaproid)
@@ -208,12 +212,11 @@ def Agregar_productos(request):
                 tipoproductoid=tipo_producto,
                 familiaproid=familia_producto,
                 estadoid=estado_producto,
-                BodegaId=bodega
+                bodegaid=bodega
             )
 
             ultimo_producto = Producto.objects.order_by('productoid').last()
             prov_producto = Productoproveedor.objects.create(
-                ProId=2,
                 productoid=ultimo_producto,
                 proveedorid=proveedor
             )
@@ -346,13 +349,13 @@ def Editar_producto(request):
         tipoproductoid = request.POST.get('tipoproductoid')
         familiaproid = request.POST.get('familiaproid')
         estadoid = request.POST.get('estadoid')
-        bodega_id = request.POST.get('BodegaId')
+        bodega_id = request.POST.get('bodegaid')
 
         proveedor = Proveedor.objects.get(proveedorid=proveedorid)
         tipo_producto = Tipoproducto.objects.get(tipoproductoid=tipoproductoid)
         familia_producto = Familiaproducto.objects.get(familiaproid=familiaproid)
         Estado_producto = Estado.objects.get(estadoid=estadoid)
-        bodega = Bodega.objects.get(BodegaId=bodega_id)
+        bodega = Bodega.objects.get(bodegaId=bodega_id)
 
         fecha = fechavencimiento.split("/")
         if len(fechavencimiento) == 10:
@@ -375,7 +378,7 @@ def Editar_producto(request):
             producto.familiaproid = familia_producto
             producto.estadoid = Estado_producto
             producto.codigo = codigo
-            producto.BodegaId = bodega
+            producto.bodegaid = bodega
 
             if imagen:
                 producto.imagen = imagen
@@ -724,7 +727,7 @@ def Seleccion_registro(request):
 
 
 def Registro_clientes(request):
-    Seguimiento_paginas("Modulo Clientes - Registro Clientes", request.user)
+    # Seguimiento_paginas("Modulo Clientes - Registro Clientes", request.user)
 
     if request.POST.get('VerPerfil') is not None:
         request.session['_ver_perfil'] = request.POST
@@ -2282,7 +2285,7 @@ def Cambiar_estado_empleado(id_empleado):
 # *********************************Pedidos************************************************
 @csrf_exempt
 def Crear_pedido(request, id=None):
-    Seguimiento_paginas("Modulo Ordenes de Compra - Crear Pedido", request.user)
+    # Seguimiento_paginas("Modulo Ordenes de Compra - Crear Pedido", request.user)
 
     if request.POST.get('VerPerfil') is not None:
         request.session['_ver_perfil'] = request.POST
@@ -3050,7 +3053,7 @@ def creacion_doc(lista, nombre_archivo):
 
     return response
 
-registerFont(TTFont('Arial','ARIAL.ttf'))
+registerFont(TTFont('Arial','arial.ttf'))
 # tipo_tributario=0 BOLETA
 # tipo_tributario=1 FACTURA
 def generar_factura(c, venta, documento, detalle_venta, direccion_cliente, giro, tipo_tributario='1'):
@@ -3061,7 +3064,7 @@ def generar_factura(c, venta, documento, detalle_venta, direccion_cliente, giro,
     c.setStrokeColorRGB(0.1,0.8,0.1)
     c.setFillColorRGB(0,0,1) # font colour
 
-    c.drawImage('src\static\images\Ferme-logo.jpg',0*inch,8.7*inch, width=70, height=70)
+    # c.drawImage('src\static\images\Ferme-logo.jpg',0*inch,8.7*inch, width=70, height=70)
 
     c.setFillColorRGB(255,0,0) # font colour
     c.setFont("Arial", 18)
@@ -4931,7 +4934,7 @@ def informe_visitas(request):
 
 def Comprar(request):
 
-    Seguimiento_paginas("Compras - Cliente", request.user)
+    # Seguimiento_paginas("Compras - Cliente", request.user)
 
     if request.POST.get('VerPerfil') is not None:
         request.session['_ver_perfil'] = request.POST
@@ -4954,7 +4957,7 @@ def Comprar(request):
 
 def Procesar_compra(request):
 
-    Seguimiento_paginas("Procesar compra - Cliente", request.user)
+    # Seguimiento_paginas("Procesar compra - Cliente", request.user)
 
     if request.POST.get('VerPerfil') is not None:
         request.session['_ver_perfil'] = request.POST
@@ -5101,6 +5104,7 @@ def Procesar_compra(request):
 
         buff = BytesIO()  
 
+
         c = canvas.Canvas(buff, pagesize=letter)
 
         venta_adjunto = Venta.objects.get(nroventa = venta_id['nroventa'])
@@ -5130,3 +5134,89 @@ def Procesar_compra(request):
         
 
     return render(request, 'compras/procesar_compra.html', context)
+
+def dashboard(request):
+
+    if request.POST.get('VerPerfil') is not None:
+        request.session['_ver_perfil'] = request.POST
+        return redirect('ver_perfil')
+
+    if Usuario.objects.filter(nombreusuario=request.user).exists():
+        tipo_usuario = Usuario.objects.get(nombreusuario=request.user)
+        tipo_usuario = tipo_usuario.rolid.descripcion
+    else: 
+        tipo_usuario = None
+
+    # 1 Boleta
+    # 2 Factura
+    ventas = Venta.objects.all()
+    boletas = 0
+    facturas = 0
+    for venta in ventas:
+        if venta.tipodocumentoid.tipodocumentoid == 1:
+            boletas+=1
+        else:
+            facturas+=1
+    ventas_tipodocumento = [boletas, facturas]
+
+    ventas = Venta.objects.all()
+    despachos = Despacho.objects.all()
+
+    ventas_total = 0
+    despachos_total = 0
+    for venta in ventas:
+        ventas_total+=1
+
+    for despacho in despachos:
+        despachos_total+=1
+        
+    total_ventas_despachos = [ventas_total-despachos_total,despachos_total]
+    import json
+
+    detalle_ventas = Detalleventa.objects.all()
+    productos_vendidos = []
+    for detalle in detalle_ventas:
+        n_producto = str(detalle.productoid)
+        c_producto = int(detalle.cantidad)
+        if len(productos_vendidos) == 0:
+            productos_vendidos.append({"nombre": n_producto, "cantidad":c_producto})
+        else:
+            producto_found = next((product for product in productos_vendidos if product["nombre"] == n_producto), None)
+            if producto_found:
+                producto_found["cantidad"] = producto_found["cantidad"] +c_producto
+            else:
+                productos_vendidos.append({"nombre": n_producto, "cantidad":c_producto})
+
+    nombre_productos = []
+    cantidad_productos = []
+    for producto in productos_vendidos:
+        nombre_productos.append(producto["nombre"]) 
+        cantidad_productos.append(producto["cantidad"]) 
+    productos_vendidos = []
+    productos_vendidos.append(nombre_productos)
+    productos_vendidos.append(cantidad_productos)
+    productos_vendidos = json.dumps(productos_vendidos)
+
+    productos_stock = Producto.objects.all().order_by('stock')[:10]
+    productos_peligro_stock = [] 
+    nombre = []
+    stock = []
+    for pro_stock in productos_stock:
+        nombre.append(str(pro_stock.nombre))
+        stock.append(int(pro_stock.stock)-int(pro_stock.stockcritico))
+
+    productos_peligro_stock.append(nombre)
+    productos_peligro_stock.append(stock)
+    productos_peligro_stock = json.dumps(productos_peligro_stock)
+    
+    context = {
+        'ventasXDocumento': ventas_tipodocumento,
+        'ventasXDespacho': total_ventas_despachos,
+        'productosXcantidad': productos_vendidos,
+        'totalVentas':ventas_total,
+        'productoStock':productos_peligro_stock,
+        'tipo_usuario': tipo_usuario,
+
+    }
+
+    return render(request, 'dashboard.html', context)
