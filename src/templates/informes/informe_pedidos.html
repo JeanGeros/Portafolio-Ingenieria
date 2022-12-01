@@ -196,4 +196,21 @@
 </script>
 
 <script src="{% static 'js/informes.js' %}"></script>
+
+<script>
+    function manual(){
+      Swal.fire({
+        title: 'Informe de Pedidos',
+        html: `Aca podremos generar el Informe de Pedido. Tenemos varias opciones para generar 
+        este tipo de Informes. Debes ir chequeando las opciones que necesitas y despues de esto tienes
+        3 diferentes opciones de formato para descargarlo.
+        <br><br>
+        Tambien podras visualizar una vista previa del Informe, antes de decargarlo.
+        <br><br>
+        `,
+        showConfirmButton: true,
+        confirmButtonText: 'Continuar',
+      })
+    }
+</script>
 {% endblock %}

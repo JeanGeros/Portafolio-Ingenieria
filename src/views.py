@@ -11,6 +11,7 @@ import cx_Oracle
 
 from datetime import datetime
 import string
+import json
 
 import pandas as pd
 
@@ -3291,8 +3292,7 @@ def crear_venta(request):
     if request.method == 'POST':
         productos_venta = []
         for key, value in request.POST.items():
-
-            if key == "total" and value == "":
+            if key == "valor_total" and value == "":
                 sweetify.warning(request, "Porfavor ingrese productos")
             elif value == "":
                 sweetify.warning(request, "Ingrese todo los datos")
@@ -3318,12 +3318,11 @@ def crear_venta(request):
                 except Exception as error:
                     if "cantidad" in key:
                         cantidad = value
-                    elif key != "total" and "total" in key:
+                    elif key != "valor_total" and "total" in key:
                         total = value.replace("$", "")
                         productos_venta.append([producto, cantidad, total])
-                    elif key == "total":
+                    elif key == "valor_total":
                         total_venta = value
-                    
         if len(productos_venta) >0: 
             Venta.objects.create(
                 fechaventa=datetime.now().date(),
@@ -3335,6 +3334,7 @@ def crear_venta(request):
 
             ultima_ventas = Venta.objects.order_by('nroventa').last()
             for producto in productos_venta:
+
                 Detalleventa.objects.create(
                     cantidad = producto[1],
                     subtotal = int(producto[2]) * int(producto[1]),
@@ -3375,14 +3375,13 @@ def crear_venta(request):
 
                     ultimo_despacho = Despacho.objects.order_by('despachoid').last()
                     direccion_cliente = Direccioncliente.objects.get(clienteid=cliente_venta)
-                    
                     Guiadespacho.objects.create(
                         fechaguia = datetime.now().date(),
                         despachoid = ultimo_despacho,
                         iddircliente = direccion_cliente
                     )
                 else: 
-                     Despacho.objects.create(
+                    Despacho.objects.create(
                         fechasolicitud = datetime.now().date(),
                         fechadespacho =  datetime.now().date(),
                         nroventa = ultima_ventas,
@@ -3418,21 +3417,20 @@ def crear_venta(request):
 
                     ultimo_despacho = Despacho.objects.order_by('despachoid').last()
                     direccion_cliente = Direccioncliente.objects.get(clienteid=cliente_venta)
-                    
                     Guiadespacho.objects.create(
                         fechaguia = datetime.now().date(),
                         despachoid = ultimo_despacho,
                         iddircliente = direccion_cliente
                     )  
 
+
                 else: 
-                     Despacho.objects.create(
+                    Despacho.objects.create(
                         fechasolicitud = datetime.now().date(),
                         fechadespacho =  datetime.now().date(),
                         nroventa = ultima_ventas,
                         estadoid = Estado.objects.get(descripcion="Activo"),
                         tipodespacho = "Retiro")
-           
                 Boleta.objects.create(
                     fechaboleta = datetime.now().date(),
                     totalboleta = total_venta,
@@ -5080,7 +5078,10 @@ def Procesar_compra(request):
                 productoid = Producto.objects.get(productoid = int(detalle[0 + cont_valores][f'producto_id{x}'])),
                 nroventa = Venta.objects.get(nroventa = venta_id['nroventa'])
             )
-
+            producto_modificar = Producto.objects.get(productoid = int(detalle[0 + cont_valores][f'producto_id{x}']))
+            producto_vendido, created =  Producto.objects.get_or_create(productoid = producto_modificar.productoid)
+            producto_vendido.stock = producto_vendido.stock-int(detalle[3 + cont_valores][f'producto_cantidad{x}'])
+            producto_vendido.save()
             cont += 1
 
         doc_adjunto = ''
@@ -5162,7 +5163,6 @@ def Procesar_compra(request):
     return render(request, 'compras/procesar_compra.html', context)
 
 def dashboard(request):
-
     if request.POST.get('VerPerfil') is not None:
         request.session['_ver_perfil'] = request.POST
         return redirect('ver_perfil')
@@ -5176,48 +5176,35 @@ def dashboard(request):
     # 1 Boleta
     # 2 Factura
     ventas = Venta.objects.all()
-    boletas = 0
-    facturas = 0
-    for venta in ventas:
-        if venta.tipodocumentoid.tipodocumentoid == 1:
-            boletas+=1
-        else:
-            facturas+=1
-    ventas_tipodocumento = [boletas, facturas]
 
-    ventas = Venta.objects.all()
+    boletas = Venta.objects.filter(tipodocumentoid__tipodocumentoid = 1)
+    facturas = Venta.objects.filter(tipodocumentoid__tipodocumentoid = 2)
+    ventas_tipodocumento = [len(boletas), len(facturas)]
+
     despachos = Despacho.objects.all()
-
-    ventas_total = 0
-    despachos_total = 0
-    for venta in ventas:
-        ventas_total+=1
-
-    for despacho in despachos:
-        despachos_total+=1
-        
-    total_ventas_despachos = [ventas_total-despachos_total,despachos_total]
-    import json
+    
+    total_ventas_despachos = [len(ventas)-len(despachos), len(despachos)]
 
     detalle_ventas = Detalleventa.objects.all()
     productos_vendidos = []
+
     for detalle in detalle_ventas:
-        n_producto = str(detalle.productoid)
-        c_producto = int(detalle.cantidad)
         if len(productos_vendidos) == 0:
-            productos_vendidos.append({"nombre": n_producto, "cantidad":c_producto})
+            productos_vendidos.append({"nombre": str(detalle.productoid), "cantidad":int(detalle.cantidad)})
         else:
-            producto_found = next((product for product in productos_vendidos if product["nombre"] == n_producto), None)
+            producto_found = next((product for product in productos_vendidos if product["nombre"] == str(detalle.productoid)), None)
             if producto_found:
-                producto_found["cantidad"] = producto_found["cantidad"] +c_producto
+                producto_found["cantidad"] = producto_found["cantidad"] +int(detalle.cantidad)
             else:
-                productos_vendidos.append({"nombre": n_producto, "cantidad":c_producto})
+                productos_vendidos.append({"nombre": str(detalle.productoid), "cantidad":int(detalle.cantidad)})
 
     nombre_productos = []
     cantidad_productos = []
+
     for producto in productos_vendidos:
         nombre_productos.append(producto["nombre"]) 
         cantidad_productos.append(producto["cantidad"]) 
+
     productos_vendidos = []
     productos_vendidos.append(nombre_productos)
     productos_vendidos.append(cantidad_productos)
@@ -5227,6 +5214,7 @@ def dashboard(request):
     productos_peligro_stock = [] 
     nombre = []
     stock = []
+
     for pro_stock in productos_stock:
         nombre.append(str(pro_stock.nombre))
         stock.append(int(pro_stock.stock)-int(pro_stock.stockcritico))
@@ -5239,7 +5227,7 @@ def dashboard(request):
         'ventasXDocumento': ventas_tipodocumento,
         'ventasXDespacho': total_ventas_despachos,
         'productosXcantidad': productos_vendidos,
-        'totalVentas':ventas_total,
+        'totalVentas':len(ventas),
         'productoStock':productos_peligro_stock,
         'tipo_usuario': tipo_usuario,
 

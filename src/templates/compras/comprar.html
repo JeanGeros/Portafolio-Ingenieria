@@ -22,7 +22,7 @@
                     </div>
                     
                     <div class="text-center pb-3">
-                        <a href="" type="button" class="btn btn-outline-danger agregar-carrito" data-id="{{producto.productoid}}">Agregar al Carrito</a>
+                        <a href="" type="button" class="btn btn-outline-danger agregar-carrito" onclick="alertar('Producto Agregado Correctamente');" data-id="{{producto.productoid}}">Agregar al Carrito</a>
                     </div>
                 </div>
                 </div>
@@ -36,5 +36,27 @@
     </div>
     <script src="{% static 'js/buscador_tabla.js' %}"></script>
     <script src="{% static 'js/compra.js' %}"></script>
+    <script type="text/javascript">
+        
+        function alertar(texto) {
+            alert(texto);
+        }
+    </script>
+
+<script>
+    function manual(){
+      Swal.fire({
+        title: 'Generar Compras',
+        html: `Esta Interfaz te permitira realizar las compras de manera Online.
+        <br><br>
+        Solo debes seleccionar los productos que necesitas. Unas vez seleccionados todos los
+        productos, debes ir al carrito de compas y seleccionar el boton "Procesar Compra"
+        <br><br>
+        `,
+        showConfirmButton: true,
+        confirmButtonText: 'Continuar',
+      })
+    }
+</script>
 
 {% endblock %}

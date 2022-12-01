@@ -62,7 +62,7 @@
                         <div id="plazos" class="row" style="padding-left: 30px;">
                         </div>
                         <br>  
-                        <label for="state_id" class="control-label">Valor Total:$</label>
+                        <label for="state_id" class="control-label">Total:$</label>
                         <label for="state_id" name="total_precios" class="control-label" id="total_precios"></label>
                     </div>
                 </form>
@@ -125,12 +125,12 @@
         elemento2 = document.createElement('input');
         elemento2.setAttribute("class", "form-control col-sm-3 mb-2 bg-dark" );
         elemento2.setAttribute("style", "width:200px" );
-        elemento2.setAttribute("name", `total` );
-        elemento2.id = 'total';
+        elemento2.setAttribute("name", `valor_total` );
+        elemento2.id = 'valor_total';
         elemento2.setAttribute("readonly", "" );
         bloque.appendChild(elemento2);
         document.getElementById(elemento2.id).value = total;
-
+        print(total)
         Swal.fire({
             icon: 'info',
             title: 'Creando Venta...',
@@ -139,7 +139,6 @@
         })
         setTimeout(function(){
             document.formulario.submit();
-            document.formulario2.submit();
         }, 3000);
     }
 </script>
@@ -156,7 +155,6 @@
         let cont2 = 0;
         let multi = 0;
         precios.forEach( function(valor) {
-            console.log(valor.value)
             cont1++;
             valores = parseInt(valor.value.replace("$", ""));
             
@@ -171,9 +169,7 @@
             suma += multi;
         });
 
-
         document.getElementById("total_precios").innerHTML = suma;
-        console.log(suma)
     }
     
     valor = "";
@@ -185,11 +181,6 @@
         let cantidad = document.getElementById(cantidadProd).value;
         let idcoincidencia = document.getElementById(producto_id).textContent;
         
-        console.log(`coincidencia: ${coincidencia}`)
-        console.log(`precio: ${precio}`)
-        console.log(`cantidad: ${cantidad}`)
-        console.log(`idcoincidencia: ${idcoincidencia}`)
-
         incremento++;
         //Obteniendo el Div "plazos"
         bloque = document.getElementById('plazos');
