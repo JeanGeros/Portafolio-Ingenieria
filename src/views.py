@@ -3292,8 +3292,7 @@ def crear_venta(request):
     if request.method == 'POST':
         productos_venta = []
         for key, value in request.POST.items():
-
-            if key == "total" and value == "":
+            if key == "valor_total" and value == "":
                 sweetify.warning(request, "Porfavor ingrese productos")
             elif value == "":
                 sweetify.warning(request, "Ingrese todo los datos")
@@ -3319,12 +3318,11 @@ def crear_venta(request):
                 except Exception as error:
                     if "cantidad" in key:
                         cantidad = value
-                    elif key != "total" and "total" in key:
+                    elif key != "valor_total" and "total" in key:
                         total = value.replace("$", "")
                         productos_venta.append([producto, cantidad, total])
-                    elif key == "total":
+                    elif key == "valor_total":
                         total_venta = value
-                    
         if len(productos_venta) >0: 
             Venta.objects.create(
                 fechaventa=datetime.now().date(),
@@ -3336,6 +3334,7 @@ def crear_venta(request):
 
             ultima_ventas = Venta.objects.order_by('nroventa').last()
             for producto in productos_venta:
+
                 Detalleventa.objects.create(
                     cantidad = producto[1],
                     subtotal = int(producto[2]) * int(producto[1]),
@@ -3376,14 +3375,13 @@ def crear_venta(request):
 
                     ultimo_despacho = Despacho.objects.order_by('despachoid').last()
                     direccion_cliente = Direccioncliente.objects.get(clienteid=cliente_venta)
-                    
                     Guiadespacho.objects.create(
                         fechaguia = datetime.now().date(),
                         despachoid = ultimo_despacho,
                         iddircliente = direccion_cliente
                     )
                 else: 
-                     Despacho.objects.create(
+                    Despacho.objects.create(
                         fechasolicitud = datetime.now().date(),
                         fechadespacho =  datetime.now().date(),
                         nroventa = ultima_ventas,
@@ -3419,21 +3417,20 @@ def crear_venta(request):
 
                     ultimo_despacho = Despacho.objects.order_by('despachoid').last()
                     direccion_cliente = Direccioncliente.objects.get(clienteid=cliente_venta)
-                    
                     Guiadespacho.objects.create(
                         fechaguia = datetime.now().date(),
                         despachoid = ultimo_despacho,
                         iddircliente = direccion_cliente
                     )  
 
+
                 else: 
-                     Despacho.objects.create(
+                    Despacho.objects.create(
                         fechasolicitud = datetime.now().date(),
                         fechadespacho =  datetime.now().date(),
                         nroventa = ultima_ventas,
                         estadoid = Estado.objects.get(descripcion="Activo"),
                         tipodespacho = "Retiro")
-           
                 Boleta.objects.create(
                     fechaboleta = datetime.now().date(),
                     totalboleta = total_venta,
